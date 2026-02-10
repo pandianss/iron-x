@@ -1,1 +1,70 @@
 @import "tailwindcss";
+
+:root {
+    --color-neutral-base: #121212;
+    --color-neutral-muted: #1e1e1e;
+    --color-neutral-border: #333333;
+    --color-neutral-text: #a0a0a0;
+    --color-neutral-accent: #e0e0e0;
+
+    --color-amber-alert: #ffbf00;
+    --color-red-breach: #ff4500;
+
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+body {
+    background-color: var(--color-neutral-base);
+    color: var(--color-neutral-text);
+    font-family: var(--font-mono);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* Fix layout as per specs */
+}
+
+/* Technical aesthetics */
+.panel-border {
+    border: 1px solid var(--color-neutral-border);
+}
+
+.mono-display {
+    font-family: var(--font-mono);
+    letter-spacing: -0.05em;
+}
+
+.signal-amber {
+    color: var(--color-amber-alert);
+}
+
+.signal-red {
+    color: var(--color-red-breach);
+}
+
+.bg-breach {
+    background-color: var(--color-red-breach);
+}
+
+.bg-alert {
+    background-color: var(--color-amber-alert);
+}
+
+/* Decay animation (simulated) */
+@keyframes score-decay {
+    from {
+        opacity: 0.9;
+    }
+
+    to {
+        opacity: 0.6;
+    }
+}
+
+.animate-decay {
+    animation: score-decay 5s infinite alternate ease-in-out;
+}
+
+/* Sharp transitions for breaches */
+.transition-breach {
+    transition: all 0.1s cubic-bezier(1, 0, 0, 1);
+}

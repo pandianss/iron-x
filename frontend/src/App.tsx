@@ -6,6 +6,8 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import GoalsPage from './pages/GoalsPage';
 import ActionsPage from './pages/ActionsPage';
+import CockpitPage from './pages/CockpitPage';
+
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -43,6 +45,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/cockpit"
+            element={
+              <ProtectedRoute>
+                <CockpitPage />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </Router>
     </AuthProvider>

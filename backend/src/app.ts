@@ -12,6 +12,8 @@ import actionRoutes from './routes/actionRoutes';
 import outcomeRoutes from './routes/outcomeRoutes';
 import policyRoutes from './routes/policyRoutes';
 import experienceRoutes from './routes/experienceRoutes';
+import disciplineRoutes from './routes/disciplineRoutes';
+
 import { apiLimiter, authLimiter } from './middleware/rateLimitMiddleware';
 import { policyEnforcementMiddleware } from './middleware/policyEnforcementMiddleware';
 
@@ -43,6 +45,8 @@ app.use('/actions', policyEnforcementMiddleware, actionRoutes);
 app.use('/outcomes', outcomeRoutes);
 app.use('/policies', policyRoutes);
 app.use('/experience', experienceRoutes);
+app.use('/discipline', disciplineRoutes);
+
 
 app.get('/', (req, res) => {
     res.send('Discipline Enforcement API');

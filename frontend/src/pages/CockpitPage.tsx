@@ -44,13 +44,13 @@ const CockpitPage: React.FC = () => {
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 30000); // Poll every 30s
+        const interval = setInterval(fetchData, 10000); // Poll every 10s for high awareness
         return () => clearInterval(interval);
     }, [token]);
 
     if (loading || !state) {
         return (
-            <div className="h-screen w-screen bg-neutral-base flex items-center justify-center mono-display text-sm opacity-50">
+            <div className="h-screen w-screen bg-neutral-base flex items-center justify-center mono-display text-sm opacity-50 crt-flicker">
                 INITIALIZING ENFORCEMENT INTERFACE...
             </div>
         );
@@ -59,18 +59,24 @@ const CockpitPage: React.FC = () => {
     const isBreach = state.status === 'BREACH';
 
     return (
-        <div className={`h-screen w-screen flex flex-col bg-neutral-base overflow-hidden p-4 gap-4 transition-breach ${isBreach ? 'grayscale brightness-75' : ''}`}>
-            {/* 1. Discipline Status Bar (persistent) */}
-            <DisciplineStatusBar
-                score={state.score}
-                status={state.status}
-                lastViolation={state.timeSinceLastViolation}
-                nextCheck={state.countdownToNextCheck}
-            />
+        <div className={`h-screen w-screen flex flex-col bg-neutral-base overflow-hidden p-4 gap-4 transition-breach relative ${isBreach ? 'grayscale brightness-75' : ''}`}>
+            {/* Visual Enforcement Layers */}
+            <div className="scanline-overlay" />
+            {isBreach && <div className="fixed inset-0 z-[10000] breach-disruption pointer-events-none opacity-40 animate-pulse" />}
 
-            <div className="flex-1 flex gap-4 min-h-0">
+            {/* 1. Discipline Status Bar (persistent) */}
+            <div className="z-10">
+                <DisciplineStatusBar
+                    score={state.score}
+                    status={state.status}
+                    lastViolation={state.timeSinceLastViolation}
+                    nextCheck={state.countdownToNextCheck}
+                />
+            </div>
+
+            <div className="flex-1 flex gap-4 min-h-0 z-10">
                 {/* Left Side: Pressure & Drift (Primary focus) */}
-                <div className="flex-1 flex flex-col gap-4">
+                <div className={`flex-1 flex flex-col gap-4 ${isBreach ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
                     <PressureDriftPanel
                         compositePressure={pressure.compositePressure}
                         driftVectors={pressure.driftVectors}
@@ -86,15 +92,19 @@ const CockpitPage: React.FC = () => {
                 </div>
 
                 {/* Right Side: Violation Horizon (Forward-looking) */}
-                <ViolationHorizon predictions={predictions} />
+                <div className={`flex-[0.6] min-h-0 flex flex-col ${isBreach ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
+                    <ViolationHorizon predictions={predictions} />
+                </div>
             </div>
 
             {/* 5. Audit & Consequence Log (compressed) */}
-            <AuditLogPanel logs={history} />
+            <div className="z-10">
+                <AuditLogPanel logs={history} />
+            </div>
 
             {isBreach && (
-                <div className="fixed inset-0 pointer-events-none border-[12px] border-red-600/20 z-50 animate-pulse">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-600 text-9xl font-black opacity-10 rotate-12 select-none">
+                <div className="fixed inset-0 pointer-events-none border-[24px] border-red-900/10 z-[10001] flex items-center justify-center">
+                    <div className="text-red-600 text-[15vw] font-black opacity-10 -rotate-12 select-none tracking-tighter">
                         BREACH
                     </div>
                 </div>

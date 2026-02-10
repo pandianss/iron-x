@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-    --color-neutral-base: #121212;
-    --color-neutral-muted: #1e1e1e;
-    --color-neutral-border: #333333;
-    --color-neutral-text: #a0a0a0;
-    --color-neutral-accent: #e0e0e0;
+    --color-neutral-base: #0a0a0a;
+    --color-neutral-muted: #141414;
+    --color-neutral-border: #2a2a2a;
+    --color-neutral-text: #8a8a8a;
+    --color-neutral-accent: #d1d1d1;
 
     --color-amber-alert: #ffbf00;
-    --color-red-breach: #ff4500;
+    --color-red-breach: #ff3300;
 
     --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 }
@@ -20,7 +20,8 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    /* Fix layout as per specs */
+    -webkit-font-smoothing: none;
+    /* Crisper technical look */
 }
 
 /* Technical aesthetics */
@@ -49,22 +50,81 @@ body {
     background-color: var(--color-amber-alert);
 }
 
-/* Decay animation (simulated) */
-@keyframes score-decay {
-    from {
-        opacity: 0.9;
+/* CRT / Control Room Effects */
+.scanline-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
+            rgba(255, 0, 0, 0.02),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.02));
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 0.99;
     }
 
-    to {
-        opacity: 0.6;
+    5% {
+        opacity: 0.95;
+    }
+
+    10% {
+        opacity: 0.99;
+    }
+
+    15% {
+        opacity: 0.97;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
 
-.animate-decay {
-    animation: score-decay 5s infinite alternate ease-in-out;
+.crt-flicker {
+    animation: flicker 0.15s infinite;
+}
+
+/* Score decay animation (visceral pressure) */
+@keyframes score-tick {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-score-tick {
+    animation: score-tick 2s infinite ease-in-out;
 }
 
 /* Sharp transitions for breaches */
 .transition-breach {
-    transition: all 0.1s cubic-bezier(1, 0, 0, 1);
+    transition: all 0.01s steps(2);
+}
+
+/* Breach disruption overlay */
+.breach-disruption {
+    background: repeating-linear-gradient(45deg,
+            rgba(255, 51, 0, 0.1),
+            rgba(255, 51, 0, 0.1) 10px,
+            rgba(0, 0, 0, 0.2) 10px,
+            rgba(0, 0, 0, 0.2) 20px);
 }

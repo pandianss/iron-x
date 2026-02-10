@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "scope": "USER",
+    "targetId": "39c0c876-fcfb-43d2-ac7e-b3459803ba74",
+    "generatedAt": "2026-02-10T00:16:08.522Z"
+  },
+  "enforcement_history": [],
+  "discipline_records": [
+    {
+      "score_id": "861dc682-99a8-486d-aa1a-ae127cd4c9dc",
+      "user_id": "39c0c876-fcfb-43d2-ac7e-b3459803ba74",
+      "date": "2026-02-08T18:30:00.000Z",
+      "score": 0,
+      "execution_rate": "0",
+      "on_time_rate": "0",
+      "calculated_at": "2026-02-09T18:29:00.041Z"
+    }
+  ]
+}

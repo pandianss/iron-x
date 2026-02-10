@@ -1,0 +1,41 @@
+{
+    "version": "1.0",
+    "entity_id": "did:ods:user:example-001",
+    "exported_at": "2024-06-15T12:00:00Z",
+    "current_discipline_score": 0.85,
+    "policy_snapshot": {
+        "strictness": "HARD",
+        "window_size": 14
+    },
+    "intents": [
+        {
+            "id": "int-001",
+            "description": "Morning Review",
+            "due_at": "2024-06-14T09:00:00Z",
+            "weight": 1.0,
+            "status": "COMPLETED"
+        },
+        {
+            "id": "int-002",
+            "description": "Weekly Sync",
+            "due_at": "2024-06-14T14:00:00Z",
+            "weight": 2.0,
+            "status": "FAILED"
+        },
+        {
+            "id": "int-003",
+            "description": "Deep Work Block",
+            "due_at": "2024-06-15T10:00:00Z",
+            "weight": 1.5,
+            "status": "PENDING"
+        }
+    ],
+    "actions": [
+        {
+            "id": "act-001",
+            "intent_id": "int-001",
+            "executed_at": "2024-06-14T08:55:00Z",
+            "proof_hash": "sha256:e3b0c4..."
+        }
+    ]
+}

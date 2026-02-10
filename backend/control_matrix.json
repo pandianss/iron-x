@@ -1,0 +1,34 @@
+[
+  {
+    "control_id": "0b0000ea-4c8f-4e7d-a305-84cd66b85df0",
+    "framework": "ISO 27001",
+    "control_code": "A.9.2.1",
+    "description": "User registration and de-registration",
+    "mappings": []
+  },
+  {
+    "control_id": "6d20707a-8e59-4021-a4ca-aceb87afb5fd",
+    "framework": "ISO 27001",
+    "control_code": "A.9.4.1",
+    "description": "Information access restriction",
+    "mappings": []
+  },
+  {
+    "control_id": "6b4c080c-fd42-4501-802a-ed6329cd42f8",
+    "framework": "ISO 27001",
+    "control_code": "A.12.4.1",
+    "description": "Event logging",
+    "mappings": [
+      {
+        "mapping_id": "a7b32532-a675-44ad-a817-9faa1180ef5e",
+        "control_id": "6b4c080c-fd42-4501-802a-ed6329cd42f8",
+        "policy_id": null,
+        "system_config_key": null,
+        "enforcement_mechanism": "IMMUTABLE_LOG",
+        "evidence_source": "LOG:audit_logs",
+        "policy": null,
+        "system_config": null
+      }
+    ]
+  }
+]

@@ -1,0 +1,90 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ODS Interchange Format",
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "string",
+            "const": "1.0"
+        },
+        "exported_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "entity_id": {
+            "type": "string"
+        },
+        "current_discipline_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+        },
+        "intents": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "due_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "PENDING",
+                            "COMPLETED",
+                            "FAILED"
+                        ]
+                    },
+                    "weight": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "id",
+                    "description",
+                    "due_at",
+                    "status"
+                ]
+            }
+        },
+        "actions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "intent_id": {
+                        "type": "string"
+                    },
+                    "executed_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "evidence_link": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "intent_id",
+                    "executed_at"
+                ]
+            }
+        }
+    },
+    "required": [
+        "version",
+        "entity_id",
+        "intents",
+        "actions"
+    ]
+}

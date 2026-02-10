@@ -1,0 +1,4 @@
+Framework,ControlCode,Description,Mechanism,EvidenceSource,MappedPolicy/Config
+"ISO 27001","A.9.2.1","User registration and de-registration","UNMAPPED","",""
+"ISO 27001","A.9.4.1","Information access restriction","UNMAPPED","",""
+"ISO 27001","A.12.4.1","Event logging","IMMUTABLE_LOG","LOG:audit_logs","N/A"

@@ -48,7 +48,7 @@ export const EvidenceService = {
     },
 
     async gatherData(scope: 'USER' | 'SYSTEM', targetId: string, start?: Date, end?: Date) {
-        const dateFilter = {};
+        const dateFilter: any = {};
         if (start) dateFilter['gte'] = start;
         if (end) dateFilter['lte'] = end;
 

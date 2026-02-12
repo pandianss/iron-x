@@ -6,7 +6,7 @@ import { AuditService } from '../services/audit.service';
 export const getFrameworkStatus = async (req: Request, res: Response) => {
     try {
         const { framework } = req.params;
-        const status = await ComplianceService.getGapAnalysis(framework);
+        const status = await ComplianceService.getGapAnalysis(framework as string);
         res.json(status);
 
         // Log auditor access if applicable (checking role done in middleware)
@@ -26,7 +26,7 @@ export const getFrameworkStatus = async (req: Request, res: Response) => {
 export const getAllControls = async (req: Request, res: Response) => {
     try {
         const { framework } = req.params;
-        const controls = await ComplianceService.getControlsByFramework(framework);
+        const controls = await ComplianceService.getControlsByFramework(framework as string);
         res.json(controls);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch controls' });

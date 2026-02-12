@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: iron_postgres
+    environment:
+      POSTGRES_USER: iron_user
+      POSTGRES_PASSWORD: iron_password
+      POSTGRES_DB: iron_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: iron_backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://iron_user:iron_password@postgres:5432/iron_db?schema=public
+      PORT: 3000
+      JWT_SECRET: super_secret_jwt_key_change_me
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./frontend
+    container_name: iron_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://backend:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

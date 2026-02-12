@@ -1,6 +1,6 @@
 
 import * as crypto from 'crypto';
-import fetch from 'node-fetch'; // Assuming node-fetch is available or using built-in fetch in newer Node
+// import fetch from 'node-fetch'; // Built-in in Node 18+
 
 export interface WebhookPayload {
     event: string; // 'score.changed', 'policy.violation'

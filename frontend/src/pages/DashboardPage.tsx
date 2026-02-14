@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import DisciplineDashboard from '../components/DisciplineDashboard';
@@ -29,9 +29,12 @@ const DashboardPage: React.FC = () => {
 
     const fetchSchedule = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/schedule/today', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // Client already has interceptor for token if set up correctly, 
+            // but if AuthContext doesn't set it in client, we might need headers.
+            // Assuming client.ts handles it or we pass it (AuthContext usually sets axios default headers)
+            // Let's check client.ts. It has an interceptor? 
+            // For safety, passing header here too if client doesn't auto-attach from context.
+            const response = await client.get('/schedule/today');
             setInstances(response.data);
         } catch (error) {
             console.error('Error fetching schedule', error);
@@ -48,11 +51,9 @@ const DashboardPage: React.FC = () => {
 
     const handleLogExecution = async (instanceId: string) => {
         try {
-            await axios.post(`http://localhost:3000/schedule/instances/${instanceId}/log`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setLastExecutionStatus('COMPLETED'); // Assumption: If logged now, it's completed (or late, determined by backend time, but for UI feedback let's assume successful log)
-            fetchSchedule(); // Refresh list
+            await client.post(`/schedule/instances/${instanceId}/log`);
+            setLastExecutionStatus('COMPLETED');
+            fetchSchedule();
         } catch (error) {
             console.error('Error logging execution', error);
         }

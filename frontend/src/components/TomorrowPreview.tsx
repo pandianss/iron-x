@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import client from '../api/client';
 import { Calendar, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
 interface PreviewData {
@@ -14,13 +15,9 @@ const TomorrowPreview: React.FC = () => {
     useEffect(() => {
         const fetchPreview = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3000/experience/preview', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    setData(result);
+                const response = await client.get('/experience/preview');
+                if (response.status === 200) {
+                    setData(response.data);
                 }
             } catch (err) {
                 console.error(err);

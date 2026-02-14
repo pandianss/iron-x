@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getHistory, AuditEntry } from '../../api/discipline';
+import { getHistory, type AuditEntry } from '../../api/discipline';
 
 export const AuditLog: React.FC = () => {
     const [history, setHistory] = useState<AuditEntry[]>([]);

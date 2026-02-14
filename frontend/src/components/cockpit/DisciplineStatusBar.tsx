@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDisciplineState, DisciplineState } from '../../api/discipline';
+import { getDisciplineState, type DisciplineState } from '../../api/discipline';
 
 export const DisciplineStatusBar: React.FC = () => {
     const [state, setState] = useState<DisciplineState | null>(null);

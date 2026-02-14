@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import client from '../api/client';
 
 interface TrajectoryData {
     history: { date: string; score: number }[];
@@ -14,13 +15,9 @@ const DisciplineTrajectoryGraph: React.FC = () => {
         const fetchTrajectory = async () => {
             setLoading(true);
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:3000/experience/trajectory?days=${days}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    setData(result);
+                const response = await client.get(`/experience/trajectory?days=${days}`);
+                if (response.status === 200) {
+                    setData(response.data);
                 }
             } catch (err) {
                 console.error(err);

@@ -87,6 +87,14 @@ function App() {
               }
             />
 
+
+            <Route path="*" element={
+              <div style={{ padding: 40, textAlign: 'center', color: '#666' }}>
+                <h1 style={{ fontSize: '2em', marginBottom: 20 }}>404 - Page Not Found</h1>
+                <p>The requested route does not exist.</p>
+                <a href="/" style={{ color: 'blue', textDecoration: 'underline' }}>Go Home</a>
+              </div>
+            } />
           </Routes>
         </Router>
       </AuthProvider>

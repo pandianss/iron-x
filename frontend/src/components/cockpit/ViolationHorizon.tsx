@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPredictions, Prediction } from '../../api/discipline';
+import { getPredictions, type Prediction } from '../../api/discipline';
 
 export const ViolationHorizon: React.FC = () => {
     const [predictions, setPredictions] = useState<Prediction[]>([]);

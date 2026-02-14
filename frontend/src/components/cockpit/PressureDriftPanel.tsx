@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPressure, PressureData } from '../../api/discipline';
+import { getPressure, type PressureData } from '../../api/discipline';
 
 export const PressureDriftPanel: React.FC = () => {
     const [data, setData] = useState<PressureData | null>(null);

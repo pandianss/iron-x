@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import client from '../api/client';
 import DisciplineIdentityCard from './DisciplineIdentityCard';
 import DisciplineTrajectoryGraph from './DisciplineTrajectoryGraph';
 import TomorrowPreview from './TomorrowPreview';
@@ -19,13 +20,9 @@ const DisciplineDashboard: React.FC = () => {
         // For simplicity, re-using the logic but extracting just what we need
         const fetchStats = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3000/analytics/daily', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    setStats(result.todayStats);
+                const response = await client.get('/analytics/daily');
+                if (response.status === 200 && response.data?.todayStats) {
+                    setStats(response.data.todayStats);
                 }
             } catch (err) {
                 console.error(err);

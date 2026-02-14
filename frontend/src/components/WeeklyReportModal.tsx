@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import client from '../api/client';
 import { X, Calendar, Activity, AlertCircle } from 'lucide-react';
 
 interface WeeklyReportData {
@@ -24,13 +25,9 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
             const fetchReport = async () => {
                 setLoading(true);
                 try {
-                    const token = localStorage.getItem('token');
-                    const response = await fetch('http://localhost:3000/experience/report', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const result = await response.json();
-                        setData(result);
+                    const response = await client.get('/experience/report');
+                    if (response.status === 200) {
+                        setData(response.data);
                     }
                 } catch (err) {
                     console.error(err);

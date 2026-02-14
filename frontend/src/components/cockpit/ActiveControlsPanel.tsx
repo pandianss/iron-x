@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getConstraints, ConstraintsData } from '../../api/discipline';
+import { getConstraints, type ConstraintsData } from '../../api/discipline';
 
 export const ActiveControlsPanel: React.FC = () => {
     const [data, setData] = useState<ConstraintsData | null>(null);

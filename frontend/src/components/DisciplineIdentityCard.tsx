@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import client from '../api/client';
 
 interface IdentityData {
     score: number;
@@ -15,13 +16,9 @@ const DisciplineIdentityCard: React.FC = () => {
     useEffect(() => {
         const fetchIdentity = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3000/experience/identity', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    setData(result);
+                const response = await client.get('/experience/identity');
+                if (response.status === 200) {
+                    setData(response.data);
                 }
             } catch (err) {
                 console.error(err);

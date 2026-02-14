@@ -1,7 +1,8 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import prisma from '../db';
-import { generateDailyInstances } from '../services/scheduler';
+import { kernel } from '../kernel/DisciplineEngine';
+import { v4 as uuidv4 } from 'uuid';
 
 export const getDailySchedule = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
@@ -9,7 +10,11 @@ export const getDailySchedule = async (req: AuthRequest, res: Response) => {
 
     try {
         // Ensure instances exist for today
-        await generateDailyInstances(userId);
+        await kernel.runCycle({
+            userId,
+            traceId: uuidv4(),
+            timestamp: new Date()
+        });
 
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);

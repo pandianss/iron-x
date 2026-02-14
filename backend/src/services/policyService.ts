@@ -104,5 +104,27 @@ export const PolicyService = {
                 ]
             }
         });
+    },
+
+    async assignDefaultRole(userId: string): Promise<void> {
+        // Find default role, if not exists, pick first or create?
+        // For MVP, look for role with name 'USER' or 'DEFAULT'
+        const defaultRole = await prisma.role.findFirst({
+            where: { name: 'USER' }
+        });
+
+        if (defaultRole) {
+            await prisma.user.update({
+                where: { user_id: userId },
+                data: { role_id: defaultRole.role_id }
+            });
+        }
+    },
+
+    async setEnforcementMode(userId: string, mode: string): Promise<void> {
+        await prisma.user.update({
+            where: { user_id: userId },
+            data: { enforcement_mode: mode }
+        });
     }
 };

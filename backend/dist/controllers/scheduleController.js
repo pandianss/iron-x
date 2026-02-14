@@ -5,14 +5,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logExecution = exports.getDailySchedule = void 0;
 const db_1 = __importDefault(require("../db"));
-const scheduler_1 = require("../services/scheduler");
+const DisciplineEngine_1 = require("../kernel/DisciplineEngine");
+const uuid_1 = require("uuid");
 const getDailySchedule = async (req, res) => {
     const userId = req.user?.userId;
     if (!userId)
         return res.sendStatus(401);
     try {
         // Ensure instances exist for today
-        await (0, scheduler_1.generateDailyInstances)(userId);
+        await DisciplineEngine_1.kernel.runCycle({
+            userId,
+            traceId: (0, uuid_1.v4)(),
+            timestamp: new Date()
+        });
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date();

@@ -21,6 +21,23 @@ export interface DisciplineContext {
     userId: UserId;
     traceId: string;
     timestamp: Date;
+    // Normalized State
+    user?: {
+        current_discipline_score: number;
+    };
+    instances: {
+        instance_id: string;
+        action_id: string;
+        status: string;
+        scheduled_date: Date;
+        scheduled_start_time: Date;
+        scheduled_end_time: Date;
+    }[];
+    policy: {
+        rules: PolicyRules;
+        mode: EnforcementMode;
+    };
+    violations: Violation[];
 }
 
 export interface PolicyRules {

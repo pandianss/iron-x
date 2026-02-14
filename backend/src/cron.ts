@@ -1,26 +1,27 @@
 import cron from 'node-cron';
 import prisma from './db';
-import { kernel } from './kernel/DisciplineEngine';
+import { kernelQueue } from './infrastructure/queue';
 import { v4 as uuidv4 } from 'uuid';
 
 export const startCronJobs = () => {
     // Run every hour to check for missed actions and violations
     cron.schedule('0 * * * *', async () => {
-        console.log('[Cron] Starting hourly discipline cycle...');
+        console.log('[Cron] Enqueuing hourly discipline cycle...');
 
         try {
             const users = await prisma.user.findMany({ select: { user_id: true } });
+            const batchId = uuidv4();
+            const timestamp = new Date();
 
             for (const user of users) {
-                const traceId = uuidv4();
-                await kernel.runCycle({
+                await kernelQueue.add('KERNEL_CYCLE_JOB', {
                     userId: user.user_id,
-                    traceId,
-                    timestamp: new Date()
+                    traceId: `${batchId}-${user.user_id}`,
+                    timestamp
                 });
             }
         } catch (error) {
-            console.error('[Cron] Discipline cycle failed:', error);
+            console.error('[Cron] Failed to enqueue discipline cycle:', error);
         }
     });
 

@@ -9,11 +9,11 @@ export class ExecutionPipeline {
         // Future: Check for late execution or other policy violations
     }
 
-    async handleViolations(userId: UserId, violations: string[]) {
+    async handleViolations(userId: UserId, violations: string[], context: DisciplineContext) {
         // We only emit events here. The actual "enforcement" (lockout, badging)
         // should happen in an observer that listens to VIOLATION_DETECTED.
 
-        const { rules, mode } = await this.policyEvaluator.evaluate(userId);
+        const { rules, mode } = await this.policyEvaluator.evaluate(context);
 
         for (const instanceId of violations) {
             console.log(`[Kernel] Violation detected for ${userId}: MISSED action ${instanceId}`);

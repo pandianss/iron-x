@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import { EnforcementService } from '../services/enforcement.service';
+import { PolicyService } from '../services/policyService';
 
 export const updateEnforcementMode = async (req: Request, res: Response) => {
     try {
@@ -11,7 +11,7 @@ export const updateEnforcementMode = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Invalid mode' });
         }
 
-        await EnforcementService.setEnforcementMode(userId, mode, userId);
+        await PolicyService.setEnforcementMode(userId, mode);
         res.json({ message: 'Enforcement mode updated', mode });
     } catch (error) {
         console.error('Error updating enforcement mode', error);

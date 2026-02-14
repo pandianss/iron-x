@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const outcomeController_1 = require("../controllers/outcomeController");
+const outcomeGovernanceMiddleware_1 = require("../middleware/outcomeGovernanceMiddleware");
+const router = (0, express_1.Router)();
+router.use(outcomeGovernanceMiddleware_1.outcomeGovernanceMiddleware);
+router.get('/user/:userId', outcomeController_1.getUserOutcomes);
+router.get('/team/:teamId', outcomeController_1.getTeamOutcomes);
+router.get('/org/summary', outcomeController_1.getOrgSummary);
+router.get('/report/csv', outcomeController_1.getCSVReport);
+router.get('/value-dashboard/:userId', outcomeController_1.getValueDashboard);
+router.post('/evaluate/:userId', outcomeController_1.triggerEvaluation);
+router.post('/baseline/:userId', outcomeController_1.triggerBaselineComparison);
+router.post('/cost-estimation/:userId', outcomeController_1.estimateCost);
+exports.default = router;

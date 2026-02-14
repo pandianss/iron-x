@@ -22,7 +22,7 @@ export const register = async (req: Request, res: Response) => {
 
         // Phase 6: Institutionalization - Assign Default Role
         try {
-            const { PolicyService } = await import('../services/policy.service');
+            const { PolicyService } = await import('../services/policyService');
             await PolicyService.assignDefaultRole(user.user_id);
         } catch (e) {
             console.error('Failed to assign default role:', e);

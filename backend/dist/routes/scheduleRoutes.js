@@ -5,6 +5,7 @@ const scheduleController_1 = require("../controllers/scheduleController");
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = (0, express_1.Router)();
 router.use(authMiddleware_1.authenticateToken);
+const rateLimitMiddleware_1 = require("../middleware/rateLimitMiddleware");
 router.get('/today', scheduleController_1.getDailySchedule);
-router.post('/instances/:id/log', scheduleController_1.logExecution);
+router.post('/instances/:id/log', rateLimitMiddleware_1.logExecutionLimiter, scheduleController_1.logExecution);
 exports.default = router;

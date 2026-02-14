@@ -1,6 +1,7 @@
 import { UserId, InstanceId, DisciplineContext } from './domain/types';
 import { PolicyEvaluator } from './PolicyEvaluator';
 import { domainEvents, DomainEventType } from './domain/events';
+import { Logger } from '../utils/logger';
 
 export class ExecutionPipeline {
     constructor(private policyEvaluator: PolicyEvaluator) { }
@@ -16,7 +17,7 @@ export class ExecutionPipeline {
         const { rules, mode } = await this.policyEvaluator.evaluate(context);
 
         for (const instanceId of violations) {
-            console.log(`[Kernel] Violation detected for ${userId}: MISSED action ${instanceId}`);
+            Logger.info(`[Kernel] Violation detected for ${userId}: MISSED action ${instanceId}`);
 
             domainEvents.emit(DomainEventType.VIOLATION_DETECTED, {
                 type: DomainEventType.VIOLATION_DETECTED,

@@ -39,11 +39,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.exportComplianceReport = exports.getTeamStats = exports.addMember = exports.createTeam = void 0;
 const db_1 = __importDefault(require("../db"));
 const audit_service_1 = require("../services/audit.service");
+const privacy_1 = require("../utils/privacy");
+const AppError_1 = require("../utils/AppError");
 /**
  * Creates a new team.
  * User becomes the owner.
  */
-const createTeam = async (req, res) => {
+const createTeam = async (req, res, next) => {
     try {
         const { name } = req.body;
         const ownerId = req.user.userId;
@@ -64,8 +66,7 @@ const createTeam = async (req, res) => {
         res.status(201).json(team);
     }
     catch (error) {
-        console.error('Error creating team', error);
-        res.status(500).json({ error: 'Failed to create team' });
+        next(error);
     }
 };
 exports.createTeam = createTeam;
@@ -73,7 +74,7 @@ exports.createTeam = createTeam;
  * Adds a member to the team.
  * Enforces Seat Limits (G1).
  */
-const addMember = async (req, res) => {
+const addMember = async (req, res, next) => {
     try {
         const { teamId, email, role } = req.body;
         const requesterId = req.user.userId;
@@ -82,7 +83,7 @@ const addMember = async (req, res) => {
             where: { team_id_user_id: { team_id: teamId, user_id: requesterId } }
         });
         if (!membership || membership.role !== 'MANAGER') {
-            return res.status(403).json({ error: 'Not authorized to add members' });
+            throw new AppError_1.ForbiddenError('Not authorized to add members');
         }
         // Check Seat Limits
         const team = await db_1.default.team.findUnique({
@@ -90,14 +91,14 @@ const addMember = async (req, res) => {
             include: { _count: { select: { members: true } } }
         });
         if (!team)
-            return res.status(404).json({ error: 'Team not found' });
+            throw new AppError_1.NotFoundError('Team not found');
         if (team._count.members >= team.max_seats) {
-            return res.status(403).json({ error: `Seat limit reached (${team.max_seats} max)` });
+            throw new AppError_1.ForbiddenError(`Seat limit reached (${team.max_seats} max)`);
         }
         // Find user to add
         const userToAdd = await db_1.default.user.findUnique({ where: { email } });
         if (!userToAdd)
-            return res.status(404).json({ error: 'User not found' });
+            throw new AppError_1.NotFoundError('User not found');
         await db_1.default.teamMember.create({
             data: {
                 team_id: teamId,
@@ -109,8 +110,7 @@ const addMember = async (req, res) => {
         res.status(201).json({ message: 'Member added' });
     }
     catch (error) {
-        console.error('Error adding team member', error);
-        res.status(500).json({ error: 'Failed to add member' });
+        next(error);
     }
 };
 exports.addMember = addMember;
@@ -119,7 +119,7 @@ exports.addMember = addMember;
  * Includes: Heatmap, Trends, User Status Counts.
  * Privacy: If Private Mode, hide action titles (Not implemented here, but frontend should handle or we strip titles if we returned actions. Here we return stats).
  */
-const getTeamStats = async (req, res) => {
+const getTeamStats = async (req, res, next) => {
     try {
         const { teamId } = req.params;
         const requesterId = req.user.userId;
@@ -128,8 +128,7 @@ const getTeamStats = async (req, res) => {
             where: { team_id_user_id: { team_id: teamId, user_id: requesterId } }
         });
         if (!membership || membership.role !== 'MANAGER') {
-            // Or allow members to see stats? Usually Manager Dashboard.
-            return res.status(403).json({ error: 'Not authorized to view team stats' });
+            throw new AppError_1.ForbiddenError('Not authorized to view team stats');
         }
         const members = await db_1.default.teamMember.findMany({
             where: { team_id: teamId },
@@ -141,7 +140,6 @@ const getTeamStats = async (req, res) => {
                         current_discipline_score: true,
                         enforcement_mode: true,
                         locked_until: true,
-                        // TODO: Privacy check if we return more details
                     }
                 }
             }
@@ -153,26 +151,18 @@ const getTeamStats = async (req, res) => {
             statusCounts: {
                 normal: members.filter((m) => !m.user.locked_until).length,
                 locked: members.filter((m) => m.user.locked_until && m.user.locked_until > new Date()).length,
-                // "Warning" could be score < X but not locked.
                 warning: members.filter((m) => (m.user.current_discipline_score || 100) < 50 && (!m.user.locked_until || m.user.locked_until < new Date())).length
             },
-            members: members.map((m) => ({
-                userId: m.user.user_id,
-                email: m.user.email, // Maybe mask if strict privacy?
-                score: m.user.current_discipline_score,
-                mode: m.user.enforcement_mode,
-                isLocked: m.user.locked_until && m.user.locked_until > new Date()
-            }))
+            members: members.map((m) => (0, privacy_1.sanitizeMemberProfile)(m, membership.role))
         };
         res.json(stats);
     }
     catch (error) {
-        console.error('Error fetching team stats', error);
-        res.status(500).json({ error: 'Failed to fetch team stats' });
+        next(error);
     }
 };
 exports.getTeamStats = getTeamStats;
-const exportComplianceReport = async (req, res) => {
+const exportComplianceReport = async (req, res, next) => {
     try {
         const { ReportService } = await Promise.resolve().then(() => __importStar(require('../services/report.service')));
         const { teamId } = req.params;
@@ -182,7 +172,7 @@ const exportComplianceReport = async (req, res) => {
             where: { team_id_user_id: { team_id: teamId, user_id: requesterId } }
         });
         if (!membership || membership.role !== 'MANAGER') {
-            return res.status(403).json({ error: 'Not authorized to export report' });
+            throw new AppError_1.ForbiddenError('Not authorized to export report');
         }
         const csv = await ReportService.generateTeamComplianceReport(teamId);
         res.set('Content-Type', 'text/csv');
@@ -190,8 +180,7 @@ const exportComplianceReport = async (req, res) => {
         res.send(csv);
     }
     catch (error) {
-        console.error('Error exporting report', error);
-        res.status(500).json({ error: 'Failed to export report' });
+        next(error);
     }
 };
 exports.exportComplianceReport = exportComplianceReport;

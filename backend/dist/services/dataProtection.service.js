@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataProtectionService = exports.DataMap = exports.DataClassification = void 0;
 const db_1 = __importDefault(require("../db"));
+const logger_1 = require("../utils/logger");
 var DataClassification;
 (function (DataClassification) {
     DataClassification["PUBLIC"] = "PUBLIC";
@@ -85,6 +86,6 @@ exports.DataProtectionService = {
                 timestamp: { lt: cutoffDate }
             }
         });
-        console.log(`Retention Policy Enforced: ${deleted.count} old logs deleted.`);
+        logger_1.Logger.info(`Retention Policy Enforced: ${deleted.count} old logs deleted.`);
     }
 };

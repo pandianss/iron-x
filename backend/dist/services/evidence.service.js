@@ -67,8 +67,7 @@ exports.EvidenceService = {
         hashSum.update(fileBuffer);
         const sha256 = hashSum.digest('hex');
         // Log the creation of evidence
-        // (Assuming AuditService is available and circular dependency is managed)
-        // console.log(`Evidence generated: ${packId} SHA256:${sha256}`);
+        // Logger.debug(`Evidence generated: ${packId} SHA256:${sha256}`);
         return {
             packId,
             files: { json: jsonPath, html: htmlPath },

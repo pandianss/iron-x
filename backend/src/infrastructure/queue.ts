@@ -5,14 +5,14 @@ import Redis from 'ioredis';
 const REDIS_URL = process.env.REDIS_URL || 'redis://iron_redis:6379';
 
 // Shared Redis connection for reuse
-const connection = new Redis(REDIS_URL, {
+export const redisConnection = new Redis(REDIS_URL, {
     maxRetriesPerRequest: null
 });
 
 export const QUEUE_NAME = 'kernel-operations';
 
 // Producer
-export const kernelQueue = new Queue(QUEUE_NAME, { connection });
+export const kernelQueue = new Queue(QUEUE_NAME, { connection: redisConnection });
 
 // Consumer (Worker)
 export const createKernelWorker = () => {
@@ -29,5 +29,5 @@ export const createKernelWorker = () => {
                 timestamp: new Date(timestamp)
             });
         }
-    }, { connection });
+    }, { connection: redisConnection });
 };

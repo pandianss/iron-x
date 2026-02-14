@@ -31,7 +31,7 @@ exports.getAuditLogs = getAuditLogs;
 const updateSystemConfig = async (req, res) => {
     try {
         const { key, value } = req.body;
-        const actorId = req.user.userId;
+        const actorId = req.user?.userId;
         await db_1.default.systemConfig.upsert({
             where: { config_key: key },
             update: { value },

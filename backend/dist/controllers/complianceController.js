@@ -10,7 +10,7 @@ const getFrameworkStatus = async (req, res) => {
         res.json(status);
         // Log auditor access if applicable (checking role done in middleware)
         if (req.user?.role?.name === 'Auditor') {
-            await audit_service_1.AuditService.logEvent('AUDITOR_ACCESS', { resource: 'FRAMEWORK_STATUS', framework }, req.user.user_id, req.user.user_id);
+            await audit_service_1.AuditService.logEvent('AUDITOR_ACCESS', { resource: 'FRAMEWORK_STATUS', framework }, req.user?.userId, req.user?.userId);
         }
     }
     catch (error) {

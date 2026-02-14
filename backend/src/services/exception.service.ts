@@ -7,7 +7,7 @@ export const ExceptionService = {
      * Grants a discipline exception/waiver to a user.
      */
     async grantException(userId: string, reason: string, validUntil: Date, approverId: string) {
-        const exception = await (prisma as any).disciplineException.create({
+        const exception = await prisma.disciplineException.create({
             data: {
                 user_id: userId,
                 reason,
@@ -32,7 +32,7 @@ export const ExceptionService = {
      */
     async hasActiveException(userId: string): Promise<boolean> {
         const now = new Date();
-        const activeException = await (prisma as any).disciplineException.findFirst({
+        const activeException = await prisma.disciplineException.findFirst({
             where: {
                 user_id: userId,
                 valid_from: { lte: now },

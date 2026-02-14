@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const tsyringe_1 = require("tsyringe");
+const team_controller_1 = require("./team.controller");
+const authMiddleware_1 = require("../../middleware/authMiddleware");
+const router = (0, express_1.Router)();
+const teamController = tsyringe_1.container.resolve(team_controller_1.TeamController);
+router.post('/', authMiddleware_1.authenticateToken, teamController.createTeam);
+router.post('/members', authMiddleware_1.authenticateToken, teamController.addMember);
+router.get('/:teamId/stats', authMiddleware_1.authenticateToken, teamController.getTeamStats);
+router.get('/:teamId/report', authMiddleware_1.authenticateToken, teamController.exportComplianceReport);
+exports.default = router;

@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const tsyringe_1 = require("tsyringe");
+const auth_controller_1 = require("./auth.controller");
+const validateResource_1 = require("../../middleware/validateResource");
+const auth_schema_1 = require("../../schemas/auth.schema");
+const router = (0, express_1.Router)();
+const authController = tsyringe_1.container.resolve(auth_controller_1.AuthController);
+router.post('/register', (0, validateResource_1.validateResource)(auth_schema_1.registerSchema), authController.register);
+router.post('/login', (0, validateResource_1.validateResource)(auth_schema_1.loginSchema), authController.login);
+exports.default = router;

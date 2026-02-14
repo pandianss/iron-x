@@ -1,5 +1,6 @@
 
 import prisma from '../db';
+import { Logger } from '../utils/logger';
 
 export const schedulePrompts = async () => {
     // Run every minute
@@ -21,7 +22,7 @@ export const schedulePrompts = async () => {
         });
 
         for (const instance of pendingForFirstPrompt) {
-            console.log(`Sending FIRST prompt for ${instance.action?.title}`);
+            Logger.info(`Sending FIRST prompt for ${instance.action?.title}`);
             // Mock dispatch
             await prisma.prompt.create({
                 data: {
@@ -67,7 +68,7 @@ export const schedulePrompts = async () => {
                 const retryTime = new Date(start.getTime() + (durationMs * 0.5));
 
                 if (now >= retryTime) {
-                    console.log(`Sending RETRY prompt for ${instance.action?.title}`);
+                    Logger.info(`Sending RETRY prompt for ${instance.action?.title}`);
                     await prisma.prompt.create({
                         data: {
                             instance_id: instance.instance_id,
@@ -79,6 +80,6 @@ export const schedulePrompts = async () => {
             }
         }
     } catch (error) {
-        console.error('Error in schedulePrompts', error);
+        Logger.error('Error in schedulePrompts', { error });
     }
 };

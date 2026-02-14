@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuditService = void 0;
 const db_1 = __importDefault(require("../db"));
+const logger_1 = require("../utils/logger");
 /**
  * Service for creating immutable audit logs.
  * Covers: Status changes, Enforcement actions, Lockouts, Manager interventions.
@@ -32,7 +33,9 @@ exports.AuditService = {
             // console.log(`[AUDIT] ${action} - Target: ${targetUserId} - Actor: ${actorId}`);
         }
         catch (error) {
-            console.error('Failed to create audit log', error);
+            // Fail silent? or rethrow? For audit, maybe we should alert.
+            // ...
+            logger_1.Logger.error('Failed to create audit log', error);
             // Fail silent? or rethrow? For audit, maybe we should alert.
         }
     },

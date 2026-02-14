@@ -1,4 +1,5 @@
 import prisma from '../db';
+import { Logger } from '../utils/logger';
 
 /**
  * Service for creating immutable audit logs.
@@ -32,7 +33,10 @@ export const AuditService = {
             });
             // console.log(`[AUDIT] ${action} - Target: ${targetUserId} - Actor: ${actorId}`);
         } catch (error) {
-            console.error('Failed to create audit log', error);
+            // Fail silent? or rethrow? For audit, maybe we should alert.
+
+            // ...
+            Logger.error('Failed to create audit log', error);
             // Fail silent? or rethrow? For audit, maybe we should alert.
         }
     },

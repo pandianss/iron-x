@@ -36,17 +36,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createKernelWorker = exports.kernelQueue = exports.QUEUE_NAME = void 0;
+exports.createKernelWorker = exports.kernelQueue = exports.QUEUE_NAME = exports.redisConnection = void 0;
 const bullmq_1 = require("bullmq");
 const ioredis_1 = __importDefault(require("ioredis"));
 const REDIS_URL = process.env.REDIS_URL || 'redis://iron_redis:6379';
 // Shared Redis connection for reuse
-const connection = new ioredis_1.default(REDIS_URL, {
+exports.redisConnection = new ioredis_1.default(REDIS_URL, {
     maxRetriesPerRequest: null
 });
 exports.QUEUE_NAME = 'kernel-operations';
 // Producer
-exports.kernelQueue = new bullmq_1.Queue(exports.QUEUE_NAME, { connection });
+exports.kernelQueue = new bullmq_1.Queue(exports.QUEUE_NAME, { connection: exports.redisConnection });
 // Consumer (Worker)
 const createKernelWorker = () => {
     return new bullmq_1.Worker(exports.QUEUE_NAME, async (job) => {
@@ -61,6 +61,6 @@ const createKernelWorker = () => {
                 timestamp: new Date(timestamp)
             });
         }
-    }, { connection });
+    }, { connection: exports.redisConnection });
 };
 exports.createKernelWorker = createKernelWorker;

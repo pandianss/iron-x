@@ -2,11 +2,12 @@
 import { PrismaClient } from '@prisma/client';
 import { kernel } from '../kernel/DisciplineEngine';
 import { v4 as uuidv4 } from 'uuid';
+import { Logger } from '../utils/logger';
 
 const prisma = new PrismaClient();
 
 export const runKernelCycle = async () => {
-    console.log('[Job] Starting Kernel Cycle...');
+    Logger.info('[Job] Starting Kernel Cycle...');
     const users = await prisma.user.findMany({ select: { user_id: true } });
 
     for (const user of users) {
@@ -17,8 +18,8 @@ export const runKernelCycle = async () => {
                 timestamp: new Date()
             });
         } catch (error) {
-            console.error(`[Job] Error running cycle for user ${user.user_id}:`, error);
+            Logger.error(`[Job] Error running cycle for user ${user.user_id}:`, { error });
         }
     }
-    console.log('[Job] Kernel Cycle Completed.');
+    Logger.info('[Job] Kernel Cycle Completed.');
 };

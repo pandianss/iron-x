@@ -5,11 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getGoals = exports.createGoal = void 0;
 const db_1 = __importDefault(require("../db"));
-const createGoal = async (req, res) => {
+const AppError_1 = require("../utils/AppError");
+const createGoal = async (req, res, next) => {
+    // Input is already validated by middleware
     const { title, description, deadline } = req.body;
     const userId = req.user?.userId;
     if (!userId)
-        return res.sendStatus(401);
+        return next(new AppError_1.UnauthorizedError());
     try {
         const goal = await db_1.default.goal.create({
             data: {
@@ -22,15 +24,14 @@ const createGoal = async (req, res) => {
         res.status(201).json(goal);
     }
     catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        next(error);
     }
 };
 exports.createGoal = createGoal;
-const getGoals = async (req, res) => {
+const getGoals = async (req, res, next) => {
     const userId = req.user?.userId;
     if (!userId)
-        return res.sendStatus(401);
+        return next(new AppError_1.UnauthorizedError());
     try {
         const goals = await db_1.default.goal.findMany({
             where: { user_id: userId, status: 'ACTIVE' },
@@ -39,8 +40,7 @@ const getGoals = async (req, res) => {
         res.json(goals);
     }
     catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        next(error);
     }
 };
 exports.getGoals = getGoals;

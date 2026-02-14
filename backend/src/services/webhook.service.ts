@@ -1,5 +1,6 @@
 
 import * as crypto from 'crypto';
+import { Logger } from '../utils/logger';
 // import fetch from 'node-fetch'; // Built-in in Node 18+
 
 export interface WebhookPayload {
@@ -33,20 +34,25 @@ export const WebhookService = {
         };
 
         for (const sub of subscribers) {
-            const signature = this.signPayload(payload, sub.secret);
+            // Logger.info(`Dispatching ${event} to ${sub.url}`);
+
+            const signature = crypto
+                .createHmac('sha256', sub.secret)
+                .update(JSON.stringify(payload))
+                .digest('hex');
+
             try {
-                // console.log(`Dispatching ${event} to ${sub.url}`);
-                // await fetch(sub.url, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //         'X-Discipline-Signature': signature,
-                //         'X-Discipline-Event': event
-                //     },
-                //     body: JSON.stringify(payload)
-                // });
+                await fetch(sub.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Iron-Signature': signature
+                    },
+                    body: JSON.stringify(payload),
+                    signal: AbortSignal.timeout(5000)
+                });
             } catch (e) {
-                console.error(`Failed to dispatch webhook to ${sub.url}`, e);
+                Logger.error(`Failed to dispatch webhook to ${sub.url}`, e);
             }
         }
     }

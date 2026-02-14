@@ -5,6 +5,7 @@ const InstanceLifecycle_1 = require("./InstanceLifecycle");
 const ExecutionPipeline_1 = require("./ExecutionPipeline");
 const PolicyEvaluator_1 = require("./PolicyEvaluator");
 const ScoreCalculator_1 = require("./ScoreCalculator");
+const logger_1 = require("../utils/logger");
 class DisciplineEngine {
     constructor() {
         this.lifecycle = new InstanceLifecycle_1.InstanceLifecycle();
@@ -14,7 +15,7 @@ class DisciplineEngine {
     }
     async runCycle(contextParams) {
         const startTotal = Date.now();
-        console.log(`[Kernel] Running cycle for ${contextParams.userId}`);
+        logger_1.Logger.info(`[Kernel] Running cycle for ${contextParams.userId}`);
         // 0. Build Context (Data Access)
         const startLifecycle = Date.now();
         const context = await this.lifecycle.loadContext(contextParams.userId);

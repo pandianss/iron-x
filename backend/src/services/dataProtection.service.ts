@@ -1,5 +1,6 @@
 
 import prisma from '../db';
+import { Logger } from '../utils/logger';
 import { AuditService } from './audit.service';
 
 export enum DataClassification {
@@ -92,6 +93,6 @@ export const DataProtectionService = {
             }
         });
 
-        console.log(`Retention Policy Enforced: ${deleted.count} old logs deleted.`);
+        Logger.info(`Retention Policy Enforced: ${deleted.count} old logs deleted.`);
     }
 };

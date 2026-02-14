@@ -4,8 +4,9 @@ exports.registerObservers = registerObservers;
 const events_1 = require("../kernel/domain/events");
 const EnforcementObserver_1 = require("../governance/observers/EnforcementObserver");
 const AuditObserver_1 = require("../governance/observers/AuditObserver");
+const logger_1 = require("../utils/logger");
 function registerObservers() {
-    console.log('[Bootstrap] Registering Governance Observers...');
+    logger_1.Logger.info('[Bootstrap] Registering Governance Observers...');
     // Enforcement
     events_1.domainEvents.on(events_1.DomainEventType.VIOLATION_DETECTED, (e) => EnforcementObserver_1.enforcementObserver.handle(e));
     // Audit

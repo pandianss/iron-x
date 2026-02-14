@@ -3,6 +3,7 @@ import { InstanceLifecycle } from './InstanceLifecycle';
 import { ExecutionPipeline } from './ExecutionPipeline';
 import { PolicyEvaluator } from './PolicyEvaluator';
 import { ScoreCalculator } from './ScoreCalculator';
+import { Logger } from '../utils/logger';
 
 export class DisciplineEngine {
     private lifecycle: InstanceLifecycle;
@@ -19,7 +20,7 @@ export class DisciplineEngine {
 
     async runCycle(contextParams: { userId: string, traceId: string, timestamp: Date }) {
         const startTotal = Date.now();
-        console.log(`[Kernel] Running cycle for ${contextParams.userId}`);
+        Logger.info(`[Kernel] Running cycle for ${contextParams.userId}`);
 
         // 0. Build Context (Data Access)
         const startLifecycle = Date.now();

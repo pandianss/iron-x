@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const tsyringe_1 = require("tsyringe");
+const action_controller_1 = require("./action.controller");
+const authMiddleware_1 = require("../../middleware/authMiddleware");
+const lockoutMiddleware_1 = require("../../middleware/lockoutMiddleware");
+const subscriptionMiddleware_1 = require("../../middleware/subscriptionMiddleware");
+const router = (0, express_1.Router)();
+const actionController = tsyringe_1.container.resolve(action_controller_1.ActionController);
+router.use(authMiddleware_1.authenticateToken);
+router.post('/', lockoutMiddleware_1.checkLockout, subscriptionMiddleware_1.checkActionLimit, subscriptionMiddleware_1.checkStrictModeAccess, actionController.createAction);
+router.get('/', actionController.getActions);
+exports.default = router;

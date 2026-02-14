@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const trajectoryController_1 = require("../../controllers/trajectoryController");
+const authMiddleware_1 = require("../../middleware/authMiddleware");
+const router = (0, express_1.Router)();
+router.use(authMiddleware_1.authenticateToken);
+router.get('/identity', trajectoryController_1.getIdentity);
+router.get('/trajectory', trajectoryController_1.getTrajectory);
+router.get('/preview', trajectoryController_1.getTomorrowPreview);
+router.get('/report', trajectoryController_1.getWeeklyReport);
+router.get('/projection', trajectoryController_1.getProjectedScore);
+router.get('/warnings', trajectoryController_1.getAnticipatoryWarnings);
+exports.default = router;

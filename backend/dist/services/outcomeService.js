@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OutcomeService = void 0;
 const client_1 = require("@prisma/client");
+const logger_1 = require("../utils/logger");
 const prisma = new client_1.PrismaClient();
 exports.OutcomeService = {
     async createOutcome(data) {
@@ -22,7 +23,8 @@ exports.OutcomeService = {
                 linked_actions: true
             }
         });
-        console.log(`Created outcome ${outcome.outcome_id} for user ${data.user_id || 'system'}`);
+        // ...
+        logger_1.logger.info(`Created outcome ${outcome.outcome_id} for user ${data.user_id || 'system'}`);
         return outcome;
     },
     async getOutcomesForUser(userId) {
@@ -69,7 +71,7 @@ exports.OutcomeService = {
         return header + rows;
     },
     async estimateCostOfIndiscipline(userId, hourlyRate = 50) {
-        console.log(`Estimating cost for user ${userId} at rate ${hourlyRate}`);
+        logger_1.logger.info(`Estimating cost for user ${userId} at rate ${hourlyRate}`);
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
         // 1. Missed Actions
         const missedActions = await prisma.actionInstance.count({
@@ -140,7 +142,7 @@ exports.OutcomeService = {
     },
     // Rule Evaluation Logic
     async evaluateUserOutcomes(userId) {
-        console.log(`Evaluating outcomes for user ${userId}`);
+        logger_1.logger.info(`Evaluating outcomes for user ${userId}`);
         // 1. Fetch recent discipline data
         const scores = await prisma.disciplineScore.findMany({
             where: { user_id: userId },
@@ -148,7 +150,7 @@ exports.OutcomeService = {
             take: 30
         });
         if (scores.length < 7) {
-            console.log(`Not enough data to evaluate outcomes for user ${userId}`);
+            logger_1.logger.info(`Not enough data to evaluate outcomes for user ${userId}`);
             return;
         }
         // Rule 1: High Reliability (Consistent scores > 80 for 7 days)
@@ -197,14 +199,14 @@ exports.OutcomeService = {
         }
     },
     async computeBaselineComparison(userId) {
-        console.log(`Computing baseline comparison for user ${userId}`);
+        logger_1.logger.info(`Computing baseline comparison for user ${userId}`);
         // 1. Fetch all discipline scores sorted by date
         const allScores = await prisma.disciplineScore.findMany({
             where: { user_id: userId },
             orderBy: { date: 'asc' }
         });
         if (allScores.length < 14) {
-            console.log(`Not enough data for baseline comparison (need 14+ days)`);
+            logger_1.logger.info(`Not enough data for baseline comparison (need 14+ days)`);
             return null;
         }
         // 2. Define Baseline (First 14 days) vs Current (Last 14 days)
@@ -214,7 +216,7 @@ exports.OutcomeService = {
         const baselineAvg = avg(baselinePeriod);
         const currentAvg = avg(currentPeriod);
         const delta = currentAvg - baselineAvg;
-        console.log(`Baseline: ${baselineAvg}, Current: ${currentAvg}, Delta: ${delta}`);
+        logger_1.logger.info(`Baseline: ${baselineAvg}, Current: ${currentAvg}, Delta: ${delta}`);
         // 3. Generate Outcome if improvement is significant (> 10 points)
         if (delta > 10) {
             const confidence = Math.min(1.0, 0.5 + (allScores.length / 100)); // More data = higher confidence

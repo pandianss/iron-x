@@ -4,7 +4,8 @@ import { UserId, InstanceId, PolicyId } from './types';
 export enum DomainEventType {
     INSTANCE_MATERIALIZED = 'INSTANCE_MATERIALIZED',
     VIOLATION_DETECTED = 'VIOLATION_DETECTED',
-    SCORE_UPDATED = 'SCORE_UPDATED'
+    SCORE_UPDATED = 'SCORE_UPDATED',
+    KERNEL_CYCLE_COMPLETED = 'KERNEL_CYCLE_COMPLETED'
 }
 
 export interface DomainEvent {
@@ -41,10 +42,18 @@ export interface ScoreUpdatedEvent extends DomainEvent {
     };
 }
 
+export interface KernelCycleCompletedEvent extends DomainEvent {
+    type: DomainEventType.KERNEL_CYCLE_COMPLETED;
+    payload: {
+        score: number;
+    };
+}
+
 type EventMap = {
     [DomainEventType.INSTANCE_MATERIALIZED]: InstanceMaterializedEvent;
     [DomainEventType.VIOLATION_DETECTED]: ViolationDetectedEvent;
     [DomainEventType.SCORE_UPDATED]: ScoreUpdatedEvent;
+    [DomainEventType.KERNEL_CYCLE_COMPLETED]: KernelCycleCompletedEvent;
     [key: string]: DomainEvent;
 };
 
@@ -61,3 +70,4 @@ export class DomainEventBus extends EventEmitter {
 }
 
 export const domainEvents = new DomainEventBus();
+

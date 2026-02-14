@@ -7,6 +7,7 @@ var DomainEventType;
     DomainEventType["INSTANCE_MATERIALIZED"] = "INSTANCE_MATERIALIZED";
     DomainEventType["VIOLATION_DETECTED"] = "VIOLATION_DETECTED";
     DomainEventType["SCORE_UPDATED"] = "SCORE_UPDATED";
+    DomainEventType["KERNEL_CYCLE_COMPLETED"] = "KERNEL_CYCLE_COMPLETED";
 })(DomainEventType || (exports.DomainEventType = DomainEventType = {}));
 class DomainEventBus extends events_1.EventEmitter {
     // @ts-ignore

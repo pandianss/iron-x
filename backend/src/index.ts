@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import app from './app';
 import { startCronJobs } from './cron';
 import { registerObservers } from './bootstrap/registerObservers';
@@ -7,8 +8,10 @@ dotenv.config();
 
 const port = process.env.PORT || 3000;
 
+import { Logger } from './utils/logger';
+
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    Logger.info(`Server is running on port ${port}`);
     registerObservers();
     startCronJobs();
 });

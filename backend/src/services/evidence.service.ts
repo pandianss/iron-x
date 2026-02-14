@@ -1,5 +1,7 @@
 
 import prisma from '../db';
+import { v4 as uuidv4 } from 'uuid';
+import { Logger } from '../utils/logger';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
@@ -36,8 +38,8 @@ export const EvidenceService = {
         const sha256 = hashSum.digest('hex');
 
         // Log the creation of evidence
-        // (Assuming AuditService is available and circular dependency is managed)
-        // console.log(`Evidence generated: ${packId} SHA256:${sha256}`);
+
+        // Logger.debug(`Evidence generated: ${packId} SHA256:${sha256}`);
 
         return {
             packId,

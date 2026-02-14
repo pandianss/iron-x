@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getWeeklyReport = exports.getAnticipatoryWarnings = exports.getTomorrowPreview = exports.getProjectedScore = exports.getTrajectory = exports.getIdentity = void 0;
-const trajectory_service_1 = require("../services/trajectory.service");
+const trajectory_1 = require("../services/trajectory");
 const getIdentity = async (req, res) => {
     const userId = req.user?.userId;
     if (!userId)
         return res.sendStatus(401);
     try {
         // Ensure classification is up to date before returning
-        await trajectory_service_1.TrajectoryService.updateClassification(userId);
-        const data = await trajectory_service_1.TrajectoryService.getIdentityData(userId);
+        await trajectory_1.TrajectoryService.updateClassification(userId);
+        const data = await trajectory_1.TrajectoryService.getIdentityData(userId);
         res.json(data);
     }
     catch (error) {
@@ -24,7 +24,7 @@ const getTrajectory = async (req, res) => {
         return res.sendStatus(401);
     try {
         const days = req.query.days ? parseInt(req.query.days) : 30;
-        const data = await trajectory_service_1.TrajectoryService.getTrajectory(userId, days);
+        const data = await trajectory_1.TrajectoryService.getTrajectory(userId, days);
         res.json(data);
     }
     catch (error) {
@@ -38,7 +38,7 @@ const getProjectedScore = async (req, res) => {
     if (!userId)
         return res.sendStatus(401);
     try {
-        const data = await trajectory_service_1.TrajectoryService.getProjectedScore(userId);
+        const data = await trajectory_1.TrajectoryService.getProjectedScore(userId);
         res.json(data);
     }
     catch (error) {
@@ -52,7 +52,7 @@ const getTomorrowPreview = async (req, res) => {
     if (!userId)
         return res.sendStatus(401);
     try {
-        const data = await trajectory_service_1.TrajectoryService.getTomorrowPreview(userId);
+        const data = await trajectory_1.TrajectoryService.getTomorrowPreview(userId);
         res.json(data);
     }
     catch (error) {
@@ -66,7 +66,7 @@ const getAnticipatoryWarnings = async (req, res) => {
     if (!userId)
         return res.sendStatus(401);
     try {
-        const data = await trajectory_service_1.TrajectoryService.getAnticipatoryWarnings(userId);
+        const data = await trajectory_1.TrajectoryService.getAnticipatoryWarnings(userId);
         res.json(data);
     }
     catch (error) {
@@ -80,7 +80,7 @@ const getWeeklyReport = async (req, res) => {
     if (!userId)
         return res.sendStatus(401);
     try {
-        const data = await trajectory_service_1.TrajectoryService.getWeeklyReport(userId);
+        const data = await trajectory_1.TrajectoryService.getWeeklyReport(userId);
         res.json(data);
     }
     catch (error) {

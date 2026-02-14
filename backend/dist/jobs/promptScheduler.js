@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.schedulePrompts = void 0;
 const db_1 = __importDefault(require("../db"));
+const logger_1 = require("../utils/logger");
 const schedulePrompts = async () => {
     // Run every minute
     const now = new Date();
@@ -23,7 +24,7 @@ const schedulePrompts = async () => {
             include: { action: true } // to get details if needed
         });
         for (const instance of pendingForFirstPrompt) {
-            console.log(`Sending FIRST prompt for ${instance.action?.title}`);
+            logger_1.Logger.info(`Sending FIRST prompt for ${instance.action?.title}`);
             // Mock dispatch
             await db_1.default.prompt.create({
                 data: {
@@ -65,7 +66,7 @@ const schedulePrompts = async () => {
                 const durationMs = end.getTime() - start.getTime();
                 const retryTime = new Date(start.getTime() + (durationMs * 0.5));
                 if (now >= retryTime) {
-                    console.log(`Sending RETRY prompt for ${instance.action?.title}`);
+                    logger_1.Logger.info(`Sending RETRY prompt for ${instance.action?.title}`);
                     await db_1.default.prompt.create({
                         data: {
                             instance_id: instance.instance_id,
@@ -78,7 +79,7 @@ const schedulePrompts = async () => {
         }
     }
     catch (error) {
-        console.error('Error in schedulePrompts', error);
+        logger_1.Logger.error('Error in schedulePrompts', { error });
     }
 };
 exports.schedulePrompts = schedulePrompts;

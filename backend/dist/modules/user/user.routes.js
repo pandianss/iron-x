@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const tsyringe_1 = require("tsyringe");
+const user_controller_1 = require("./user.controller");
+const authMiddleware_1 = require("../../middleware/authMiddleware");
+const router = (0, express_1.Router)();
+const userController = tsyringe_1.container.resolve(user_controller_1.UserController);
+router.put('/enforcement-mode', authMiddleware_1.authenticateToken, userController.updateEnforcementMode);
+exports.default = router;

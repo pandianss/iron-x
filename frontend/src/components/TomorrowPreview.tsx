@@ -1,31 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import client from '../api/client';
-import { Calendar, AlertTriangle, CheckCircle, Info } from 'lucide-react';
-
-interface PreviewData {
-    scheduledCount: number;
-    riskLevel: 'Low Risk' | 'Medium Risk' | 'High Risk';
-    date: string;
-}
+import { getTomorrowPreview, getAnticipatoryWarnings, TomorrowPreviewData, Warning } from '../api/trajectory';
+import { Calendar, AlertTriangle, CheckCircle, Info, Siren } from 'lucide-react';
 
 const TomorrowPreview: React.FC = () => {
-    const [data, setData] = useState<PreviewData | null>(null);
+    const [data, setData] = useState<TomorrowPreviewData | null>(null);
+    const [warnings, setWarnings] = useState<Warning[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchPreview = async () => {
+        const fetchData = async () => {
             try {
-                const response = await client.get('/experience/preview');
-                if (response.status === 200) {
-                    setData(response.data);
-                }
+                const [previewData, warningsData] = await Promise.all([
+                    getTomorrowPreview(),
+                    getAnticipatoryWarnings()
+                ]);
+                setData(previewData);
+                setWarnings(warningsData);
             } catch (err) {
                 console.error(err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchPreview();
+        fetchData();
     }, []);
 
     if (loading) return <div className="animate-pulse h-24 bg-gray-100 rounded-lg"></div>;
@@ -66,10 +62,22 @@ const TomorrowPreview: React.FC = () => {
             </div>
 
             <div className="mt-2 text-xs text-gray-400">
-                {data.riskLevel === 'High Risk' ? 'Prepare for a tight schedule.' :
+                {data.warning || (data.riskLevel === 'High Risk' ? 'Prepare for a tight schedule.' :
                     data.riskLevel === 'Medium Risk' ? 'Moderate load expected.' :
-                        'Light schedule. Focus on quality.'}
+                        'Light schedule. Focus on quality.')}
             </div>
+
+            {warnings.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                    {warnings.map((w, i) => (
+                        <div key={i} className={`text-xs p-2 rounded flex items-start ${w.severity === 'HIGH' ? 'bg-red-50 text-red-700' : 'bg-yellow-50 text-yellow-700'
+                            }`}>
+                            <Siren className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span>{w.message}</span>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

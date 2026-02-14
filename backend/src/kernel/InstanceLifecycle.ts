@@ -1,8 +1,16 @@
 
-import prisma from '../../db';
+import prisma from '../db';
 import { UserId, DisciplineContext } from './domain/types';
 
 export class InstanceLifecycle {
+    async loadContext(userId: string): Promise<DisciplineContext> {
+        return {
+            userId,
+            traceId: 'pending',
+            timestamp: new Date()
+        };
+    }
+
     async materialize(context: DisciplineContext) {
         const { userId, timestamp } = context;
         const startOfDay = new Date(timestamp);

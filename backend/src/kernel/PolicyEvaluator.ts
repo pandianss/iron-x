@@ -1,8 +1,9 @@
-
-import prisma from '../../db';
+import prisma from '../db';
 import { UserId, PolicyRules, EnforcementMode } from './domain/types';
 
 export class PolicyEvaluator {
+    // In a pure kernel, this would accept a Policy Aggregate.
+    // For now, it acts as a Repository/Adapter to fetch policy state.
     async evaluate(userId: UserId): Promise<{ rules: PolicyRules; mode: EnforcementMode }> {
         // 1. Resolve Policy
         const user = await prisma.user.findUnique({
@@ -45,8 +46,6 @@ export class PolicyEvaluator {
         }
 
         // 3. Determine Mode
-        // Policy mode overrides user setting? Or logic says "Policy wins".
-        // enforcement.service said: "enforcementMode = policy ? policy.enforcement_mode : user.enforcement_mode || 'NONE'"
         const modeStr = policy?.enforcement_mode || user.enforcement_mode || 'NONE';
         const mode = modeStr as EnforcementMode;
 

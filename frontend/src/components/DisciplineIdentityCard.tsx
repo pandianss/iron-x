@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import client from '../api/client';
-
-interface IdentityData {
-    score: number;
-    classification: string;
-    daysAtCurrent: number;
-    nextThreshold: number;
-    supervisionMode: 'LOW_SUPERVISION' | 'NORMAL_SUPERVISION';
-}
+import { getTrajectoryIdentity, TrajectoryIdentity } from '../api/trajectory';
 
 const DisciplineIdentityCard: React.FC = () => {
-    const [data, setData] = useState<IdentityData | null>(null);
+    const [data, setData] = useState<TrajectoryIdentity | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchIdentity = async () => {
             try {
-                const response = await client.get('/experience/identity');
-                if (response.status === 200) {
-                    setData(response.data);
-                }
+                const identity = await getTrajectoryIdentity();
+                setData(identity);
             } catch (err) {
                 console.error(err);
             } finally {

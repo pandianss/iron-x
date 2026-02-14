@@ -1,13 +1,10 @@
-
-import { UserId, InstanceId, PolicyId, Violation } from './types';
+import { EventEmitter } from 'events';
+import { UserId, InstanceId, PolicyId } from './types';
 
 export enum DomainEventType {
     INSTANCE_MATERIALIZED = 'INSTANCE_MATERIALIZED',
-    EXECUTION_RECORDED = 'EXECUTION_RECORDED',
     VIOLATION_DETECTED = 'VIOLATION_DETECTED',
-    SCORE_UPDATED = 'SCORE_UPDATED',
-    POLICY_BREACHED = 'POLICY_BREACHED',
-    USER_LOCKED_OUT = 'USER_LOCKED_OUT'
+    SCORE_UPDATED = 'SCORE_UPDATED'
 }
 
 export interface DomainEvent {
@@ -43,3 +40,24 @@ export interface ScoreUpdatedEvent extends DomainEvent {
         reason: string;
     };
 }
+
+type EventMap = {
+    [DomainEventType.INSTANCE_MATERIALIZED]: InstanceMaterializedEvent;
+    [DomainEventType.VIOLATION_DETECTED]: ViolationDetectedEvent;
+    [DomainEventType.SCORE_UPDATED]: ScoreUpdatedEvent;
+    [key: string]: DomainEvent;
+};
+
+export class DomainEventBus extends EventEmitter {
+    // @ts-ignore
+    emit<K extends keyof EventMap>(event: K, payload: EventMap[K]) {
+        return super.emit(event as string, payload);
+    }
+
+    // @ts-ignore
+    on<K extends keyof EventMap>(event: K, listener: (payload: EventMap[K]) => void): this {
+        return super.on(event as string, listener);
+    }
+}
+
+export const domainEvents = new DomainEventBus();

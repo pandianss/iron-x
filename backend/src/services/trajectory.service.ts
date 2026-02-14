@@ -1,9 +1,9 @@
 import prisma from '../db';
-import { calculateUserScore } from '../jobs/calculateScore';
+
 
 export type DisciplineClassification = 'UNRELIABLE' | 'RECOVERING' | 'STABLE' | 'HIGH_RELIABILITY';
 
-export const ExperienceService = {
+export const TrajectoryService = {
     /**
      * Calculates and updates the user's discipline classification.
      * Rules:
@@ -11,11 +11,6 @@ export const ExperienceService = {
      * - RECOVERING: Score >= 50 AND < 80
      * - STABLE: Score >= 80 AND < 95
      * - HIGH_RELIABILITY: Score >= 95
-     * 
-     * Hysteresis/Stability:
-     * - To upgrade: Must hold score for X days? (Simpler for now: Instant based on current score, 
-     *   but "Days at current classification" will handle the stability aspect visually).
-     * - Actually, let's just derive it from the score for now to be deterministic as per specs.
      */
     async calculateClassification(userId: string): Promise<DisciplineClassification> {
         const user = await prisma.user.findUnique({
@@ -50,7 +45,6 @@ export const ExperienceService = {
                     classification_last_updated: new Date()
                 }
             });
-            // We could log this to audit log if needed
         }
     },
 
@@ -131,7 +125,53 @@ export const ExperienceService = {
     },
 
     /**
-     * Get tomorrow's preview.
+     * Projects the user's score 7 days into the future based on current behavior.
+     * Naive projection: assumes current "miss rate" continues.
+     */
+    async getProjectedScore(userId: string): Promise<{ projectedScore: number, trend: 'UP' | 'DOWN' | 'FLAT' }> {
+        // 1. Get last 7 days of data
+        const now = new Date();
+        const weekAgo = new Date();
+        weekAgo.setDate(now.getDate() - 7);
+
+        const instances = await prisma.actionInstance.findMany({
+            where: {
+                user_id: userId,
+                scheduled_date: { gte: weekAgo }
+            },
+            select: { status: true }
+        });
+
+        if (instances.length === 0) return { projectedScore: 50, trend: 'FLAT' };
+
+        const misses = instances.filter(i => i.status === 'MISSED').length;
+        // Simple penalty model: -5 per miss, +1 per day of perfect execution?
+        // Let's reuse a simplified version of ScoreCalculator logic:
+        // Current score - (misses * 5) + (days_perfect * 1)
+        // This is a rough heuristic for projection.
+
+        const user = await prisma.user.findUnique({
+            where: { user_id: userId },
+            select: { current_discipline_score: true }
+        });
+
+        const currentScore = user?.current_discipline_score || 50;
+
+        // Extrapolate: If they miss at the same rate next week...
+        // misses per week = current misses 
+        const projectedChange = -(misses * 2); // Assume -2 score impact per miss roughly
+
+        let projectedScore = currentScore + projectedChange;
+        if (projectedScore > 100) projectedScore = 100;
+        if (projectedScore < 0) projectedScore = 0;
+
+        const trend = projectedChange > 0 ? 'UP' : (projectedChange < 0 ? 'DOWN' : 'FLAT');
+
+        return { projectedScore, trend };
+    },
+
+    /**
+     * Get tomorrow's preview and Risk Analysis.
      */
     async getTomorrowPreview(userId: string) {
         const tomorrow = new Date();
@@ -152,17 +192,59 @@ export const ExperienceService = {
         });
 
         // Determine Window Tightness / Risk
-        // Simple heuristic for now: > 5 actions = High, > 2 = Medium, else Low
         let risk = 'Low Risk';
-        if (instances > 5) risk = 'High Risk';
-        else if (instances > 2) risk = 'Medium Risk';
+        let warning = '';
+
+        if (instances > 8) {
+            risk = 'High Risk';
+            warning = 'Heavy load detected. High chance of failure due to fatigue.';
+        } else if (instances > 5) {
+            risk = 'Medium Risk';
+            warning = 'Moderate load. Ensure breaks between actions.';
+        }
 
         return {
             scheduledCount: instances,
             riskLevel: risk,
+            warning,
             date: tomorrow
         };
     },
+
+    /**
+     * Generates anticipatory warnings about status changes.
+     */
+    async getAnticipatoryWarnings(userId: string) {
+        const user = await prisma.user.findUnique({
+            where: { user_id: userId },
+            select: { current_discipline_score: true, discipline_classification: true }
+        });
+
+        if (!user) return [];
+
+        const warnings = [];
+        const score = user.current_discipline_score;
+
+        // Warning thresholds (buffer zones)
+        if (score > 50 && score < 55) {
+            warnings.push({
+                type: 'STATUS_RISK',
+                severity: 'HIGH',
+                message: 'Danger Zone: You are 1-2 misses away from dropping to UNRELIABLE.'
+            });
+        }
+
+        if (score > 80 && score < 85) {
+            warnings.push({
+                type: 'STATUS_RISK',
+                severity: 'MEDIUM',
+                message: 'Warning: You are close to losing STABLE status.'
+            });
+        }
+
+        return warnings;
+    },
+
     async getWeeklyReport(userId: string) {
         const now = new Date();
         const weekAgo = new Date();

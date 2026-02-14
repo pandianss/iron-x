@@ -16,10 +16,26 @@ export class DisciplineEngine {
         this.policy = new PolicyEvaluator();
         this.pipeline = new ExecutionPipeline(this.policy);
         this.calculator = new ScoreCalculator();
+
+        // Register Observers
+        // In a real DI container this would be cleaner, but for MVP we wire here
+        const { enforcementObserver } = require('../governance/observers/EnforcementObserver');
+        const { auditObserver } = require('../governance/observers/AuditObserver');
+        const { domainEvents, DomainEventType } = require('./domain/events');
+
+        domainEvents.on(DomainEventType.VIOLATION_DETECTED, (e: any) => enforcementObserver.handle(e));
+        domainEvents.on(DomainEventType.SCORE_UPDATED, (e: any) => auditObserver.handle(e));
+        domainEvents.on(DomainEventType.VIOLATION_DETECTED, (e: any) => auditObserver.handle(e));
+        domainEvents.on(DomainEventType.INSTANCE_MATERIALIZED, (e: any) => auditObserver.handle(e));
     }
 
-    async runCycle(context: DisciplineContext) {
-        console.log(`[Kernel] Running cycle for ${context.userId}`);
+    async runCycle(contextParams: { userId: string, traceId: string, timestamp: Date }) {
+        console.log(`[Kernel] Running cycle for ${contextParams.userId}`);
+
+        // 0. Build Context (Data Access)
+        const context = await this.lifecycle.loadContext(contextParams.userId);
+        context.traceId = contextParams.traceId;
+        context.timestamp = contextParams.timestamp;
 
         // 1. Materialize
         await this.lifecycle.materialize(context);

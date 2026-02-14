@@ -1,17 +1,28 @@
-
 import cron from 'node-cron';
-import { runKernelCycle } from './jobs/runKernelCycle';
+import prisma from './db';
+import { kernel } from './kernel/DisciplineEngine';
+import { v4 as uuidv4 } from 'uuid';
 
 export const startCronJobs = () => {
-    console.log('Starting cron jobs...');
+    // Run every hour to check for missed actions and violations
+    cron.schedule('0 * * * *', async () => {
+        console.log('[Cron] Starting hourly discipline cycle...');
 
-    // Unified Kernel Cycle - Runs every minute
-    // This orchestrates materialization, violation detection, and scoring
-    cron.schedule('* * * * *', () => {
-        runKernelCycle();
+        try {
+            const users = await prisma.user.findMany({ select: { user_id: true } });
+
+            for (const user of users) {
+                const traceId = uuidv4();
+                await kernel.runCycle({
+                    userId: user.user_id,
+                    traceId,
+                    timestamp: new Date()
+                });
+            }
+        } catch (error) {
+            console.error('[Cron] Discipline cycle failed:', error);
+        }
     });
 
-    // Run once on startup
-    runKernelCycle();
+    console.log('[Cron] Scheduler started.');
 };
-

@@ -11,7 +11,7 @@ import goalRoutes from './routes/goalRoutes';
 import actionRoutes from './routes/actionRoutes';
 import outcomeRoutes from './routes/outcomeRoutes';
 import policyRoutes from './routes/policyRoutes';
-import experienceRoutes from './routes/experienceRoutes';
+import trajectoryRoutes from './routes/trajectoryRoutes';
 import disciplineRoutes from './routes/disciplineRoutes';
 
 import { apiLimiter, authLimiter } from './middleware/rateLimitMiddleware';
@@ -44,7 +44,7 @@ app.use('/actions', policyEnforcementMiddleware, actionRoutes);
 
 app.use('/outcomes', outcomeRoutes);
 app.use('/policies', policyRoutes);
-app.use('/experience', experienceRoutes);
+app.use('/trajectory', trajectoryRoutes);
 app.use('/discipline', disciplineRoutes);
 
 

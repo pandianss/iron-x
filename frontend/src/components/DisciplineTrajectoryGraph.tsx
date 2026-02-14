@@ -1,31 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import client from '../api/client';
-
-interface TrajectoryData {
-    history: { date: string; score: number }[];
-    events: { date: string; type: string; cause: string }[];
-}
+import { getTrajectoryHistory, getProjectedScore, TrajectoryData, PredictionData } from '../api/trajectory';
 
 const DisciplineTrajectoryGraph: React.FC = () => {
     const [data, setData] = useState<TrajectoryData | null>(null);
+    const [projection, setProjection] = useState<PredictionData | null>(null);
     const [loading, setLoading] = useState(true);
     const [days, setDays] = useState(30);
 
     useEffect(() => {
-        const fetchTrajectory = async () => {
+        const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await client.get(`/experience/trajectory?days=${days}`);
-                if (response.status === 200) {
-                    setData(response.data);
-                }
+                const [historyData, projectionData] = await Promise.all([
+                    getTrajectoryHistory(days),
+                    getProjectedScore()
+                ]);
+                setData(historyData);
+                setProjection(projectionData);
             } catch (err) {
                 console.error(err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchTrajectory();
+        fetchData();
     }, [days]);
 
     if (loading) return <div className="animate-pulse h-64 bg-gray-100 rounded-lg"></div>;
@@ -36,18 +34,33 @@ const DisciplineTrajectoryGraph: React.FC = () => {
     const width = 600;
     const padding = 20;
 
-    const maxScore = 100;
-    const minScore = 0;
+    // Calculate X scale considering we might want space for prediction?
+    // For now, let's overlay prediction at the end or extend X?
+    // Let's prediction be 7 days out.
+    const historyPoints = data.history.length;
+    const totalPoints = historyPoints + 1; // +1 for 7-day predicted point
 
     const getX = (index: number) => {
-        return padding + (index / (data.history.length - 1)) * (width - 2 * padding);
+        return padding + (index / (totalPoints - 1)) * (width - 2 * padding);
     };
 
     const getY = (score: number) => {
         return height - padding - (score / 100) * (height - 2 * padding);
     };
 
-    const points = data.history.map((d, i) => `${getX(i)},${getY(d.score)}`).join(' ');
+    const historyPath = data.history.map((d, i) => `${getX(i)},${getY(d.score)}`).join(' ');
+
+    let projectionPath = '';
+    if (projection && data.history.length > 0) {
+        const lastPoint = data.history[data.history.length - 1];
+        const lastX = getX(data.history.length - 1);
+        const lastY = getY(lastPoint.score);
+
+        const predX = getX(totalPoints - 1);
+        const predY = getY(projection.projectedScore);
+
+        projectionPath = `${lastX},${lastY} ${predX},${predY}`;
+    }
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
@@ -78,8 +91,19 @@ const DisciplineTrajectoryGraph: React.FC = () => {
                         fill="none"
                         stroke="#4f46e5"
                         strokeWidth="2"
-                        points={points}
+                        points={historyPath}
                     />
+
+                    {/* Projection */}
+                    {projectionPath && (
+                        <polyline
+                            fill="none"
+                            stroke="#9ca3af"
+                            strokeWidth="2"
+                            strokeDasharray="4 4"
+                            points={projectionPath}
+                        />
+                    )}
 
                     {/* Points & Tooltips */}
                     {data.history.map((d, i) => (

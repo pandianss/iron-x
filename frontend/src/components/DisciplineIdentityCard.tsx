@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDiscipline } from '../context/DisciplineContext';
+import { useDiscipline } from '../hooks/useDiscipline';
 
 const DisciplineIdentityCard: React.FC = () => {
     const { identity: data, loading } = useDiscipline();

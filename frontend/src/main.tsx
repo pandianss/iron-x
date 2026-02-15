@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 // alert('Main.tsx Executing'); // Debug confirmation
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
+import App from './App'
 
 
 try {

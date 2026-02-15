@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TrajectoryClient, type TomorrowPreviewData, type Warning } from '../domain/trajectory';
 import { Calendar, AlertTriangle, CheckCircle, Info, Siren } from 'lucide-react';
-import { useDiscipline } from '../context/DisciplineContext';
+import { useDiscipline } from '../hooks/useDiscipline';
 
 
 const TomorrowPreview: React.FC = () => {

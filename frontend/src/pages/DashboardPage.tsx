@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScheduleClient, type ScheduledItem } from '../domain/schedule';
 import { useAuth } from '../hooks/useAuth';
-import { useDiscipline } from '../context/DisciplineContext';
+import { useDiscipline } from '../hooks/useDiscipline';
 import { Link } from 'react-router-dom';
 import DisciplineDashboard from '../components/DisciplineDashboard';
 import ExecutionFeedbackPanel from '../components/ExecutionFeedbackPanel';

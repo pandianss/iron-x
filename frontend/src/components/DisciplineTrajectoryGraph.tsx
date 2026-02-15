@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTrajectoryHistory, useTrajectoryProjection } from '../hooks/useTrajectory';
-import { useDiscipline } from '../context/DisciplineContext';
+import { useDiscipline } from '../hooks/useDiscipline';
 
 const DisciplineTrajectoryGraph: React.FC = () => {
     const { refreshTrigger } = useDiscipline();

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getSubscription, createPortalSession } from '../api/client';
-import { CreditCard, Shield, Activity, ArrowRight, CheckCircle } from 'lucide-react';
+import { CreditCard, Shield, Activity, CheckCircle } from 'lucide-react';
 
 const BillingPortalPage: React.FC = () => {
     const { user } = useAuth();

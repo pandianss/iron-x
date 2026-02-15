@@ -127,4 +127,9 @@ export const runSimulation = async (type: string, value: number) => {
     return response.data;
 };
 
+export const getTeamVelocity = async (teamId: string) => {
+    const response = await client.get(`/analytics/team/${teamId}/velocity`);
+    return response.data;
+};
+
 export default client;

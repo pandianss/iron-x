@@ -3,7 +3,7 @@ import { DisciplineStatusBar } from '../components/cockpit/DisciplineStatusBar';
 import { PressureDriftPanel } from '../components/cockpit/PressureDriftPanel';
 import { ActiveControlsPanel } from '../components/cockpit/ActiveControlsPanel';
 import { ViolationHorizon } from '../components/cockpit/ViolationHorizon';
-import { AuditLog } from '../components/cockpit/AuditLog';
+import { PerformancePanel } from '../components/cockpit/PerformancePanel';
 
 const CockpitPage: React.FC = () => {
     return (
@@ -36,7 +36,7 @@ const CockpitPage: React.FC = () => {
 
                 {/* 8. Audit & Consequence Log - Bottom span */}
                 <div className="col-span-8 row-span-2 flex flex-col min-h-0 overflow-hidden">
-                    <AuditLog />
+                    <PerformancePanel />
                 </div>
             </div>
 

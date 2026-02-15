@@ -1,12 +1,16 @@
+
 import { Request, Response, NextFunction } from 'express';
 import { autoInjectable } from 'tsyringe';
 import prisma from '../../db';
 import { AuditService } from '../../services/audit.service';
 import { sanitizeMemberProfile } from '../../utils/privacy';
 import { NotFoundError, ForbiddenError } from '../../utils/AppError';
+import { TeamService } from './team.service';
 
 @autoInjectable()
 export class TeamController {
+    constructor(private teamService: TeamService) { }
+
     createTeam = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { name } = req.body;
@@ -39,7 +43,7 @@ export class TeamController {
             const requesterId = (req as any).user!.userId;
 
             const membership = await prisma.teamMember.findUnique({
-                where: { team_id_user_id: { team_id: teamId, user_id: requesterId } }
+                where: { team_id_user_id: { team_id: teamId as string, user_id: requesterId } }
             });
 
             if (!membership || membership.role !== 'MANAGER') {
@@ -147,6 +151,31 @@ export class TeamController {
             res.set('Content-Disposition', `attachment; filename="compliance_report_${teamId}.csv"`);
             res.send(csv);
 
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    inviteMember = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { teamId } = req.params;
+            const { email, role } = req.body;
+            const requesterId = (req as any).user!.userId;
+
+            const invitation = await this.teamService.createInvitation(teamId as string, email, role, requesterId);
+            res.status(201).json({ message: 'Invitation sent', invitationId: invitation.invitation_id });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    acceptInvite = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { token } = req.params;
+            const userId = (req as any).user!.userId;
+
+            const result = await this.teamService.acceptInvitation(token as string, userId);
+            res.status(200).json(result);
         } catch (error) {
             next(error);
         }

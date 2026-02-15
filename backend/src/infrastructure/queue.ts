@@ -29,5 +29,38 @@ export const createKernelWorker = () => {
                 timestamp: new Date(timestamp)
             });
         }
+
+        if (job.name === 'CLEANUP_LOGS_JOB') {
+            const { retentionDays } = job.data;
+            const { AuditService } = await import('../modules/audit/audit.service');
+            console.log(`[Worker] Running Audit Log Cleanup. Retention: ${retentionDays} days`);
+            const deletedCount = await AuditService.cleanupLogs(retentionDays);
+            console.log(`[Worker] Audit Log Cleanup Complete. Deleted ${deletedCount} logs.`);
+        }
+
+        if (job.name === 'WEBHOOK_JOB') {
+            const { url, payload, secret } = job.data;
+            const axios = (await import('axios')).default;
+            const crypto = await import('crypto');
+
+            console.log(`[Worker] Delivering Webhook to: ${url}`);
+
+            const headers: any = { 'Content-Type': 'application/json' };
+            if (secret) {
+                const signature = crypto
+                    .createHmac('sha256', secret)
+                    .update(JSON.stringify(payload))
+                    .digest('hex');
+                headers['X-Iron-X-Signature'] = signature;
+            }
+
+            try {
+                await axios.post(url, payload, { headers, timeout: 5000 });
+                console.log(`[Worker] Webhook delivered successfully to ${url}`);
+            } catch (error: any) {
+                console.error(`[Worker] Webhook delivery failed to ${url}:`, error.message);
+                throw error; // Let BullMQ handle retries
+            }
+        }
     }, { connection: redisConnection });
 };

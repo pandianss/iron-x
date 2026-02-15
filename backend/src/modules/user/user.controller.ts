@@ -29,7 +29,19 @@ export class UserController {
     getProfile = async (req: Request, res: Response) => {
         const userId = (req as any).user!.userId;
         const user = await prisma.user.findUnique({
-            where: { user_id: userId }
+            where: { user_id: userId },
+            include: {
+                team_memberships: {
+                    include: {
+                        team: {
+                            select: { team_id: true, name: true, owner_id: true }
+                        }
+                    }
+                },
+                teams_owned: {
+                    select: { team_id: true, name: true }
+                }
+            }
         });
 
         if (!user) return res.status(404).json({ error: 'User not found' });

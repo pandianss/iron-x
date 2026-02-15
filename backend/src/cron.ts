@@ -29,5 +29,30 @@ export const startCronJobs = () => {
         }
     });
 
+    // Run every day at 3 AM to cleanup old audit logs
+    cron.schedule('0 3 * * *', async () => {
+        Logger.info('[Cron] Triggering audit log cleanup...');
+        try {
+            // Default to 90 days retention if not specified
+            const retentionDays = parseInt(process.env.AUDIT_RETENTION_DAYS || '90');
+            await kernelQueue.add('CLEANUP_LOGS_JOB', { retentionDays });
+        } catch (error) {
+            Logger.error('[Cron] Failed to trigger audit log cleanup:', error);
+        }
+    });
+
+    // Run every Sunday at 2 AM for database maintenance
+    cron.schedule('0 2 * * 0', async () => {
+        Logger.info('[Cron] Triggering weekly database maintenance...');
+        try {
+            const { container } = await import('tsyringe');
+            const { OpsService } = await import('./modules/ops/ops.service');
+            const opsService = container.resolve(OpsService);
+            await opsService.runDatabaseMaintenance();
+        } catch (error) {
+            Logger.error('[Cron] Weekly maintenance failed:', error);
+        }
+    });
+
     Logger.info('[Cron] Scheduler started.');
 };

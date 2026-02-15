@@ -2,11 +2,16 @@ import { singleton, inject } from 'tsyringe';
 import prisma from '../../db';
 import { hashPassword, comparePassword, generateToken } from '../../utils/auth';
 import { AppError } from '../../utils/AppError';
+import { SecurityService } from '../security/security.service';
 
 @singleton()
 export class AuthService {
+    constructor(
+        @inject(SecurityService) private securityService: SecurityService
+    ) { }
+
     async register(data: any) {
-        const { email, password, timezone } = data;
+        const { email, password, timezone, orgName, orgSlug } = data;
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
@@ -14,31 +19,45 @@ export class AuthService {
         }
 
         const hashedPassword = await hashPassword(password);
-        const user = await prisma.user.create({
+
+        let orgId = undefined;
+        if (orgName && orgSlug) {
+            const org = await (prisma as any).organization.create({
+                data: { name: orgName, slug: orgSlug }
+            });
+            orgId = org.org_id;
+        }
+
+        const user = await (prisma as any).user.create({
             data: {
                 email,
                 password_hash: hashedPassword,
                 timezone: timezone || 'UTC',
+                org_id: orgId
             },
-        });
-
-        // Phase 6: Institutionalization - Assign Default Role
-        // We can inject PolicyService here later, but for now dynamic import or direct import is fine if not circular
-        try {
-            // Check if PolicyService is available to import without circular deps
-            // For now, we will keep the pattern from the controller but cleaned up
-        } catch (e) {
-            console.error('Failed to assign default role:', e);
-        }
+            include: { organization: true } as any
+        }) as any;
 
         const token = generateToken(user.user_id);
-        return { token, user: { id: user.user_id, email: user.email } };
+        return {
+            token,
+            user: {
+                id: user.user_id,
+                email: user.email,
+                org_id: user.org_id,
+                organization: user.organization
+            }
+        };
     }
 
     async login(data: any) {
-        const { email, password } = data;
+        const { email, password, mfaToken } = data;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({
+            where: { email },
+            include: { organization: true }
+        }) as any;
+
         if (!user) {
             throw new AppError('Invalid credentials', 401);
         }
@@ -48,7 +67,27 @@ export class AuthService {
             throw new AppError('Invalid credentials', 401);
         }
 
+        // Check MFA
+        if (user.mfa_enabled) {
+            if (!mfaToken) {
+                return { mfaRequired: true, userId: user.user_id };
+            }
+
+            const isValid = this.securityService.verifyToken(mfaToken, user.mfa_secret!);
+            if (!isValid) {
+                throw new AppError('Invalid MFA token', 401);
+            }
+        }
+
         const token = generateToken(user.user_id);
-        return { token, user: { id: user.user_id, email: user.email } };
+        return {
+            token,
+            user: {
+                id: user.user_id,
+                email: user.email,
+                org_id: user.org_id,
+                organization: user.organization
+            }
+        };
     }
 }

@@ -4,6 +4,11 @@ import type { ReactNode } from 'react';
 interface User {
     id: string;
     email: string;
+    org_id?: string;
+    organization?: {
+        name: string;
+        slug: string;
+    };
 }
 
 interface AuthContextType {

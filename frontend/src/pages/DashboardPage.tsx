@@ -22,7 +22,7 @@ interface ActionInstance {
 }
 
 const DashboardPage: React.FC = () => {
-    const { token, logout } = useAuth();
+    const { token, logout, user } = useAuth();
     const [instances, setInstances] = useState<ActionInstance[]>([]);
     const [loading, setLoading] = useState(true);
     const [isReportOpen, setIsReportOpen] = useState(false);
@@ -75,6 +75,17 @@ const DashboardPage: React.FC = () => {
                         >
                             <BookOpen className="w-4 h-4 mr-1" /> Weekly Report
                         </button>
+                        <Link to="/pricing" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                            Plans & Billing
+                        </Link>
+                        <Link to="/security" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                            Security
+                        </Link>
+                        {user?.organization && (
+                            <Link to={`/org/${user.organization.slug}`} className="text-red-600 hover:text-red-800 text-sm font-bold uppercase tracking-tighter">
+                                Organization
+                            </Link>
+                        )}
                         <button onClick={logout} className="text-red-600 hover:text-red-800 text-sm">Logout</button>
                     </div>
                 </div>

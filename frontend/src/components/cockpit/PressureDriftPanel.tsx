@@ -1,5 +1,7 @@
+
 import React, { useEffect, useState } from 'react';
 import { getPressure, type PressureData } from '../../api/discipline';
+import { DriftChart } from '../analytics/DriftChart';
 
 export const PressureDriftPanel: React.FC = () => {
     const [data, setData] = useState<PressureData | null>(null);
@@ -39,19 +41,25 @@ export const PressureDriftPanel: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-                {data.driftVectors.map((vector, idx) => (
-                    <div key={idx} className="bg-zinc-950 p-3 border-l-2 border-amber-600 flex justify-between items-center font-mono">
-                        <div className="flex flex-col">
-                            <span className="text-zinc-300 text-sm font-bold">{vector.source}</span>
-                            <span className="text-zinc-600 text-xs">Threshold: {vector.threshold}</span>
+            <div className="flex-1 min-h-0 flex flex-col gap-4">
+                <div className="flex-1 min-h-0 border border-zinc-800 bg-zinc-950/50 rounded overflow-hidden">
+                    <DriftChart />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 h-1/3 overflow-y-auto">
+                    {data.driftVectors.map((vector, idx) => (
+                        <div key={idx} className="bg-zinc-950 p-3 border-l-2 border-amber-600 flex justify-between items-center font-mono text-xs">
+                            <div className="flex flex-col">
+                                <span className="text-zinc-300 font-bold">{vector.source}</span>
+                                <span className="text-zinc-600 text-[10px]">Threshold: {vector.threshold}</span>
+                            </div>
+                            <div className="flex flex-col items-end">
+                                <span className="text-amber-500 font-bold">{vector.current}</span>
+                                <span className="text-zinc-500 text-[10px] whitespace-nowrap">Breach: {vector.timeToBreach}</span>
+                            </div>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <span className="text-amber-500 font-bold">{vector.current}</span>
-                            <span className="text-zinc-500 text-xs">Breach in: {vector.timeToBreach}</span>
-                        </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );

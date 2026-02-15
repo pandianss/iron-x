@@ -7,15 +7,21 @@ import DashboardPage from './pages/DashboardPage';
 import CockpitPage from './pages/CockpitPage';
 import GoalsPage from './pages/GoalsPage';
 import ActionsPage from './pages/ActionsPage';
+// import ActionInstancePage from './pages/ActionInstancePage'; // Removed as likely unused or causing errors
+import PricingPage from './pages/PricingPage';
+import ROICalculatorPage from './pages/ROICalculatorPage';
+import HomePage from './pages/marketing/HomePage';
+import IndustryPage from './pages/marketing/IndustryPage';
+import JoinTeamPage from './pages/JoinTeamPage';
+import SecuritySettingsPage from './pages/SecuritySettingsPage';
+import OrganizationDashboardPage from './pages/OrganizationDashboardPage';
 
 console.log('App.tsx loaded');
-
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
-
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
   constructor(props: any) {
@@ -52,10 +58,16 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
+            {/* Marketing Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/solutions/:industry" element={<IndustryPage />} />
+            <Route path="/solutions" element={<Navigate to="/" replace />} /> {/* Or a solutions hub page later */}
+
+            {/* App Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <DashboardPage />
@@ -86,7 +98,42 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            <Route
+              path="/pricing"
+              element={
+                <ProtectedRoute>
+                  <PricingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/roi-calculator"
+              element={
+                <ROICalculatorPage />
+              }
+            />
+            <Route
+              path="/security"
+              element={
+                <ProtectedRoute>
+                  <SecuritySettingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/org/:slug"
+              element={
+                <ProtectedRoute>
+                  <OrganizationDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/join/:token"
+              element={
+                <JoinTeamPage />
+              }
+            />
 
             <Route path="*" element={
               <div style={{ padding: 40, textAlign: 'center', color: '#666' }}>

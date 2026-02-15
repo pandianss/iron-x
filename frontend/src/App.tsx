@@ -15,6 +15,7 @@ import IndustryPage from './pages/marketing/IndustryPage';
 import JoinTeamPage from './pages/JoinTeamPage';
 import SecuritySettingsPage from './pages/SecuritySettingsPage';
 import OrganizationDashboardPage from './pages/OrganizationDashboardPage';
+import BillingPortalPage from './pages/BillingPortalPage';
 
 console.log('App.tsx loaded');
 
@@ -125,6 +126,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OrganizationDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/billing"
+              element={
+                <ProtectedRoute>
+                  <BillingPortalPage />
                 </ProtectedRoute>
               }
             />

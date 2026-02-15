@@ -2,12 +2,17 @@ import { Response } from 'express';
 import { autoInjectable } from 'tsyringe';
 import { AuthRequest } from '../../middleware/authMiddleware';
 import { AnalyticsService } from './analytics.service';
-import prisma from '../../db'; // Keep for user fetch or move to service completely
-// Ideally move user fetch to service too, but for speed:
+import { OutcomeService } from './outcome.service';
+import { SimulationService } from './simulation.service';
+import prisma from '../../db';
 
 @autoInjectable()
 export class AnalyticsController {
-    constructor(private analyticsService: AnalyticsService) { }
+    constructor(
+        private analyticsService: AnalyticsService,
+        private outcomeService: OutcomeService,
+        private simulationService: SimulationService
+    ) { }
 
     getDisciplineData = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
@@ -70,6 +75,34 @@ export class AnalyticsController {
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Server error' });
+        }
+    }
+
+    getProjections = async (req: AuthRequest, res: Response) => {
+        const userId = req.user?.userId;
+        if (!userId) return res.sendStatus(401);
+
+        try {
+            const trajectory = await this.outcomeService.predictFailureTrajectory(userId);
+            const success = await this.outcomeService.calculateSuccessProbability(userId);
+            res.json({ trajectory, success });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to calculate projections' });
+        }
+    };
+
+    runSimulation = async (req: AuthRequest, res: Response) => {
+        const userId = req.user?.userId;
+        const { type, value } = req.body;
+        if (!userId) return res.sendStatus(401);
+
+        try {
+            const result = await this.simulationService.runCounterfactual(userId, { type, value });
+            res.json(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Simulation failed' });
         }
     }
 }

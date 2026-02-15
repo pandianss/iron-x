@@ -331,6 +331,8 @@ model Subscription {
   start_date      DateTime         @default(now())
   end_date        DateTime?
   is_active       Boolean          @default(true)
+  is_locked       Boolean          @default(false)
+  grace_period_until DateTime?
   stripe_customer_id String?       @unique
   stripe_subscription_id String?   @unique
   metadata        String? // JSON for payment/cust_id

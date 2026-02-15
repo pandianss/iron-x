@@ -75,7 +75,7 @@ const DashboardPage: React.FC = () => {
                         >
                             <BookOpen className="w-4 h-4 mr-1" /> Weekly Report
                         </button>
-                        <Link to="/pricing" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                        <Link to="/billing" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
                             Plans & Billing
                         </Link>
                         <Link to="/security" className="text-gray-600 hover:text-gray-900 text-sm font-medium">

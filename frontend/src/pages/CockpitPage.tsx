@@ -4,6 +4,7 @@ import { PressureDriftPanel } from '../components/cockpit/PressureDriftPanel';
 import { ActiveControlsPanel } from '../components/cockpit/ActiveControlsPanel';
 import { ViolationHorizon } from '../components/cockpit/ViolationHorizon';
 import { PerformancePanel } from '../components/cockpit/PerformancePanel';
+import { StrategySandbox } from '../components/cockpit/StrategySandbox';
 
 const CockpitPage: React.FC = () => {
     return (
@@ -24,17 +25,22 @@ const CockpitPage: React.FC = () => {
                     <PressureDriftPanel />
                 </div>
 
-                {/* 3. Active Controls & Constraints - Side panel for enforcement context */}
-                <div className="col-span-4 row-span-3 flex flex-col min-h-0 overflow-hidden">
+                {/* 3. Active Controls & Constraints (Top Right) */}
+                <div className="col-span-4 row-span-2 flex flex-col min-h-0 overflow-hidden">
                     <ActiveControlsPanel />
                 </div>
 
-                {/* 7. Violation Horizon (Forward-Looking) - Below controls */}
-                <div className="col-span-4 row-span-3 flex flex-col min-h-0 overflow-hidden">
+                {/* 7. Violation Horizon (Middle Right) */}
+                <div className="col-span-4 row-span-2 flex flex-col min-h-0 overflow-hidden">
                     <ViolationHorizon />
                 </div>
 
-                {/* 8. Audit & Consequence Log - Bottom span */}
+                {/* 8. Strategy Sandbox (Bottom Right) */}
+                <div className="col-span-4 row-span-2 flex flex-col min-h-0 overflow-hidden">
+                    <StrategySandbox />
+                </div>
+
+                {/* Bottom Left Panel */}
                 <div className="col-span-8 row-span-2 flex flex-col min-h-0 overflow-hidden">
                     <PerformancePanel />
                 </div>

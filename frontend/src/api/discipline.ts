@@ -67,3 +67,21 @@ export const getHistory = async () => {
     const response = await client.get<AuditEntry[]>('/discipline/history');
     return response.data;
 };
+
+export const getProjections = async () => {
+    const response = await client.get<{
+        trajectory: { probability: number; trend: string; slope: number; projectedCollapseDate: string | null };
+        success: { rate: number; probability: number; message: string };
+    }>('/analytics/projections');
+    return response.data;
+};
+
+export const runSimulation = async (type: string, value: number) => {
+    const response = await client.post<{
+        currentScore: number;
+        simulatedScore: number;
+        delta: number;
+        impact: 'POSITIVE' | 'NEGATIVE';
+    }>('/analytics/simulate', { type, value });
+    return response.data;
+};

@@ -15,8 +15,8 @@ export class StripeService {
 
     async createCustomer(userId: string, email: string): Promise<string> {
         // Check if existing
-        const existingSub = await prisma.subscription.findUnique({ where: { user_id: userId } });
-        if (existingSub?.stripe_customer_id) return existingSub.stripe_customer_id;
+        const existingSub = await (prisma as any).subscription.findUnique({ where: { user_id: userId } });
+        if ((existingSub as any)?.stripe_customer_id) return (existingSub as any).stripe_customer_id;
 
         const customer = await this.stripe.customers.create({
             email,
@@ -24,7 +24,7 @@ export class StripeService {
         });
 
         // Update DB
-        await prisma.subscription.upsert({
+        await (prisma as any).subscription.upsert({
             where: { user_id: userId },
             update: { stripe_customer_id: customer.id },
             create: {
@@ -59,11 +59,11 @@ export class StripeService {
     }
 
     async createPortalSession(userId: string, returnUrl: string) {
-        const sub = await prisma.subscription.findUnique({ where: { user_id: userId } });
-        if (!sub?.stripe_customer_id) throw new Error('No Stripe customer found for user');
+        const sub = await (prisma as any).subscription.findUnique({ where: { user_id: userId } });
+        if (!(sub as any)?.stripe_customer_id) throw new Error('No Stripe customer found for user');
 
         const session = await this.stripe.billingPortal.sessions.create({
-            customer: sub.stripe_customer_id,
+            customer: (sub as any).stripe_customer_id,
             return_url: returnUrl,
         });
 
@@ -102,8 +102,8 @@ export class StripeService {
             case 'checkout.session.completed':
                 await this.handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
                 break;
-            case 'invoice.paid':
-                await this.handleInvoicePaid(event.data.object as Stripe.Invoice);
+            case 'invoice.payment_failed':
+                await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
                 break;
             case 'customer.subscription.deleted':
                 await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
@@ -113,12 +113,22 @@ export class StripeService {
         }
     }
 
+    private async handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+        const customerId = invoice.customer as string;
+        const sub = await (prisma as any).subscription.findUnique({ where: { stripe_customer_id: customerId } });
+
+        if (sub?.user_id) {
+            const { SubscriptionService } = require('../subscription/subscription.service');
+            await SubscriptionService.lockAccount(sub.user_id);
+        }
+    }
+
     private async handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         const userId = session.metadata?.userId;
         const subscriptionId = session.subscription as string;
 
         if (userId && subscriptionId) {
-            await prisma.subscription.update({
+            await (prisma as any).subscription.update({
                 where: { user_id: userId },
                 data: {
                     stripe_subscription_id: subscriptionId,
@@ -134,15 +144,24 @@ export class StripeService {
     private async handleInvoicePaid(invoice: Stripe.Invoice) {
         const subscriptionId = (invoice as any).subscription as string;
         if (subscriptionId) {
-            await prisma.subscription.update({
+            const sub = await (prisma as any).subscription.findUnique({
+                where: { stripe_subscription_id: subscriptionId }
+            });
+
+            await (prisma as any).subscription.update({
                 where: { stripe_subscription_id: subscriptionId },
                 data: { is_active: true }
             });
+
+            if ((sub as any)?.is_locked && sub?.user_id) {
+                const { SubscriptionService } = require('../subscription/subscription.service');
+                await SubscriptionService.unlockAccount(sub.user_id);
+            }
         }
     }
 
     private async handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-        await prisma.subscription.update({
+        await (prisma as any).subscription.update({
             where: { stripe_subscription_id: subscription.id },
             data: {
                 is_active: false,

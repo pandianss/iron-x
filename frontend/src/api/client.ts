@@ -28,8 +28,13 @@ export const createCheckoutSession = async (priceId: string, successUrl: string,
     return response.data;
 };
 
-export const createPortalSession = async (returnUrl: string) => {
+export const createPortalSession = async (returnUrl: string = window.location.href) => {
     const response = await client.post('/billing/portal', { returnUrl });
+    return response.data;
+};
+
+export const getSubscription = async (userId: string) => {
+    const response = await client.get(`/billing/subscription/${userId}`);
     return response.data;
 };
 
@@ -108,6 +113,17 @@ export const getApiKeys = async (orgId: string) => {
 
 export const getAuditLogs = async (params: { userId?: string; action?: string; limit?: number; offset?: number }) => {
     const response = await client.get('/audit/logs', { params });
+    return response.data;
+};
+
+// Analytics / Projections
+export const getProjections = async () => {
+    const response = await client.get('/analytics/projections');
+    return response.data;
+};
+
+export const runSimulation = async (type: string, value: number) => {
+    const response = await client.post('/analytics/simulate', { type, value });
     return response.data;
 };
 

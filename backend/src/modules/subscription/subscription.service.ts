@@ -7,18 +7,24 @@ export const SUBSCRIPTION_LIMITS = {
         max_actions: 3,
         max_goals: 3,
         max_teams: 1,
+        max_webhooks: 0,
+        max_api_keys: 0,
         enforcement_mode: 'SOFT_ONLY'
     },
     [SubscriptionTier.INDIVIDUAL_PRO]: {
         max_actions: Infinity,
         max_goals: Infinity,
         max_teams: 1,
+        max_webhooks: 5,
+        max_api_keys: 1,
         enforcement_mode: 'HARD'
     },
     [SubscriptionTier.TEAM_ENTERPRISE]: {
         max_actions: Infinity,
         max_goals: Infinity,
         max_teams: Infinity,
+        max_webhooks: 20,
+        max_api_keys: 10,
         enforcement_mode: 'CUSTOM'
     }
 };
@@ -104,5 +110,42 @@ export class SubscriptionService {
         }
 
         return { allowed: true };
+    }
+    static async lockAccount(userId: string, gracePeriodDays: number = 7) {
+        const graceUntil = new Date();
+        graceUntil.setDate(graceUntil.getDate() + gracePeriodDays);
+
+        return (prisma as any).subscription.update({
+            where: { user_id: userId },
+            data: {
+                is_locked: true,
+                grace_period_until: graceUntil
+            }
+        });
+    }
+
+    static async unlockAccount(userId: string) {
+        return (prisma as any).subscription.update({
+            where: { user_id: userId },
+            data: {
+                is_locked: false,
+                grace_period_until: null
+            }
+        });
+    }
+
+    static async getAccountStatus(userId: string) {
+        const sub = await this.getSubscription(userId);
+        if (!sub) return { status: 'OK' };
+
+        if ((sub as any).is_locked) {
+            const now = new Date();
+            if ((sub as any).grace_period_until && now > (sub as any).grace_period_until) {
+                return { status: 'HARD_LOCKED', message: 'Account hard-locked due to non-payment.' };
+            }
+            return { status: 'GRACE_PERIOD', message: 'Account in grace period. Please update payment method.', until: (sub as any).grace_period_until };
+        }
+
+        return { status: 'OK' };
     }
 }

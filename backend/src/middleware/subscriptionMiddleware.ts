@@ -1,65 +1,53 @@
 
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from './authMiddleware'; // Ensure this path is correct relative to middleware folder
+import { QuotaService, ResourceType } from '../modules/subscription/quota.service';
 import { SubscriptionService } from '../modules/subscription/subscription.service';
 import { SubscriptionTier } from '@prisma/client';
 
-export const checkActionLimit = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const checkAccountStatus = async (req: AuthRequest, res: Response, next: NextFunction) => {
     const userId = req.user?.userId;
     if (!userId) return res.sendStatus(401);
 
     try {
-        const check = await SubscriptionService.checkActionLimit(userId);
-        if (!check.allowed) {
+        const status = await SubscriptionService.getAccountStatus(userId);
+        if (status.status === 'HARD_LOCKED') {
             return res.status(403).json({
-                message: check.message || 'Plan limit exceeded',
-                code: 'PLAN_LIMIT_EXCEEDED'
+                message: status.message,
+                code: 'ACCOUNT_HARD_LOCKED'
             });
         }
         next();
     } catch (error) {
-        console.error('Subscription check error', error);
-        res.status(500).json({ message: 'Server error during plan check' });
+        console.error('Account status check error', error);
+        res.status(500).json({ message: 'Server error during status check' });
     }
 };
 
-export const checkGoalLimit = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const userId = req.user?.userId;
-    if (!userId) return res.sendStatus(401);
+const validateQuota = (resource: ResourceType) => {
+    return async (req: AuthRequest, res: Response, next: NextFunction) => {
+        const userId = req.user?.userId;
+        if (!userId) return res.sendStatus(401);
 
-    try {
-        const check = await SubscriptionService.checkGoalLimit(userId);
-        if (!check.allowed) {
-            return res.status(403).json({
-                message: check.message || 'Plan limit exceeded',
-                code: 'PLAN_LIMIT_EXCEEDED'
-            });
+        try {
+            const check = await QuotaService.checkQuota(userId, resource);
+            if (!check.allowed) {
+                return res.status(403).json({
+                    message: check.message || 'Plan limit exceeded',
+                    code: 'PLAN_LIMIT_EXCEEDED'
+                });
+            }
+            next();
+        } catch (error) {
+            console.error(`Quota check error for ${resource}`, error);
+            res.status(500).json({ message: 'Server error during quota check' });
         }
-        next();
-    } catch (error) {
-        console.error('Subscription check error', error);
-        res.status(500).json({ message: 'Server error during plan check' });
-    }
+    };
 };
 
-export const checkTeamLimit = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const userId = req.user?.userId;
-    if (!userId) return res.sendStatus(401);
-
-    try {
-        const check = await SubscriptionService.checkTeamLimit(userId);
-        if (!check.allowed) {
-            return res.status(403).json({
-                message: check.message || 'Plan limit exceeded',
-                code: 'PLAN_LIMIT_EXCEEDED'
-            });
-        }
-        next();
-    } catch (error) {
-        console.error('Subscription check error', error);
-        res.status(500).json({ message: 'Server error during plan check' });
-    }
-};
+export const checkActionLimit = validateQuota('ACTIONS');
+export const checkGoalLimit = validateQuota('GOALS');
+export const checkTeamLimit = validateQuota('TEAMS');
 
 
 export const checkStrictModeAccess = async (req: AuthRequest, res: Response, next: NextFunction) => {

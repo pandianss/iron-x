@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useTrajectoryHistory, useTrajectoryProjection } from '../hooks/useTrajectory';
+import { useDiscipline } from '../context/DisciplineContext';
 
 const DisciplineTrajectoryGraph: React.FC = () => {
+    const { refreshTrigger } = useDiscipline();
     const [days, setDays] = useState(30);
-    const { data, loading: historyLoading, error: historyError } = useTrajectoryHistory(days);
+    const { data, loading: historyLoading, error: historyError } = useTrajectoryHistory(days, refreshTrigger);
     const { data: projection, loading: projectionLoading } = useTrajectoryProjection();
 
     const loading = historyLoading || projectionLoading;

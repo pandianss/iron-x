@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { DisciplineClient, type ConstraintsData } from '../../domain/discipline';
+import { useDiscipline } from '../../context/DisciplineContext';
 
 export const ActiveControlsPanel: React.FC = () => {
+    const { refreshTrigger } = useDiscipline();
     const [data, setData] = useState<ConstraintsData | null>(null);
 
     useEffect(() => {
@@ -14,7 +16,7 @@ export const ActiveControlsPanel: React.FC = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [refreshTrigger]);
 
     if (!data) return <div className="p-4 bg-iron-900 border border-iron-800 h-64 animate-pulse">Loading Controls...</div>;
 

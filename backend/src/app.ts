@@ -38,8 +38,13 @@ dotenv.config();
 
 const app = express();
 
+import { DisciplineSubscriber } from './modules/discipline/discipline.subscriber';
+
 // Initialize domain event listeners for webhooks
 // initializeWebhookListeners();
+
+// Initialize internal subscribers
+DisciplineSubscriber.initialize();
 
 app.set('trust proxy', 1);
 
@@ -145,6 +150,15 @@ app.use('/api/v1', v1Router);
 // Stripe routes (can be outside v1Router if they have a different base path or specific middleware needs)
 app.use('/api/v1/billing', stripeRoutes);
 
+// Create HTTP server
+import { createServer } from 'http';
+import { SocketService } from './services/socket.service';
+
+const httpServer = createServer(app);
+
+// Initialize Socket Service
+SocketService.getInstance().initialize(httpServer);
+
 app.use(errorHandler);
 
-export default app;
+export { app, httpServer };

@@ -1,8 +1,10 @@
+
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import prisma from '../db';
 import { kernel } from '../kernel/DisciplineEngine';
 import { v4 as uuidv4 } from 'uuid';
+import { kernelEvents, DomainEventType } from '../kernel/events/bus';
 
 export const getDailySchedule = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
@@ -50,6 +52,7 @@ export const logExecution = async (req: AuthRequest, res: Response) => {
     try {
         const instance = await prisma.actionInstance.findUnique({
             where: { instance_id: id },
+            include: { action: true }
         });
 
         if (!instance || instance.user_id !== userId) {
@@ -60,7 +63,7 @@ export const logExecution = async (req: AuthRequest, res: Response) => {
 
         // Determine status (Completed, Late, etc.) - simplified for MVP
         let status = 'COMPLETED';
-        if (timestamp > instance.scheduled_end_time) {
+        if (instance.scheduled_end_time && timestamp > instance.scheduled_end_time) {
             status = 'LATE';
         }
 
@@ -71,6 +74,15 @@ export const logExecution = async (req: AuthRequest, res: Response) => {
                 status: status,
             },
         });
+
+        // EMIT EVENT
+        kernelEvents.emitEvent(DomainEventType.INSTANCE_STATUS_CHANGED, {
+            instanceId: id,
+            oldStatus: instance.status,
+            newStatus: status,
+            actionId: instance.action_id,
+            actionTitle: instance.action?.title
+        }, userId);
 
         res.json(updated);
     } catch (error) {

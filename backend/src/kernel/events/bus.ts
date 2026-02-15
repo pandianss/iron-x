@@ -13,7 +13,10 @@ export enum DomainEventType {
 
     // Governance
     ACCESS_DENIED = 'ACCESS_DENIED',
-    LOCKOUT_ENFORCED = 'LOCKOUT_ENFORCED'
+    LOCKOUT_ENFORCED = 'LOCKOUT_ENFORCED',
+
+    // Execution
+    INSTANCE_STATUS_CHANGED = 'INSTANCE_STATUS_CHANGED'
 }
 
 export interface DomainEvent {

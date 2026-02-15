@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScheduleClient, type ScheduledItem } from '../domain/schedule';
 import { useAuth } from '../context/AuthContext';
+import { useDiscipline } from '../context/DisciplineContext';
 import { Link } from 'react-router-dom';
 import DisciplineDashboard from '../components/DisciplineDashboard';
 import ExecutionFeedbackPanel from '../components/ExecutionFeedbackPanel';
@@ -10,6 +11,7 @@ import { BookOpen } from 'lucide-react';
 
 const DashboardPage: React.FC = () => {
     const { token, logout, user } = useAuth();
+    const { refresh: refreshDiscipline } = useDiscipline();
     const [instances, setInstances] = useState<ScheduledItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isReportOpen, setIsReportOpen] = useState(false);
@@ -36,6 +38,8 @@ const DashboardPage: React.FC = () => {
             await ScheduleClient.logExecution(instanceId);
             setLastExecutionStatus('COMPLETED');
             fetchSchedule();
+            // Refresh discipline state immediately
+            refreshDiscipline();
         } catch (error) {
             console.error('Error logging execution', error);
         }

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { TrajectoryClient, type TomorrowPreviewData, type Warning } from '../domain/trajectory';
 import { Calendar, AlertTriangle, CheckCircle, Info, Siren } from 'lucide-react';
+import { useDiscipline } from '../context/DisciplineContext';
 
 
 const TomorrowPreview: React.FC = () => {
+    const { refreshTrigger } = useDiscipline();
     const [data, setData] = useState<TomorrowPreviewData | null>(null);
     const [warnings, setWarnings] = useState<Warning[]>([]);
     const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ const TomorrowPreview: React.FC = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [refreshTrigger]);
 
     if (loading) return <div className="animate-pulse h-24 bg-iron-100 rounded-lg"></div>;
     if (!data) return null;

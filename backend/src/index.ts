@@ -12,14 +12,14 @@ if (missingEnvVars.length > 0) {
     process.exit(1);
 }
 
-import app from './app';
+import { app, httpServer } from './app';
 import { startCronJobs } from './cron';
 import { registerObservers } from './bootstrap/registerObservers';
 import { Logger } from './utils/logger';
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
     Logger.info(`Server is running on port ${port}`);
     registerObservers();
     startCronJobs();

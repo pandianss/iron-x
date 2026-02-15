@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DisciplineClient, type DisciplineState } from '../../domain/discipline';
+import { useDiscipline } from '../../context/DisciplineContext';
 import { AuthClient } from '../../domain/auth';
 import { UserPlus } from 'lucide-react';
 import InviteMemberModal from '../InviteMemberModal';
@@ -21,26 +21,20 @@ interface UserProfile {
 }
 
 export const DisciplineStatusBar: React.FC = () => {
-    const [state, setState] = useState<DisciplineState | null>(null);
+    const { state } = useDiscipline();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchProfile = async () => {
             try {
-                const [disciplineData, profileData] = await Promise.all([
-                    DisciplineClient.getState(),
-                    AuthClient.getProfile()
-                ]);
-                setState(disciplineData);
+                const profileData = await AuthClient.getProfile();
                 setProfile(profileData);
             } catch (error) {
-                console.error('Failed to fetch data', error);
+                console.error('Failed to fetch profile', error);
             }
         };
-        fetchData();
-        const interval = setInterval(fetchData, 60000); // Refresh every minute
-        return () => clearInterval(interval);
+        fetchProfile();
     }, []);
 
     if (!state) return <div className="p-4 bg-iron-900 border border-iron-800 animate-pulse h-24">Loading System State...</div>;
@@ -73,17 +67,17 @@ export const DisciplineStatusBar: React.FC = () => {
 
                 <div className="flex flex-col">
                     <span className="text-iron-500 text-xs uppercase tracking-wider">Status Classification</span>
-                    <span className={`text-xl font-bold ${getStatusColor(state.status)}`}>{state.status}</span>
+                    <span className={`text-xl font-bold ${getStatusColor(state.classification)}`}>{state.classification}</span>
                 </div>
 
                 <div className="flex flex-col">
-                    <span className="text-iron-500 text-xs uppercase tracking-wider">Time Since Violation</span>
-                    <span className="text-iron-300">{state.timeSinceLastViolation}</span>
+                    <span className="text-iron-500 text-xs uppercase tracking-wider">Policies Active</span>
+                    <span className="text-iron-300">{state.activeConstraints?.policiesActive ?? 0}</span>
                 </div>
 
                 <div className="flex flex-col">
-                    <span className="text-iron-500 text-xs uppercase tracking-wider">Next Enforcement Check</span>
-                    <span className="text-amber-500 font-bold">{state.countdownToNextCheck}</span>
+                    <span className="text-iron-500 text-xs uppercase tracking-wider">Violation Horizon</span>
+                    <span className="text-amber-500 font-bold">{state.violationHorizon?.daysUntilBreach ? `${state.violationHorizon.daysUntilBreach} days` : 'Stable'}</span>
                 </div>
             </div>
 

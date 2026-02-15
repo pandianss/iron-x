@@ -1,23 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { TrajectoryClient, type TrajectoryIdentity } from '../domain/trajectory';
+import React from 'react';
+import { useDiscipline } from '../context/DisciplineContext';
 
 const DisciplineIdentityCard: React.FC = () => {
-    const [data, setData] = useState<TrajectoryIdentity | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchIdentity = async () => {
-            try {
-                const identity = await TrajectoryClient.getIdentity();
-                setData(identity);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchIdentity();
-    }, []);
+    const { identity: data, loading } = useDiscipline();
 
     if (loading) return <div className="animate-pulse h-32 bg-iron-100 rounded-lg"></div>;
     if (!data) return null;

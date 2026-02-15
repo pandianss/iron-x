@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { useApi } from './useApi';
 import { TrajectoryClient } from '../domain/trajectory';
 
-export const useTrajectoryHistory = (days: number = 30) => {
+export const useTrajectoryHistory = (days: number = 30, refreshTrigger: number = 0) => {
     const { data, loading, error, execute } = useApi(TrajectoryClient.getHistory);
 
     useEffect(() => {
         execute(days);
-    }, [days, execute]);
+    }, [days, execute, refreshTrigger]);
 
     return { data, loading, error, refresh: () => execute(days) };
 };

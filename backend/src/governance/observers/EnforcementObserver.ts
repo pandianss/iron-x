@@ -1,5 +1,6 @@
 import prisma from '../../db';
-import { DomainEvent, ViolationDetectedEvent, DomainEventType } from '../../kernel/domain/events';
+import { DomainEvent, ViolationDetectedEvent } from '../../kernel/domain/events';
+import { DomainEventType } from '../../kernel/domain/types';
 
 export class EnforcementObserver {
     async handle(event: DomainEvent) {

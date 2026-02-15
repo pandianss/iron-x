@@ -45,6 +45,7 @@ const ROICalculatorPage: React.FC = () => {
                                     type="range"
                                     min="5"
                                     max="1000"
+                                    step="5"
                                     value={employees}
                                     onChange={(e) => setEmployees(Number(e.target.value))}
                                     className="w-full"

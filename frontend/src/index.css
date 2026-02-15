@@ -199,11 +199,12 @@ input[type=range] {
     width: 100%;
     background: transparent;
     cursor: crosshair;
-    outline: none;
+    outline: none !important;
+    border: none !important;
 }
 
 input[type=range]:focus {
-    outline: none;
+    outline: none !important;
 }
 
 /* Track Styles */
@@ -212,58 +213,57 @@ input[type=range]::-webkit-slider-runnable-track {
     height: 6px;
     background: #27272a;
     /* iron-800 */
-    border-radius: 2px;
+    border-radius: 0px;
+    /* Sharp industrial */
     border: 1px solid #3f3f46;
     /* iron-700 */
-    transition: all 0.2s ease;
+    transition: background 0.2s ease;
 }
 
 input[type=range]::-moz-range-track {
     width: 100%;
     height: 6px;
     background: #27272a;
-    border-radius: 2px;
+    border-radius: 0px;
     border: 1px solid #3f3f46;
 }
 
 /* Thumb Styles */
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: 18px;
-    width: 18px;
-    border-radius: 2px;
-    /* Square/Industrial Look */
-    background: #a1a1aa;
-    /* iron-400 */
+    height: 20px;
+    width: 10px;
+    /* Vertical Rectangular "Slider" Look */
+    border-radius: 0px;
+    background: #ffffff;
     cursor: crosshair;
-    margin-top: -7px;
-    /* Centers thumb: (trackH/2) - (thumbH/2) - border? */
-    border: 1px solid #ffffff;
-    box-shadow: 0 0 10px rgba(161, 161, 170, 0.3);
+    margin-top: -8px;
+    /* Correct centering for 6px track + 1px border */
+    border: 1px solid #a1a1aa;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
     transition: all 0.2s ease;
 }
 
 input[type=range]::-moz-range-thumb {
-    height: 18px;
-    width: 18px;
-    border-radius: 2px;
-    background: #a1a1aa;
+    height: 20px;
+    width: 10px;
+    border-radius: 0px;
+    background: #ffffff;
     cursor: crosshair;
-    border: 1px solid #ffffff;
-    box-shadow: 0 0 10px rgba(161, 161, 170, 0.3);
+    border: 1px solid #a1a1aa;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 /* Hover/Active States */
 input[type=range]:hover::-webkit-slider-runnable-track {
-    background: #3f3f46;
-    /* iron-700 */
     border-color: #52525b;
     /* iron-600 */
 }
 
 input[type=range]:active::-webkit-slider-thumb {
-    background: #ffffff;
-    transform: scale(1.1);
+    background: #ff3300;
+    /* Signal Red on Active */
+    box-shadow: 0 0 20px rgba(255, 51, 0, 0.6);
 }
 
 input[type=range]:hover::-moz-range-track {
@@ -272,6 +272,5 @@ input[type=range]:hover::-moz-range-track {
 }
 
 input[type=range]:active::-moz-range-thumb {
-    background: #ffffff;
-    transform: scale(1.1);
+    background: #ff3300;
 }

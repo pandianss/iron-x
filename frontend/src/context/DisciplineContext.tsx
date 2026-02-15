@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { DisciplineClient, type DisciplineState } from '../domain/discipline';
 import { TrajectoryClient, type TrajectoryIdentity } from '../domain/trajectory';
 import { SocketClient } from '../domain/socket';
@@ -14,15 +14,7 @@ interface DisciplineContextType {
     refreshTrigger: number;
 }
 
-const DisciplineContext = createContext<DisciplineContextType | undefined>(undefined);
-
-export const useDiscipline = () => {
-    const context = useContext(DisciplineContext);
-    if (!context) {
-        throw new Error('useDiscipline must be used within a DisciplineProvider');
-    }
-    return context;
-};
+export const DisciplineContext = createContext<DisciplineContextType | undefined>(undefined);
 
 export const DisciplineProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { token } = useAuth();
@@ -44,9 +36,9 @@ export const DisciplineProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             setState(stateData);
             setIdentity(identityData);
             setError(null);
-        } catch (err: any) {
+        } catch (err) {
             console.error('Failed to refresh discipline data', err);
-            setError(err);
+            setError(err instanceof Error ? err : new Error('Unknown error'));
         } finally {
             setLoading(false);
         }

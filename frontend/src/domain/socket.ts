@@ -35,7 +35,7 @@ export class SocketClient {
             console.log('[Socket] Disconnected');
         });
 
-        this.socket.on('SCORE_UPDATED', (payload: any) => {
+        this.socket.on('SCORE_UPDATED', (payload: unknown) => {
             console.log('[Socket] SCORE_UPDATED', payload);
             this.notifyListeners('SCORE_UPDATED', payload);
         });
@@ -63,7 +63,7 @@ export class SocketClient {
         };
     }
 
-    private notifyListeners(event: string, payload: any) {
+    private notifyListeners(event: string, payload: unknown) {
         const list = this.listeners.get(event);
         if (list) {
             list.forEach(cb => cb(payload));

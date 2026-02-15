@@ -10,6 +10,15 @@ interface VelocityPoint {
     score: number;
 }
 
+interface TeamMember {
+    role: string;
+    team: {
+        id: string;
+        team_id?: string;
+        owner_id: string;
+    };
+}
+
 export const TeamVelocityChart: React.FC = () => {
     const [data, setData] = useState<VelocityPoint[]>([]);
     const [loading, setLoading] = useState(true);
@@ -17,15 +26,18 @@ export const TeamVelocityChart: React.FC = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
+
+                // inside component
                 const profile = await AuthClient.getProfile();
                 // Find a team managed by user
-                const managedTeam = profile.team_memberships.find((m: any) => m.role === 'MANAGER' || m.team.owner_id === profile.user_id)?.team
+                const managedTeam = (profile.team_memberships as TeamMember[]).find((m) => m.role === 'MANAGER' || m.team.owner_id === profile.user_id)?.team
                     || profile.teams_owned[0];
 
                 if (managedTeam) {
-                    const result = await TeamClient.getVelocity(managedTeam.team_id || (managedTeam as any).id);
+                    const teamId = managedTeam.team_id || managedTeam.id;
+                    const result = await TeamClient.getVelocity(teamId);
                     // Mask emails for privacy in demo
-                    const formattedData = result.map((r: any) => ({
+                    const formattedData = result.map((r: { email: string; score: number; userId: string }) => ({
                         ...r,
                         name: r.email.split('@')[0]
                     }));

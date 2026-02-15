@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { OrganizationClient } from '../domain/organization';
@@ -26,6 +27,7 @@ const OrganizationDashboardPage: React.FC = () => {
 
     useEffect(() => {
         if (slug) fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug]);
 
     const fetchData = async () => {
@@ -44,7 +46,7 @@ const OrganizationDashboardPage: React.FC = () => {
             setWebhooks(orgWebhooks || []);
             setApiKeys(orgKeys || []);
             setAuditLogs(logsResponse.logs || []);
-        } catch (err: any) {
+        } catch {
             setError('System Access Denied or Organization Not Found');
         } finally {
             setLoading(false);
@@ -58,7 +60,7 @@ const OrganizationDashboardPage: React.FC = () => {
             setNewWebhookUrl('');
             const updated = await IntegrationClient.getWebhooks(org.org_id);
             setWebhooks(updated);
-        } catch (err: any) {
+        } catch {
             setError('Failed to register webhook');
         }
     };
@@ -71,7 +73,7 @@ const OrganizationDashboardPage: React.FC = () => {
             setNewKeyName('');
             const updated = await IntegrationClient.getApiKeys(org.org_id);
             setApiKeys(updated);
-        } catch (err: any) {
+        } catch {
             setError('Failed to generate API key');
         }
     };

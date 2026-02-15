@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthClient } from '../domain/auth';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 
 const RegisterPage: React.FC = () => {
@@ -26,8 +26,10 @@ const RegisterPage: React.FC = () => {
             });
             login(data.token, data.user);
             navigate('/cockpit');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Registration failed');
+        } catch (err: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const errorMessage = (err as any).response?.data?.message || 'Registration failed';
+            setError(errorMessage);
         }
     };
 

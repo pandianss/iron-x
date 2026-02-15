@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-const API_URL = 'http://localhost:3000/api/v1'; // Port 3000 inside container usually? OR 4000? 
+
 // app.ts usually listens on PORT env var. Let's check. 
 // verify_enterprise used 3000. 
 // docker-compose maps 4000:4000 usually.

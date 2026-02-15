@@ -24,7 +24,7 @@ jest.mock('bullmq', () => ({
 }));
 
 // Import app AFTER mocking
-import app from '../../src/app';
+import { app } from '../../src/app';
 
 
 describe('Discipline Cockpit Endpoints', () => {

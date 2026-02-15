@@ -81,7 +81,7 @@ app.use(helmet({
 }));
 
 const corsOptions = {
-    origin: (origin: string | undefined, callback: Function) => {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
         const allowedOrigins = [
             process.env.FRONTEND_URL,
             'http://localhost:5173',

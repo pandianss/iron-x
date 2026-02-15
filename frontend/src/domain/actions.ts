@@ -18,8 +18,9 @@ export const ActionClient = {
         return response.data;
     },
 
-    create: async (data: any) => {
-        const response = await api.post('/actions', data);
+    create: async (data: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response = await api.post('/actions', data as any);
         return response.data;
     }
 };

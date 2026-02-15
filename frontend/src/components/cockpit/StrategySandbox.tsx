@@ -6,8 +6,11 @@ import { Play, RotateCcw, TrendingUp, TrendingDown, Target } from 'lucide-react'
 export const StrategySandbox: React.FC = () => {
     const [type, setType] = useState<'ADHERENCE_BOOST' | 'BUFFER_INCREASE' | 'STRICT_MODE_TOGGLE'>('ADHERENCE_BOOST');
     const [value, setValue] = useState(0.1);
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<unknown>(null);
     const [loading, setLoading] = useState(false);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const r = result as any;
 
     const handleSimulate = async () => {
         setLoading(true);
@@ -70,17 +73,17 @@ export const StrategySandbox: React.FC = () => {
                 </button>
             </div>
 
-            {result && (
+            {r && (
                 <div className="mt-4 p-4 bg-iron-950 border border-amber-900/50 rounded-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div className="flex justify-between items-center mb-3">
                         <span className="text-iron-500 text-[10px] uppercase font-bold tracking-tighter">Simulation Output</span>
-                        {result.impact === 'POSITIVE' ? <TrendingUp className="w-4 h-4 text-emerald-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />}
+                        {r.impact === 'POSITIVE' ? <TrendingUp className="w-4 h-4 text-emerald-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />}
                     </div>
 
                     <div className="flex items-baseline gap-2">
-                        <div className="text-2xl font-mono font-bold text-iron-100">{result.simulatedScore.toFixed(1)}</div>
-                        <div className={`text-[10px] font-bold ${result.delta >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                            {result.delta >= 0 ? '+' : ''}{result.delta}
+                        <div className="text-2xl font-mono font-bold text-iron-100">{r.simulatedScore.toFixed(1)}</div>
+                        <div className={`text-[10px] font-bold ${r.delta >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {r.delta >= 0 ? '+' : ''}{r.delta}
                         </div>
                     </div>
                     <div className="text-[9px] text-iron-600 mt-1 uppercase font-mono tracking-widest">
@@ -90,7 +93,7 @@ export const StrategySandbox: React.FC = () => {
                     <div className="mt-4 pt-4 border-t border-iron-800 flex items-center gap-3">
                         <Target className="w-4 h-4 text-amber-500" />
                         <span className="text-[10px] text-iron-400 italic leading-tight">
-                            "Adjusting {type.replace('_', ' ')} by {Math.round(value * 100)}% drives a {result.impact.toLowerCase()} shift in system integrity."
+                            "Adjusting {type.replace('_', ' ')} by {Math.round(value * 100)}% drives a {r.impact.toLowerCase()} shift in system integrity."
                         </span>
                     </div>
                 </div>

@@ -1,5 +1,15 @@
 
+
+export enum DomainEventType {
+    INSTANCE_MATERIALIZED = 'INSTANCE_MATERIALIZED',
+    VIOLATION_DETECTED = 'VIOLATION_DETECTED',
+    SCORE_UPDATED = 'SCORE_UPDATED',
+    KERNEL_CYCLE_COMPLETED = 'KERNEL_CYCLE_COMPLETED',
+    KERNEL_STAGE_TIMING = 'KERNEL_STAGE_TIMING'
+}
+
 export type UserId = string;
+
 export type ActionId = string;
 export type InstanceId = string;
 export type PolicyId = string;

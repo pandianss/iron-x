@@ -38,7 +38,7 @@ export class QuotaService {
                 count = await prisma.team.count({ where: { owner_id: userId } });
                 limit = limits.max_teams;
                 break;
-            case 'WEBHOOKS':
+            case 'WEBHOOKS': {
                 // Check Org level if user tied to org
                 const user = await (prisma as any).user.findUnique({ where: { user_id: userId } });
                 if (user?.org_id) {
@@ -46,13 +46,15 @@ export class QuotaService {
                 }
                 limit = limits.max_webhooks || 5; // Default for webhooks if not in limits
                 break;
-            case 'API_KEYS':
+            }
+            case 'API_KEYS': {
                 const userKey = await (prisma as any).user.findUnique({ where: { user_id: userId } });
                 if (userKey?.org_id) {
                     count = await (prisma as any).apiKey.count({ where: { org_id: userKey.org_id } });
                 }
                 limit = limits.max_api_keys || 3;
                 break;
+            }
         }
 
         if (count >= limit) {

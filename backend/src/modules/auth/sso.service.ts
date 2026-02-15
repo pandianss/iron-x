@@ -49,7 +49,7 @@ export class SSOService {
         // ideally we normalize domains to a separate table but for MVP string check is fine.
 
         // In production, might cache this.
-        // @ts-ignore
+
         const configs = await prisma.sSOConfig.findMany({
             where: { enabled: true }
         });
@@ -58,7 +58,7 @@ export class SSOService {
     }
 
     static async createConfig(data: { entry_point: string; issuer: string; cert: string; domain_whitelist: string; team_id?: string }) {
-        // @ts-ignore
+
         return prisma.sSOConfig.create({
             data: {
                 ...data,

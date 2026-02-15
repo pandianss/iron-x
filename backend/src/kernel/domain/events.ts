@@ -1,12 +1,6 @@
 import { EventEmitter } from 'events';
-import { UserId, InstanceId, PolicyId } from './types';
+import { UserId, InstanceId, PolicyId, DomainEventType } from './types';
 
-export enum DomainEventType {
-    INSTANCE_MATERIALIZED = 'INSTANCE_MATERIALIZED',
-    VIOLATION_DETECTED = 'VIOLATION_DETECTED',
-    SCORE_UPDATED = 'SCORE_UPDATED',
-    KERNEL_CYCLE_COMPLETED = 'KERNEL_CYCLE_COMPLETED'
-}
 
 export interface DomainEvent {
     type: DomainEventType;
@@ -46,6 +40,19 @@ export interface KernelCycleCompletedEvent extends DomainEvent {
     type: DomainEventType.KERNEL_CYCLE_COMPLETED;
     payload: {
         score: number;
+        violations: number;
+        traceId?: string;
+    };
+}
+
+export interface KernelStageTimingEvent extends DomainEvent {
+    type: DomainEventType.KERNEL_STAGE_TIMING;
+    payload: {
+        traceId: string;
+        lifecycleMs: number;
+        pipelineMs: number;
+        scoringMs: number;
+        totalMs: number;
     };
 }
 
@@ -54,16 +61,17 @@ type EventMap = {
     [DomainEventType.VIOLATION_DETECTED]: ViolationDetectedEvent;
     [DomainEventType.SCORE_UPDATED]: ScoreUpdatedEvent;
     [DomainEventType.KERNEL_CYCLE_COMPLETED]: KernelCycleCompletedEvent;
+    [DomainEventType.KERNEL_STAGE_TIMING]: KernelStageTimingEvent;
     [key: string]: DomainEvent;
 };
 
 export class DomainEventBus extends EventEmitter {
-    // @ts-ignore
+    // @ts-expect-error - Overriding EventEmitter signatures to provide better types
     emit<K extends keyof EventMap>(event: K, payload: EventMap[K]) {
         return super.emit(event as string, payload);
     }
 
-    // @ts-ignore
+    // @ts-expect-error - Overriding EventEmitter signatures to provide better types
     on<K extends keyof EventMap>(event: K, listener: (payload: EventMap[K]) => void): this {
         return super.on(event as string, listener);
     }

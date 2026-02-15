@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import prisma from './src/db';
 import { EnforcementService } from './src/services/enforcement.service';

@@ -11,7 +11,7 @@ export const BillingClient = {
         return response.data;
     },
 
-    getSubscription: async (userId?: string) => {
+    getSubscription: async () => {
         // Currently only supports getting own subscription
         const response = await api.get('/subscription/me');
         return response.data;

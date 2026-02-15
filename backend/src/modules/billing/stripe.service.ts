@@ -1,6 +1,7 @@
 
 import Stripe from 'stripe';
 import prisma from '../../db';
+import { container } from 'tsyringe';
 
 export class StripeService {
     private stripe: Stripe;
@@ -118,8 +119,9 @@ export class StripeService {
         const sub = await (prisma as any).subscription.findUnique({ where: { stripe_customer_id: customerId } });
 
         if (sub?.user_id) {
-            const { SubscriptionService } = require('../subscription/subscription.service');
-            await SubscriptionService.lockAccount(sub.user_id);
+            const { SubscriptionService: SubService } = await import('../subscription/subscription.service');
+            const subService = container.resolve(SubService);
+            await subService.lockAccount(sub.user_id);
         }
     }
 
@@ -154,8 +156,9 @@ export class StripeService {
             });
 
             if ((sub as any)?.is_locked && sub?.user_id) {
-                const { SubscriptionService } = require('../subscription/subscription.service');
-                await SubscriptionService.unlockAccount(sub.user_id);
+                const { SubscriptionService: SubService } = await import('../subscription/subscription.service');
+                const subService = container.resolve(SubService);
+                await subService.unlockAccount(sub.user_id);
             }
         }
     }

@@ -5,23 +5,23 @@ import { Logger } from '../utils/logger';
 export interface WebhookPayload {
     event: string;
     timestamp: string;
-    data: any;
+    data: unknown;
 }
 
 @singleton()
 export class WebhookService {
-    getSubscribers(event: string) {
+    getSubscribers(_event: string) {
         return [
             { url: 'https://webhook.site/test', secret: 'whsec_test_secret_123' }
         ];
     }
 
-    signPayload(payload: any, secret: string): string {
+    signPayload(payload: unknown, secret: string): string {
         const data = JSON.stringify(payload);
         return crypto.createHmac('sha256', secret).update(data).digest('hex');
     }
 
-    async dispatchEvent(event: string, data: any) {
+    async dispatchEvent(event: string, data: unknown) {
         const subscribers = this.getSubscribers(event);
         const timestamp = new Date().toISOString();
 

@@ -1,4 +1,4 @@
-import { DisciplineContext } from './domain/types';
+import { DisciplineContext, DomainEventType } from './domain/types';
 import { InstanceLifecycle } from './InstanceLifecycle';
 import { ExecutionPipeline } from './ExecutionPipeline';
 import { PolicyEvaluator } from './PolicyEvaluator';
@@ -57,10 +57,10 @@ export class DisciplineEngine {
         const durationScoring = Date.now() - startScoring;
 
         // 5. Emit Events
-        const { domainEvents } = require('./domain/events');
+        const { domainEvents } = await import('./domain/events');
 
-        domainEvents.emit('KERNEL_CYCLE_COMPLETED', {
-            type: 'KERNEL_CYCLE_COMPLETED',
+        domainEvents.emit(DomainEventType.KERNEL_CYCLE_COMPLETED, {
+            type: DomainEventType.KERNEL_CYCLE_COMPLETED,
             timestamp: new Date(),
             userId: context.userId,
             payload: {
@@ -70,8 +70,8 @@ export class DisciplineEngine {
             }
         });
 
-        domainEvents.emit('KERNEL_STAGE_TIMING', {
-            type: 'KERNEL_STAGE_TIMING',
+        domainEvents.emit(DomainEventType.KERNEL_STAGE_TIMING, {
+            type: DomainEventType.KERNEL_STAGE_TIMING,
             timestamp: new Date(),
             userId: context.userId,
             payload: {

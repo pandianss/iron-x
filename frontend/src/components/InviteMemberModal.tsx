@@ -28,9 +28,10 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ isOpen, onClose, 
                 onClose();
                 setMessage(null);
             }, 1500);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Failed to send invitation.' });
+            const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Failed to send invitation.';
+            setMessage({ type: 'error', text: errorMessage });
         } finally {
             setLoading(false);
         }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthClient } from '../domain/auth';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
@@ -25,8 +25,9 @@ const LoginPage: React.FC = () => {
 
             login(data.token, data.user);
             navigate('/cockpit'); // Navigate to cockpit as primary view
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Login failed');
+        } catch (err: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setError((err as any).response?.data?.message || 'Login failed');
         }
     };
 

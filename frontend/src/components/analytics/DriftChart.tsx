@@ -15,7 +15,7 @@ export const DriftChart: React.FC = () => {
         const loadData = async () => {
             try {
                 const result = await AnalyticsClient.getDisciplineData();
-                const formattedHistory = result.history.map((h: any) => ({
+                const formattedHistory = result.history.map((h: { date: string | number | Date; score: number }) => ({
                     date: new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
                     score: h.score
                 }));

@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { DisciplineContext } from '../context/DisciplineContext';
+import { DisciplineContext } from '../context/DisciplineContextInstance';
 
 export const useDiscipline = () => {
     const context = useContext(DisciplineContext);

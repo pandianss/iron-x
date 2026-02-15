@@ -1,20 +1,10 @@
 
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DisciplineClient, type DisciplineState } from '../domain/discipline';
 import { TrajectoryClient, type TrajectoryIdentity } from '../domain/trajectory';
 import { SocketClient } from '../domain/socket';
-import { useAuth } from './AuthContext';
-
-interface DisciplineContextType {
-    state: DisciplineState | null;
-    identity: TrajectoryIdentity | null;
-    loading: boolean;
-    error: Error | null;
-    refresh: () => Promise<void>;
-    refreshTrigger: number;
-}
-
-export const DisciplineContext = createContext<DisciplineContextType | undefined>(undefined);
+import { useAuth } from '../hooks/useAuth';
+import { DisciplineContext } from './DisciplineContextInstance';
 
 export const DisciplineProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { token } = useAuth();

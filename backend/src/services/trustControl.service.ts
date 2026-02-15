@@ -1,5 +1,6 @@
 import { singleton, inject } from 'tsyringe';
 import { AuditService } from '../modules/audit/audit.service';
+import * as crypto from 'crypto';
 
 @singleton()
 export class TrustControlService {
@@ -16,8 +17,7 @@ export class TrustControlService {
         );
     }
 
-    signExport(data: any): string {
-        const crypto = require('crypto');
+    signExport(data: unknown): string {
         return crypto.createHmac('sha256', process.env.EXPORT_SECRET || 'default_secret').update(JSON.stringify(data)).digest('hex');
     }
 }

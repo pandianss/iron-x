@@ -4,7 +4,7 @@ import { io, Socket } from 'socket.io-client';
 export class SocketClient {
     private static instance: SocketClient;
     private socket: Socket | null = null;
-    private listeners: Map<string, Function[]> = new Map();
+    private listeners: Map<string, ((payload: unknown) => void)[]> = new Map();
 
     private constructor() { }
 
@@ -48,7 +48,7 @@ export class SocketClient {
         }
     }
 
-    subscribe(event: string, callback: Function) {
+    subscribe(event: string, callback: (payload: unknown) => void) {
         if (!this.listeners.has(event)) {
             this.listeners.set(event, []);
         }

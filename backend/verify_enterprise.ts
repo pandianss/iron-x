@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { PrismaClient } from '@prisma/client';
 import { sign } from 'jsonwebtoken';
@@ -21,7 +22,7 @@ async function main() {
     });
 
     // 2. Configure Mock SSO
-    // @ts-ignore
+
     const ssoConfig = await prisma.sSOConfig.create({
         data: {
             entry_point: 'http://mock-idp.com/login',
@@ -136,7 +137,7 @@ async function main() {
     // Cleanup
     await prisma.auditLog.deleteMany({ where: { actor_id: user.user_id } });
     await prisma.user.delete({ where: { user_id: user.user_id } });
-    // @ts-ignore
+
     await prisma.sSOConfig.delete({ where: { config_id: ssoConfig.config_id } });
     console.log('Cleanup done.');
 }

@@ -1,4 +1,4 @@
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { DataProtectionService } = require('../services/dataProtection.service');
 // Note: In a real TS environment this would be compiled. 
 // For this environment, we might need a JS wrapper or assume ts-node.

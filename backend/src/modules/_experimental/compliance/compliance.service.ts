@@ -69,8 +69,8 @@ export class ComplianceService {
             for (const map of control.mappings) {
                 // In future, we would actually check the Evidence Source (e.g., query audit logs count)
                 // For Phase 1, we assume if mapping exists + system is active = Evidence Found.
-                let evidenceFound = true;
-                let details = 'System active';
+                const evidenceFound = true;
+                const details = 'System active';
 
                 if (map.evidence_source.startsWith('DB_TABLE')) {
                     // For now, static true. Future implementation will use type-safe Prisma count per table.

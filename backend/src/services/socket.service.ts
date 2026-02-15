@@ -1,7 +1,6 @@
 
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import { verifyToken } from '../middleware/authMiddleware'; // We'll need a helper or extracting logic
 import jwt from 'jsonwebtoken';
 
 export class SocketService {
@@ -36,7 +35,7 @@ export class SocketService {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as any;
                 socket.data.userId = decoded.userId;
                 next();
-            } catch (err) {
+            } catch {
                 next(new Error('Authentication error'));
             }
         });
@@ -57,7 +56,7 @@ export class SocketService {
         console.log('[SocketService] Initialized');
     }
 
-    emitToUser(userId: string, event: string, payload: any) {
+    emitToUser(userId: string, event: string, payload: unknown) {
         if (!this.io) {
             console.warn('[SocketService] Not initialized, skipping emit');
             return;

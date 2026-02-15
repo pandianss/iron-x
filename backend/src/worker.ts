@@ -34,7 +34,7 @@ worker.on('failed', (job, err: Error) => {
 });
 
 // Listen for completion to log success/score
-worker.on('completed', (job, result) => {
+worker.on('completed', (job, _result) => {
     // The result comes from engine.runCycle()
     // We can assume it returns the event payload or we catch the domain event separately.
     // For now, let's just log completion.

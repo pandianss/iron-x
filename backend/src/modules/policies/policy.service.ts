@@ -103,7 +103,7 @@ export class PolicyService {
                         team: { include: { policies: true } as any }
                     }
                 },
-                // @ts-ignore
+
                 organization: { include: { policies: true } as any }
             }
         }) as any;

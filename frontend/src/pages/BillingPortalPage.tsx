@@ -1,19 +1,21 @@
+ 
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { BillingClient } from '../domain/billing';
 import { CreditCard, Shield, Activity, CheckCircle } from 'lucide-react';
 
 const BillingPortalPage: React.FC = () => {
     const { user } = useAuth();
-    const [subscription, setSubscription] = useState<any>(null);
+    const [subscription, setSubscription] = useState<unknown>(null);
     const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         const fetchSub = async () => {
             if (user?.id) {
-                const sub = await BillingClient.getSubscription(user.id);
-                setSubscription(sub);
+                const s = await BillingClient.getSubscription();
+                setSubscription(s);
             }
             setLoading(false);
         };

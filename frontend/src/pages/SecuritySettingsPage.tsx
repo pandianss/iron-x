@@ -22,7 +22,7 @@ const SecuritySettingsPage: React.FC = () => {
         try {
             const profile = await AuthClient.getProfile();
             setMfaEnabled(profile.mfa_enabled);
-        } catch (err: any) {
+        } catch {
             setError('Failed to fetch profile settings');
         } finally {
             setLoading(false);
@@ -36,8 +36,10 @@ const SecuritySettingsPage: React.FC = () => {
             setQrCode(data.qrCode);
             setSecret(data.secret);
             setShowSetup(true);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'MFA setup failed');
+        } catch (err: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const errorMessage = (err as any).response?.data?.message || 'MFA setup failed';
+            setError(errorMessage);
         }
     };
 
@@ -49,8 +51,10 @@ const SecuritySettingsPage: React.FC = () => {
             setShowSetup(false);
             setSuccess('MFA enabled successfully');
             setToken('');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Verification failed');
+        } catch (err: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const errorMessage = (err as any).response?.data?.message || 'Verification failed';
+            setError(errorMessage);
         }
     };
 
@@ -62,8 +66,10 @@ const SecuritySettingsPage: React.FC = () => {
             setShowDisable(false);
             setSuccess('MFA disabled successfully');
             setPassword('');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Disable failed');
+        } catch (err: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const errorMessage = (err as any).response?.data?.message || 'Disable failed';
+            setError(errorMessage);
         }
     };
 

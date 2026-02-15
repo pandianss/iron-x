@@ -1,7 +1,5 @@
 
 import prisma from '../db';
-import { v4 as uuidv4 } from 'uuid';
-import { Logger } from '../utils/logger';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
@@ -50,6 +48,7 @@ export const EvidenceService = {
     },
 
     async gatherData(scope: 'USER' | 'SYSTEM', targetId: string, start?: Date, end?: Date) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dateFilter: any = {};
         if (start) dateFilter['gte'] = start;
         if (end) dateFilter['lte'] = end;
@@ -91,7 +90,8 @@ export const EvidenceService = {
         return { error: 'SYSTEM scope not implemented yet' };
     },
 
-    generateHtmlReport(data: any, packId: string): string {
+    generateHtmlReport(data: unknown, packId: string): string {
+        const d = data as any;
         return `
             <html>
             <head>
@@ -106,13 +106,13 @@ export const EvidenceService = {
             <body>
                 <h1>Audit Evidence Pack: ${packId}</h1>
                 <p>Generated: ${new Date().toISOString()}</p>
-                <p>Subject: ${data.subject?.id} (${data.subject?.role})</p>
+                <p>Subject: ${d.subject?.id} (${d.subject?.role})</p>
                 
                 <div class="section">
                     <h2>Enforcement History</h2>
                     <table>
                         <tr><th>Time</th><th>Action</th><th>Details</th></tr>
-                        ${data.enforcement_history?.map((l: any) => `
+                        ${(d.enforcement_history as any[])?.map((l: any) => `
                             <tr>
                                 <td>${l.timestamp}</td>
                                 <td>${l.action}</td>
@@ -126,7 +126,7 @@ export const EvidenceService = {
                     <h2>Discipline Records</h2>
                     <table>
                         <tr><th>Date</th><th>Score</th></tr>
-                        ${data.discipline_records?.map((s: any) => `
+                        ${(d.discipline_records as any[])?.map((s: any) => `
                             <tr>
                                 <td>${s.date}</td>
                                 <td>${s.score}</td>

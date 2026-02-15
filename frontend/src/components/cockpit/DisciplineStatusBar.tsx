@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDiscipline } from '../../context/DisciplineContext';
+import { useDiscipline } from '../../hooks/useDiscipline';
 import { AuthClient } from '../../domain/auth';
 import { UserPlus } from 'lucide-react';
 import InviteMemberModal from '../InviteMemberModal';
@@ -94,6 +94,7 @@ export const DisciplineStatusBar: React.FC = () => {
                     <InviteMemberModal
                         isOpen={isInviteModalOpen}
                         onClose={() => setIsInviteModalOpen(false)}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         teamId={managedTeam.team_id || (managedTeam as any).id /* handle potential schema diff if any */}
                     />
                 </div>

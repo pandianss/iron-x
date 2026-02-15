@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BillingClient } from '../domain/billing';
 import { useNavigate } from 'react-router-dom';
 
-interface Subscription {
-    plan_tier: 'FREE' | 'INDIVIDUAL_PRO' | 'TEAM_ENTERPRISE';
-}
+
 
 const PricingPage: React.FC = () => {
     const [currentTier, setCurrentTier] = useState<string>('FREE');
@@ -72,7 +70,7 @@ const PricingPage: React.FC = () => {
 
     const handleUpgrade = async (tierId: string) => {
         if (tierId === 'TEAM_ENTERPRISE') {
-            window.location.href = 'mailto:sales@iron-x.com?subject=Enterprise Inquiry';
+            window.location.assign('mailto:sales@iron-x.com?subject=Enterprise Inquiry');
             return;
         }
 
@@ -81,7 +79,7 @@ const PricingPage: React.FC = () => {
             const priceId = tierId === 'INDIVIDUAL_PRO' ? 'price_pro_monthly' : 'price_enterprise_seats';
             const { url } = await BillingClient.createCheckoutSession(priceId, window.location.href, window.location.href);
             if (url) {
-                window.location.href = url;
+                window.location.assign(url);
             } else {
                 alert('Failed to initiate checkout.');
             }

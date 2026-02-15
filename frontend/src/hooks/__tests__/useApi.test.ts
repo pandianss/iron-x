@@ -35,7 +35,7 @@ describe('useApi', () => {
             await act(async () => {
                 await result.current.execute();
             });
-        } catch (e) {
+        } catch {
             // Error is expected
         }
 

@@ -7,7 +7,7 @@ interface ApiState<T> {
     error: string | null;
 }
 
-export const useApi = <T, Args extends any[]>(
+export const useApi = <T, Args extends unknown[]>(
     apiFunc: (...args: Args) => Promise<T>
 ) => {
     const [state, setState] = useState<ApiState<T>>({

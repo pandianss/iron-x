@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { TeamClient } from '../domain/team';
 import { CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const JoinTeamPage: React.FC = () => {
     const { token } = useParams<{ token: string }>();
@@ -29,10 +29,11 @@ const JoinTeamPage: React.FC = () => {
                 setStatus('success');
                 setMessage(res.message);
                 setTimeout(() => navigate('/dashboard'), 3000);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error(err);
                 setStatus('error');
-                setMessage(err.response?.data?.error || 'Failed to join team. The link may be expired or invalid.');
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                setMessage((err as any).response?.data?.error || 'Failed to join team. The link may be expired or invalid.');
             }
         };
 

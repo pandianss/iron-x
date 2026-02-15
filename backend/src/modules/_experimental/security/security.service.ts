@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe';
-const { authenticator } = require('otplib');
+import { generateSecret, verify, generateURI } from 'otplib';
 import * as QRCode from 'qrcode';
 
 @singleton()
@@ -8,14 +8,14 @@ export class SecurityService {
      * Generates a new TOTP secret for a user.
      */
     generateSecret() {
-        return authenticator.generateSecret();
+        return generateSecret();
     }
 
     /**
      * Generates a QR code URL for the user to scan.
      */
     async generateQRCode(email: string, secret: string) {
-        const otpauth = authenticator.keyuri(email, 'Iron-X', secret);
+        const otpauth = generateURI({ issuer: 'Iron-X', label: email, secret });
         return await QRCode.toDataURL(otpauth);
     }
 
@@ -23,6 +23,6 @@ export class SecurityService {
      * Verifies a TOTP code against a secret.
      */
     verifyToken(token: string, secret: string) {
-        return authenticator.verify({ token, secret });
+        return verify({ token, secret });
     }
 }

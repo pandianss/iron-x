@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { register } from './src/controllers/authController';
 import prisma from './src/db';

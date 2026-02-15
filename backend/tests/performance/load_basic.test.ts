@@ -8,7 +8,7 @@ process.env.DATABASE_URL = DATABASE_URL;
 import request from 'supertest';
 import { execSync } from 'child_process';
 import { PrismaClient } from '@prisma/client';
-import app from '../../src/app';
+import { app } from '../../src/app';
 import { performance } from 'perf_hooks';
 
 import { setupTestDb, teardownTestDb } from '../test-utils';

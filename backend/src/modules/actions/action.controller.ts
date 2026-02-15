@@ -1,10 +1,12 @@
-import { Request, Response } from 'express';
+import { Response, NextFunction } from 'express';
 import { autoInjectable } from 'tsyringe';
 import prisma from '../../db';
+import { AuthRequest } from '../../middleware/authMiddleware';
+import { NotFoundError } from '../../utils/AppError';
 
 @autoInjectable()
 export class ActionController {
-    createAction = async (req: Request, res: Response) => {
+    createAction = async (req: AuthRequest, res: Response, next: NextFunction) => {
         const {
             goal_id,
             title,
@@ -15,7 +17,7 @@ export class ActionController {
             is_strict
         } = req.body;
 
-        const userId = (req as any).user?.userId;
+        const userId = req.user?.userId;
         if (!userId) return res.sendStatus(401);
 
         // Convert time string to Date if necessary
@@ -43,13 +45,12 @@ export class ActionController {
             });
             res.status(201).json(action);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Server error' });
+            next(error);
         }
     };
 
-    getActions = async (req: Request, res: Response) => {
-        const userId = (req as any).user?.userId;
+    getActions = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        const userId = req.user?.userId;
         if (!userId) return res.sendStatus(401);
 
         try {
@@ -60,8 +61,30 @@ export class ActionController {
             });
             res.json(actions);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Server error' });
+            next(error);
+        }
+    };
+
+    getActionById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        const { actionId } = req.params;
+        const userId = req.user?.userId;
+
+        try {
+            const action = await prisma.action.findFirst({
+                where: {
+                    action_id: actionId,
+                    user_id: userId
+                },
+                include: { goal: true }
+            });
+
+            if (!action) {
+                throw new NotFoundError('Action not found');
+            }
+
+            res.json(action);
+        } catch (error) {
+            next(error);
         }
     };
 }

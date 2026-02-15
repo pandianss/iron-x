@@ -1,7 +1,9 @@
-import { Request, Response } from 'express';
+import { Response, NextFunction } from 'express';
 import { autoInjectable, inject } from 'tsyringe';
 import { PolicyService } from '../policies/policy.service';
 import prisma from '../../db';
+import { AuthRequest } from '../../middleware/authMiddleware';
+import { BadRequestError, NotFoundError } from '../../utils/AppError';
 
 @autoInjectable()
 export class UserController {
@@ -9,44 +11,47 @@ export class UserController {
         @inject(PolicyService) private policyService: PolicyService
     ) { }
 
-    updateEnforcementMode = async (req: Request, res: Response) => {
+    updateEnforcementMode = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const { mode } = req.body;
-            const userId = (req as any).user!.userId;
+            const userId = req.user!.userId;
 
             if (!['NONE', 'SOFT', 'HARD'].includes(mode)) {
-                return res.status(400).json({ error: 'Invalid mode' });
+                throw new BadRequestError('Invalid mode');
             }
 
             await this.policyService.setEnforcementMode(userId, mode);
             res.json({ message: 'Enforcement mode updated', mode });
         } catch (error) {
-            console.error('Error updating enforcement mode', error);
-            res.status(500).json({ error: 'Failed to update enforcement mode' });
+            next(error);
         }
     };
 
-    getProfile = async (req: Request, res: Response) => {
-        const userId = (req as any).user!.userId;
-        const user = await prisma.user.findUnique({
-            where: { user_id: userId },
-            include: {
-                team_memberships: {
-                    include: {
-                        team: {
-                            select: { team_id: true, name: true, owner_id: true }
+    getProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user!.userId;
+            const user = await prisma.user.findUnique({
+                where: { user_id: userId },
+                include: {
+                    team_memberships: {
+                        include: {
+                            team: {
+                                select: { team_id: true, name: true, owner_id: true }
+                            }
                         }
+                    },
+                    teams_owned: {
+                        select: { team_id: true, name: true }
                     }
-                },
-                teams_owned: {
-                    select: { team_id: true, name: true }
                 }
-            }
-        });
+            });
 
-        if (!user) return res.status(404).json({ error: 'User not found' });
+            if (!user) throw new NotFoundError('User not found');
 
-        const { password_hash, ...profile } = user;
-        res.json(profile);
+            const { password_hash, ...profile } = user;
+            res.json(profile);
+        } catch (error) {
+            next(error);
+        }
     };
 }

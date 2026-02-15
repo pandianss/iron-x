@@ -1,27 +1,23 @@
+import { singleton, inject } from 'tsyringe';
+import { AuditService } from '../modules/audit/audit.service';
 
-import prisma from '../db';
-import { AuditService } from './audit.service';
+@singleton()
+export class TrustControlService {
+    constructor(
+        @inject(AuditService) private auditService: AuditService
+    ) { }
 
-export const TrustControlService = {
-    /**
-     * Logs every external API access to prove who consumed what data and when.
-     * Essential for "Non-Repudiation" of discipline signals.
-     */
     async logConsumption(integrationId: string, endpoint: string, resourceId: string) {
-        await AuditService.logEvent(
+        await this.auditService.logEvent(
             'DATA_EGRESS',
             { integration: integrationId, endpoint, resource: resourceId },
-            'SYSTEM', // Actor is the system acting on behalf of integration
-            resourceId // Target is the user resource being accessed
+            'SYSTEM',
+            resourceId
         );
-    },
+    }
 
-    /**
-     * Generates a tamper-evident hash of an export package.
-     * (Reuses logic from EvidenceService but explicit for exports)
-     */
     signExport(data: any): string {
-        const crypto = require('crypto'); // eslint-disable-line @typescript-eslint/no-require-imports
+        const crypto = require('crypto');
         return crypto.createHmac('sha256', process.env.EXPORT_SECRET || 'default_secret').update(JSON.stringify(data)).digest('hex');
     }
-};
+}

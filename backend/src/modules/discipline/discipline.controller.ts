@@ -1,18 +1,22 @@
 import { Request, Response } from 'express';
-import { autoInjectable } from 'tsyringe';
+import { autoInjectable, inject } from 'tsyringe';
 import { AuthRequest } from '../../middleware/authMiddleware';
-import { disciplineService } from '../../services/discipline.service'; // Static for now
+import { DisciplineService } from '../../services/discipline.service';
 import { kernelQueue } from '../../infrastructure/queue';
 import { v4 as uuidv4 } from 'uuid';
 
 @autoInjectable()
 export class DisciplineController {
+    constructor(
+        @inject(DisciplineService) private disciplineService: DisciplineService
+    ) { }
+
     getState = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         if (!userId) return res.sendStatus(401);
 
         try {
-            const data = await disciplineService.getState(userId);
+            const data = await this.disciplineService.getState(userId);
             res.json(data);
         } catch (error) {
             if (error instanceof Error && error.message === 'User not found') {
@@ -26,28 +30,28 @@ export class DisciplineController {
     getPressure = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         if (!userId) return res.sendStatus(401);
-        const data = await disciplineService.getPressure(userId);
+        const data = await this.disciplineService.getPressure(userId);
         res.json(data);
     };
 
     getPredictions = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         if (!userId) return res.sendStatus(401);
-        const data = await disciplineService.getPredictions(userId);
+        const data = await this.disciplineService.getPredictions(userId);
         res.json(data);
     };
 
     getConstraints = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         if (!userId) return res.sendStatus(401);
-        const data = await disciplineService.getConstraints(userId);
+        const data = await this.disciplineService.getConstraints(userId);
         res.json(data);
     };
 
     getHistory = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         if (!userId) return res.sendStatus(401);
-        const data = await disciplineService.getHistory(userId);
+        const data = await this.disciplineService.getHistory(userId);
         res.json(data);
     };
 

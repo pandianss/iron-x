@@ -33,8 +33,10 @@ export const createKernelWorker = () => {
         if (job.name === 'CLEANUP_LOGS_JOB') {
             const { retentionDays } = job.data;
             const { AuditService } = await import('../modules/audit/audit.service');
+            const { container } = await import('tsyringe');
+            const auditService = container.resolve(AuditService);
             console.log(`[Worker] Running Audit Log Cleanup. Retention: ${retentionDays} days`);
-            const deletedCount = await AuditService.cleanupLogs(retentionDays);
+            const deletedCount = await auditService.cleanupLogs(retentionDays);
             console.log(`[Worker] Audit Log Cleanup Complete. Deleted ${deletedCount} logs.`);
         }
 

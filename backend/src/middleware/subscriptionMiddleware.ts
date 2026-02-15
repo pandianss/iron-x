@@ -1,6 +1,6 @@
-
 import { Response, NextFunction } from 'express';
-import { AuthRequest } from './authMiddleware'; // Ensure this path is correct relative to middleware folder
+import { container } from 'tsyringe';
+import { AuthRequest } from './authMiddleware';
 import { QuotaService, ResourceType } from '../modules/subscription/quota.service';
 import { SubscriptionService } from '../modules/subscription/subscription.service';
 import { SubscriptionTier } from '@prisma/client';
@@ -10,7 +10,8 @@ export const checkAccountStatus = async (req: AuthRequest, res: Response, next: 
     if (!userId) return res.sendStatus(401);
 
     try {
-        const status = await SubscriptionService.getAccountStatus(userId);
+        const subscriptionService = container.resolve(SubscriptionService);
+        const status = await subscriptionService.getAccountStatus(userId);
         if (status.status === 'HARD_LOCKED') {
             return res.status(403).json({
                 message: status.message,
@@ -30,7 +31,8 @@ const validateQuota = (resource: ResourceType) => {
         if (!userId) return res.sendStatus(401);
 
         try {
-            const check = await QuotaService.checkQuota(userId, resource);
+            const quotaService = container.resolve(QuotaService);
+            const check = await quotaService.checkQuota(userId, resource);
             if (!check.allowed) {
                 return res.status(403).json({
                     message: check.message || 'Plan limit exceeded',
@@ -58,7 +60,8 @@ export const checkStrictModeAccess = async (req: AuthRequest, res: Response, nex
         const { is_strict } = req.body;
         if (is_strict !== true) return next();
 
-        const sub = await SubscriptionService.getSubscription(userId);
+        const subscriptionService = container.resolve(SubscriptionService);
+        const sub = await subscriptionService.getSubscription(userId);
         const tier = sub?.plan_tier || SubscriptionTier.FREE;
 
         if (tier === SubscriptionTier.FREE) {

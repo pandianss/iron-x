@@ -1,8 +1,7 @@
-
 import { Request, Response, NextFunction } from 'express';
-import { autoInjectable } from 'tsyringe';
+import { container, autoInjectable } from 'tsyringe';
 import prisma from '../../db';
-import { AuditService } from '../../services/audit.service';
+import { AuditService } from '../audit/audit.service';
 import { sanitizeMemberProfile } from '../../utils/privacy';
 import { NotFoundError, ForbiddenError } from '../../utils/AppError';
 import { TeamService } from './team.service';
@@ -72,7 +71,8 @@ export class TeamController {
                 }
             });
 
-            await AuditService.logEvent(
+            const auditService = container.resolve(AuditService);
+            await auditService.logEvent(
                 'TEAM_MEMBER_ADDED',
                 { teamId, addedUserId: userToAdd.user_id, role },
                 userToAdd.user_id,
@@ -134,6 +134,7 @@ export class TeamController {
     exportComplianceReport = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { ReportService } = await import('../../services/report.service');
+            const reportService = container.resolve(ReportService);
             const { teamId } = req.params as { teamId: string };
             const requesterId = (req as any).user!.userId;
 
@@ -145,7 +146,7 @@ export class TeamController {
                 throw new ForbiddenError('Not authorized to export report');
             }
 
-            const csv = await ReportService.generateTeamComplianceReport(teamId);
+            const csv = await reportService.generateTeamComplianceReport(teamId);
 
             res.set('Content-Type', 'text/csv');
             res.set('Content-Disposition', `attachment; filename="compliance_report_${teamId}.csv"`);

@@ -1,22 +1,27 @@
-
 import rateLimit from 'express-rate-limit';
 
-export const apiLimiter = rateLimit({
+export const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: 5, // 5 attempts per window
+    message: {
+        error: 'Too many authentication attempts. Try again in 15 minutes.',
+        retryAfter: 900
+    },
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: 'Too many requests from this IP, please try again after 15 minutes' }
+    skipSuccessfulRequests: true
 });
 
-export const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 10, // Limit each IP to 10 login/register requests per hour
-    message: { message: 'Too many login attempts from this IP, please try again after an hour' }
+export const apiLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 100, // 100 requests per minute
+    message: { error: 'Rate limit exceeded' },
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 export const logExecutionLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
-    max: 20, // 20 log executions per minute (generous but prevents rapid-fire abuse)
-    message: { message: 'Logging too fast, please slow down' }
+    max: 20,
+    message: { error: 'Logging too fast, please slow down' }
 });

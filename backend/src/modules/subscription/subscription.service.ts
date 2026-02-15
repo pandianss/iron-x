@@ -1,4 +1,4 @@
-
+import { singleton } from 'tsyringe';
 import prisma from '../../db';
 import { SubscriptionTier } from '@prisma/client';
 
@@ -29,14 +29,15 @@ export const SUBSCRIPTION_LIMITS = {
     }
 };
 
+@singleton()
 export class SubscriptionService {
-    static async getSubscription(userId: string) {
+    async getSubscription(userId: string) {
         return prisma.subscription.findUnique({
             where: { user_id: userId }
         });
     }
 
-    static async assignTier(userId: string, tier: SubscriptionTier) {
+    async assignTier(userId: string, tier: SubscriptionTier) {
         // Upsert subscription
         return prisma.subscription.upsert({
             where: { user_id: userId },
@@ -49,7 +50,7 @@ export class SubscriptionService {
         });
     }
 
-    static async checkActionLimit(userId: string): Promise<{ allowed: boolean; message?: string }> {
+    async checkActionLimit(userId: string): Promise<{ allowed: boolean; message?: string }> {
         const sub = await this.getSubscription(userId);
         const tier = sub?.plan_tier || SubscriptionTier.FREE;
         const limit = SUBSCRIPTION_LIMITS[tier].max_actions;
@@ -70,7 +71,7 @@ export class SubscriptionService {
         return { allowed: true };
     }
 
-    static async checkGoalLimit(userId: string): Promise<{ allowed: boolean; message?: string }> {
+    async checkGoalLimit(userId: string): Promise<{ allowed: boolean; message?: string }> {
         const sub = await this.getSubscription(userId);
         const tier = sub?.plan_tier || SubscriptionTier.FREE;
         const limit = SUBSCRIPTION_LIMITS[tier].max_goals;
@@ -91,7 +92,7 @@ export class SubscriptionService {
         return { allowed: true };
     }
 
-    static async checkTeamLimit(userId: string): Promise<{ allowed: boolean; message?: string }> {
+    async checkTeamLimit(userId: string): Promise<{ allowed: boolean; message?: string }> {
         const sub = await this.getSubscription(userId);
         const tier = sub?.plan_tier || SubscriptionTier.FREE;
         const limit = SUBSCRIPTION_LIMITS[tier].max_teams;
@@ -111,7 +112,7 @@ export class SubscriptionService {
 
         return { allowed: true };
     }
-    static async lockAccount(userId: string, gracePeriodDays: number = 7) {
+    async lockAccount(userId: string, gracePeriodDays: number = 7) {
         const graceUntil = new Date();
         graceUntil.setDate(graceUntil.getDate() + gracePeriodDays);
 
@@ -124,7 +125,7 @@ export class SubscriptionService {
         });
     }
 
-    static async unlockAccount(userId: string) {
+    async unlockAccount(userId: string) {
         return (prisma as any).subscription.update({
             where: { user_id: userId },
             data: {
@@ -134,7 +135,7 @@ export class SubscriptionService {
         });
     }
 
-    static async getAccountStatus(userId: string) {
+    async getAccountStatus(userId: string) {
         const sub = await this.getSubscription(userId);
         if (!sub) return { status: 'OK' };
 

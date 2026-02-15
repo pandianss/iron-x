@@ -1,32 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { getTrajectoryHistory, getProjectedScore, type TrajectoryData, type PredictionData } from '../api/trajectory';
+import React, { useState } from 'react';
+import { useTrajectoryHistory, useTrajectoryProjection } from '../hooks/useTrajectory';
 
 const DisciplineTrajectoryGraph: React.FC = () => {
-    const [data, setData] = useState<TrajectoryData | null>(null);
-    const [projection, setProjection] = useState<PredictionData | null>(null);
-    const [loading, setLoading] = useState(true);
     const [days, setDays] = useState(30);
+    const { data, loading: historyLoading, error: historyError } = useTrajectoryHistory(days);
+    const { data: projection, loading: projectionLoading } = useTrajectoryProjection();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const [historyData, projectionData] = await Promise.all([
-                    getTrajectoryHistory(days),
-                    getProjectedScore()
-                ]);
-                setData(historyData);
-                setProjection(projectionData);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [days]);
+    const loading = historyLoading || projectionLoading;
 
     if (loading) return <div className="animate-pulse h-64 bg-gray-100 rounded-lg"></div>;
+    if (historyError) return <div className="p-4 text-red-500 bg-red-50 rounded-lg border border-red-100">Error: {historyError}</div>;
     if (!data || data.history.length === 0) return <div className="p-4 text-gray-400">No trajectory data.</div>;
 
     // Simple SVG Graph

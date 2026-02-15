@@ -1,6 +1,7 @@
-
+import { singleton } from 'tsyringe';
 import prisma from '../../db';
 
+@singleton()
 export class PolicyService {
     // --- Policies ---
     async createPolicy(data: any) {

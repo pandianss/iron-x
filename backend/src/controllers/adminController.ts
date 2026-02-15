@@ -1,7 +1,7 @@
-
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import prisma from '../db';
-import { AuditService } from '../services/audit.service';
+import { AuditService } from '../modules/audit/audit.service';
 
 export const getAuditLogs = async (req: Request, res: Response) => {
     try {
@@ -36,7 +36,8 @@ export const updateSystemConfig = async (req: Request, res: Response) => {
             create: { config_key: key, value }
         });
 
-        await AuditService.logEvent(
+        const auditService = container.resolve(AuditService);
+        await auditService.logEvent(
             'SYSTEM_CONFIG_CHANGE',
             { key, value },
             undefined,

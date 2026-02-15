@@ -1,27 +1,25 @@
-
+import { singleton } from 'tsyringe';
 import * as crypto from 'crypto';
 import { Logger } from '../utils/logger';
-// import fetch from 'node-fetch'; // Built-in in Node 18+
 
 export interface WebhookPayload {
-    event: string; // 'score.changed', 'policy.violation'
+    event: string;
     timestamp: string;
     data: any;
 }
 
-export const WebhookService = {
-    // In a real system, these would be loaded from DB per user/tenant
+@singleton()
+export class WebhookService {
     getSubscribers(event: string) {
-        // Mock subscription
         return [
             { url: 'https://webhook.site/test', secret: 'whsec_test_secret_123' }
         ];
-    },
+    }
 
     signPayload(payload: any, secret: string): string {
         const data = JSON.stringify(payload);
         return crypto.createHmac('sha256', secret).update(data).digest('hex');
-    },
+    }
 
     async dispatchEvent(event: string, data: any) {
         const subscribers = this.getSubscribers(event);
@@ -34,8 +32,6 @@ export const WebhookService = {
         };
 
         for (const sub of subscribers) {
-            // Logger.info(`Dispatching ${event} to ${sub.url}`);
-
             const signature = crypto
                 .createHmac('sha256', sub.secret)
                 .update(JSON.stringify(payload))
@@ -56,4 +52,4 @@ export const WebhookService = {
             }
         }
     }
-};
+}

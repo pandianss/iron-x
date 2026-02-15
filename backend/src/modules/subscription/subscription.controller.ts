@@ -1,35 +1,40 @@
-
-import { Response } from 'express';
+import { Response, NextFunction } from 'express';
+import { container, autoInjectable, inject } from 'tsyringe';
 import { AuthRequest } from '../../middleware/authMiddleware';
 import { SubscriptionService } from './subscription.service';
 import { SubscriptionTier } from '@prisma/client';
+import { BadRequestError, UnauthorizedError } from '../../utils/AppError';
 
-export const assignTier = async (req: AuthRequest, res: Response) => {
-    try {
-        const { targetUserId, tier } = req.body;
+@autoInjectable()
+export class SubscriptionController {
+    constructor(
+        @inject(SubscriptionService) private subscriptionService: SubscriptionService
+    ) { }
 
-        // Basic validation
-        if (!Object.values(SubscriptionTier).includes(tier)) {
-            return res.status(400).json({ message: 'Invalid tier' });
+    assignTier = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const { targetUserId, tier } = req.body;
+
+            if (!Object.values(SubscriptionTier).includes(tier)) {
+                throw new BadRequestError('Invalid tier');
+            }
+
+            const subscription = await this.subscriptionService.assignTier(targetUserId, tier);
+            res.json(subscription);
+        } catch (error) {
+            next(error);
         }
+    };
 
-        const subscription = await SubscriptionService.assignTier(targetUserId, tier);
-        res.json(subscription);
-    } catch (error) {
-        console.error('Assign tier error', error);
-        res.status(500).json({ message: 'Failed to assign tier' });
-    }
-};
+    getMySubscription = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId;
+            if (!userId) throw new UnauthorizedError();
 
-export const getMySubscription = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
-        if (!userId) return res.sendStatus(401);
-
-        const subscription = await SubscriptionService.getSubscription(userId);
-        res.json(subscription || { plan_tier: SubscriptionTier.FREE });
-    } catch (error) {
-        console.error('Get subscription error', error);
-        res.status(500).json({ message: 'Failed to get subscription' });
-    }
-};
+            const subscription = await this.subscriptionService.getSubscription(userId);
+            res.json(subscription || { plan_tier: SubscriptionTier.FREE });
+        } catch (error) {
+            next(error);
+        }
+    };
+}

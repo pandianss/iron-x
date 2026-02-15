@@ -1,13 +1,18 @@
-
 import { Request, Response } from 'express';
+import { autoInjectable, inject } from 'tsyringe';
 import { AuditService } from './audit.service';
 
+@autoInjectable()
 export class AuditController {
-    static async getLogs(req: Request, res: Response) {
+    constructor(
+        @inject(AuditService) private auditService: AuditService
+    ) { }
+
+    getLogs = async (req: Request, res: Response) => {
         try {
             const { userId, action, startDate, endDate, limit, offset } = req.query;
 
-            const logs = await AuditService.getLogs({
+            const logs = await this.auditService.getLogs({
                 userId: userId as string,
                 action: action as string,
                 startDate: startDate ? new Date(startDate as string) : undefined,
@@ -23,11 +28,11 @@ export class AuditController {
         }
     }
 
-    static async exportLogs(req: Request, res: Response) {
+    exportLogs = async (req: Request, res: Response) => {
         try {
             const { userId, action, startDate, endDate } = req.query;
 
-            const csv = await AuditService.exportLogs({
+            const csv = await this.auditService.exportLogs({
                 userId: userId as string,
                 action: action as string,
                 startDate: startDate ? new Date(startDate as string) : undefined,

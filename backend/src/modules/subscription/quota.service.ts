@@ -1,17 +1,23 @@
+import { singleton, inject } from 'tsyringe';
 import prisma from '../../db';
 import { SubscriptionTier } from '@prisma/client';
 import { SUBSCRIPTION_LIMITS, SubscriptionService } from './subscription.service';
 
 export type ResourceType = 'ACTIONS' | 'GOALS' | 'TEAMS' | 'WEBHOOKS' | 'API_KEYS';
 
+@singleton()
 export class QuotaService {
-    static async checkQuota(userId: string, resource: ResourceType): Promise<{ allowed: boolean; message?: string }> {
-        const sub = await SubscriptionService.getSubscription(userId);
+    constructor(
+        @inject(SubscriptionService) private subscriptionService: SubscriptionService
+    ) { }
+
+    async checkQuota(userId: string, resource: string): Promise<{ allowed: boolean; message?: string }> {
+        const sub = await this.subscriptionService.getSubscription(userId);
         const tier = sub?.plan_tier || SubscriptionTier.FREE;
         const limits = (SUBSCRIPTION_LIMITS as any)[tier];
 
         // Ensure account is not hard-locked
-        const accountStatus = await SubscriptionService.getAccountStatus(userId);
+        const accountStatus = await this.subscriptionService.getAccountStatus(userId);
         if (accountStatus.status === 'HARD_LOCKED') {
             return { allowed: false, message: accountStatus.message };
         }

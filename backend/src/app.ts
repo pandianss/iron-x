@@ -31,6 +31,8 @@ import { apiKeyMiddleware } from './middleware/apiKeyMiddleware';
 import { versionMiddleware } from './middleware/versionMiddleware';
 import { initializeWebhookListeners } from './modules/integration/webhook.listener';
 import { errorHandler } from './middleware/errorHandler';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './infrastructure/swagger';
 
 dotenv.config();
 
@@ -41,8 +43,61 @@ initializeWebhookListeners();
 
 app.set('trust proxy', 1);
 
-app.use(helmet());
-app.use(cors());
+// Security headers
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'", process.env.API_URL || ""],
+            fontSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"]
+        }
+    },
+    crossOriginEmbedderPolicy: true,
+    crossOriginOpenerPolicy: true,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    dnsPrefetchControl: true,
+    frameguard: { action: 'deny' },
+    hidePoweredBy: true,
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+    },
+    ieNoOpen: true,
+    noSniff: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    xssFilter: true
+}));
+
+const corsOptions = {
+    origin: (origin: string | undefined, callback: Function) => {
+        const allowedOrigins = [
+            process.env.FRONTEND_URL,
+            'http://localhost:5173',
+            'http://localhost:3000'
+        ].filter(Boolean);
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['X-Total-Count', 'X-Page-Number'],
+    maxAge: 600
+};
+
+app.use(cors(corsOptions));
+
 if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('dev'));
 }
@@ -84,6 +139,7 @@ v1Router.use('/organizations', organizationRoutes); // /api/v1/organizations
 v1Router.use('/integration', integrationRoutes); // /api/v1/integration
 v1Router.use('/ops', opsRoutes); // /api/v1/ops
 
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1', v1Router);
 
 // Stripe routes (can be outside v1Router if they have a different base path or specific middleware needs)

@@ -1,6 +1,7 @@
-
+import { singleton } from 'tsyringe';
 import prisma from '../../db';
 import { Prisma } from '@prisma/client';
+import { Logger } from '../../utils/logger';
 
 export interface AuditFilter {
     userId?: string;
@@ -11,8 +12,9 @@ export interface AuditFilter {
     offset?: number;
 }
 
+@singleton()
 export class AuditService {
-    private static buildWhere(filter: AuditFilter): Prisma.AuditLogWhereInput {
+    private buildWhere(filter: AuditFilter): Prisma.AuditLogWhereInput {
         const where: Prisma.AuditLogWhereInput = {};
 
         if (filter.userId) {
@@ -33,7 +35,29 @@ export class AuditService {
         return where;
     }
 
-    static async getLogs(filter: AuditFilter) {
+    async logEvent(
+        action: string,
+        details: object | string,
+        targetUserId?: string,
+        actorId?: string
+    ) {
+        try {
+            const detailsStr = typeof details === 'string' ? details : JSON.stringify(details);
+
+            await prisma.auditLog.create({
+                data: {
+                    action,
+                    details: detailsStr,
+                    target_user_id: targetUserId,
+                    actor_id: actorId,
+                },
+            });
+        } catch (error) {
+            Logger.error('Failed to create audit log', error);
+        }
+    }
+
+    async getLogs(filter: AuditFilter) {
         const where = this.buildWhere(filter);
         const limit = filter.limit || 50;
         const offset = filter.offset || 0;
@@ -62,26 +86,25 @@ export class AuditService {
         };
     }
 
-    static async exportLogs(filter: AuditFilter): Promise<string> {
+    async exportLogs(filter: AuditFilter): Promise<string> {
         const where = this.buildWhere(filter);
 
         const logs = await prisma.auditLog.findMany({
             where,
             orderBy: { timestamp: 'desc' },
-            take: 5000 // Increased limit for enterprise export
+            take: 5000
         });
 
-        // Convert to CSV
         const header = 'LogID,Timestamp,ActorID,TargetID,Action,Details\n';
         const rows = logs.map(log => {
-            const details = log.details ? log.details.replace(/"/g, '""') : ''; // Escape quotes
+            const details = log.details ? log.details.replace(/"/g, '""') : '';
             return `${log.log_id},${log.timestamp.toISOString()},${log.actor_id || ''},${log.target_user_id || ''},${log.action},"${details}"`;
         }).join('\n');
 
         return header + rows;
     }
 
-    static async cleanupLogs(retentionDays: number): Promise<number> {
+    async cleanupLogs(retentionDays: number): Promise<number> {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
 

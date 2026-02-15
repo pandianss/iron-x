@@ -1,11 +1,13 @@
-
+import { singleton, inject } from 'tsyringe';
 import prisma from '../db';
-import { AuditService } from './audit.service';
+import { AuditService } from '../modules/audit/audit.service';
 
-export const ExceptionService = {
-    /**
-     * Grants a discipline exception/waiver to a user.
-     */
+@singleton()
+export class ExceptionService {
+    constructor(
+        @inject(AuditService) private auditService: AuditService
+    ) { }
+
     async grantException(userId: string, reason: string, validUntil: Date, approverId: string) {
         const exception = await prisma.disciplineException.create({
             data: {
@@ -17,7 +19,7 @@ export const ExceptionService = {
             }
         });
 
-        await AuditService.logEvent(
+        await this.auditService.logEvent(
             'EXCEPTION_GRANTED',
             { reason, validUntil, exceptionId: exception.exception_id },
             userId,
@@ -25,11 +27,8 @@ export const ExceptionService = {
         );
 
         return exception;
-    },
+    }
 
-    /**
-     * Checks if a user has an active exception that prevents enforcement.
-     */
     async hasActiveException(userId: string): Promise<boolean> {
         const now = new Date();
         const activeException = await prisma.disciplineException.findFirst({
@@ -42,4 +41,4 @@ export const ExceptionService = {
 
         return !!activeException;
     }
-};
+}

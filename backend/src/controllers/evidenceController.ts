@@ -1,7 +1,7 @@
-
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import { EvidenceService } from '../services/evidence.service';
-import { AuditService } from '../services/audit.service';
+import { AuditService } from '../modules/audit/audit.service';
 
 export const generateEvidence = async (req: Request, res: Response) => {
     try {
@@ -17,7 +17,8 @@ export const generateEvidence = async (req: Request, res: Response) => {
         const pack = await EvidenceService.generateEvidencePack('USER', targetUserId);
 
         // Log the access
-        await AuditService.logEvent(
+        const auditService = container.resolve(AuditService);
+        await auditService.logEvent(
             'EVIDENCE_GENERATED',
             { packId: pack.packId, integrity: pack.integrity },
             (req as any).user.user_id,

@@ -1,4 +1,4 @@
-
+import { singleton } from 'tsyringe';
 import prisma from '../../db';
 
 export interface ComplianceReport {
@@ -21,8 +21,41 @@ export interface MappingSummary {
     details?: string;
 }
 
+@singleton()
 export class ComplianceService {
-    static async generateReport(framework: string): Promise<ComplianceReport> {
+    async getControlsByFramework(framework: string) {
+        return prisma.control.findMany({
+            where: { framework },
+            include: { mappings: true }
+        });
+    }
+
+    async mapPolicyToControl(controlId: string, policyId: string, mechanism: string) {
+        return prisma.controlMapping.create({
+            data: {
+                control_id: controlId,
+                policy_id: policyId,
+                enforcement_mechanism: mechanism,
+                evidence_source: 'DB_TABLE:policies'
+            }
+        });
+    }
+
+    async getGapAnalysis(framework: string) {
+        const controls = await this.getControlsByFramework(framework);
+        const gaps = controls.filter(c => c.mappings.length === 0);
+
+        return {
+            total_controls: controls.length,
+            implemented_controls: controls.length - gaps.length,
+            gaps: gaps.map(g => ({
+                control_code: g.control_code,
+                description: g.description
+            }))
+        };
+    }
+
+    async generateReport(framework: string): Promise<ComplianceReport> {
         const controls = await prisma.control.findMany({
             where: { framework },
             include: { mappings: true }
@@ -40,10 +73,7 @@ export class ComplianceService {
                 let details = 'System active';
 
                 if (map.evidence_source.startsWith('DB_TABLE')) {
-                    // checks if table has data? 
-                    // const tableName = map.evidence_source.split(':')[1];
-                    // const count = await prisma.$queryRawUnsafe(`SELECT count(*) FROM "${tableName}"`); 
-                    // For now, static true.
+                    // For now, static true. Future implementation will use type-safe Prisma count per table.
                 }
 
                 mappings.push({
@@ -69,7 +99,7 @@ export class ComplianceService {
         };
     }
 
-    static async generateEvidencePack(framework: string): Promise<string> {
+    async generateEvidencePack(framework: string): Promise<string> {
         const report = await this.generateReport(framework);
 
         // Simulating a text dump of evidence for now

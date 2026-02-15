@@ -1,5 +1,7 @@
+import { singleton } from 'tsyringe';
 import prisma from '../db';
 
+@singleton()
 export class DisciplineService {
     async getState(userId: string) {
         // Pure read-model adapter
@@ -27,4 +29,3 @@ export class DisciplineService {
     async getHistory(userId: string) { return []; }
 }
 
-export const disciplineService = new DisciplineService();

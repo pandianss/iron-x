@@ -1,10 +1,8 @@
-
+import { singleton } from 'tsyringe';
 import prisma from '../db';
 
-export const ReportService = {
-    /**
-     * Generates a CSV compliance report for a team.
-     */
+@singleton()
+export class ReportService {
     async generateTeamComplianceReport(teamId: string): Promise<string> {
         const members = await prisma.teamMember.findMany({
             where: { team_id: teamId },
@@ -20,7 +18,6 @@ export const ReportService = {
             }
         });
 
-        // Header
         let csv = 'User ID,Email,Score,Enforcement Mode,Execution Rate,Miss Count (7d),Enforcement Actions (7d)\n';
 
         const now = new Date();
@@ -28,7 +25,6 @@ export const ReportService = {
         sevenDaysAgo.setDate(now.getDate() - 7);
 
         for (const member of members) {
-            // Stats (Last 7 days)
             const instances = await prisma.actionInstance.findMany({
                 where: {
                     user_id: member.user_id,
@@ -41,7 +37,6 @@ export const ReportService = {
             const missed = instances.filter(i => i.status === 'MISSED').length;
             const executionRate = total > 0 ? (executed / total * 100).toFixed(1) : '0.0';
 
-            // Enforcement Actions from Audit Log
             const auditLogs = await prisma.auditLog.count({
                 where: {
                     target_user_id: member.user_id,
@@ -55,4 +50,4 @@ export const ReportService = {
 
         return csv;
     }
-};
+}

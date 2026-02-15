@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError';
 import { Logger } from '../utils/logger';
+import { Prisma } from '@prisma/client';
 
 export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError) {
@@ -14,6 +15,22 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
             status: 'error',
             error: err.message
         });
+    }
+
+    // Prisma Error Handling
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+            return res.status(400).json({
+                status: 'error',
+                error: `Duplicate field value: ${err.meta?.target}`
+            });
+        }
+        if (err.code === 'P2025') {
+            return res.status(404).json({
+                status: 'error',
+                error: 'Record not found'
+            });
+        }
     }
 
     // Unexpected errors

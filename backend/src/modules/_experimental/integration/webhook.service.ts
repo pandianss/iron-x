@@ -1,7 +1,7 @@
 
 import { singleton } from 'tsyringe';
-import prisma from '../../db';
-import { kernelQueue } from '../../infrastructure/queue';
+import prisma from '../../../db';
+import { kernelQueue } from '../../../infrastructure/queue';
 
 @singleton()
 export class WebhookService {

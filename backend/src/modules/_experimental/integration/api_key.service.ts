@@ -1,6 +1,6 @@
 
 import { singleton } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../../db';
 import * as crypto from 'crypto';
 
 @singleton()

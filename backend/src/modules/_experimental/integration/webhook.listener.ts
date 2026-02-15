@@ -1,8 +1,8 @@
 
-import { domainEvents, DomainEventType } from '../../kernel/domain/events';
+import { domainEvents, DomainEventType } from '../../../kernel/domain/events';
 import { container } from 'tsyringe';
 import { WebhookService } from './webhook.service';
-import prisma from '../../db';
+import prisma from '../../../db';
 
 /**
  * Initializes listeners for domain events to trigger outbound webhooks.

@@ -1,4 +1,5 @@
-import { domainEvents, DomainEventType, ViolationDetectedEvent, ScoreUpdatedEvent, InstanceMaterializedEvent } from '../kernel/domain/events';
+import { domainEvents, ViolationDetectedEvent, ScoreUpdatedEvent, InstanceMaterializedEvent } from '../kernel/domain/events';
+import { DomainEventType } from '../kernel/domain/types';
 import { enforcementObserver } from '../governance/observers/EnforcementObserver';
 import { auditObserver } from '../governance/observers/AuditObserver';
 import { auditSubscriber } from '../modules/audit/AuditSubscriber';
@@ -9,7 +10,7 @@ export function registerObservers() {
     Logger.info('[Bootstrap] Registering Governance Observers...');
 
     // Enforcement
-    domainEvents.on(DomainEventType.VIOLATION_DETECTED, (e: ViolationDetectedEvent) => enforcementObserver.handle(e));
+    domainEvents.on(DomainEventType.VIOLATION_DETECTED, (e) => { enforcementObserver.handle(e); });
 
     // Bind to new EventBus as well
     kernelEvents.on(NewDomainEventType.VIOLATION_DETECTED, (e) => {
@@ -30,9 +31,9 @@ export function registerObservers() {
     console.log('[Bootstrap] auditSubscriber initialized status:', !!auditSubscriber);
 
     // Legacy Audit (Migration in progress)
-    domainEvents.on(DomainEventType.SCORE_UPDATED, (e: ScoreUpdatedEvent) => auditObserver.handle(e));
-    domainEvents.on(DomainEventType.VIOLATION_DETECTED, (e: ViolationDetectedEvent) => auditObserver.handle(e));
-    domainEvents.on(DomainEventType.INSTANCE_MATERIALIZED, (e: InstanceMaterializedEvent) => auditObserver.handle(e));
+    domainEvents.on(DomainEventType.SCORE_UPDATED, (e) => { auditObserver.handle(e); });
+    domainEvents.on(DomainEventType.VIOLATION_DETECTED, (e) => { auditObserver.handle(e); });
+    domainEvents.on(DomainEventType.INSTANCE_MATERIALIZED, (e) => { auditObserver.handle(e); });
 
     // Future: KERNEL_CYCLE_COMPLETED
 }

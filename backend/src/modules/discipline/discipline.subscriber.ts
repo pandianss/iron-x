@@ -5,7 +5,14 @@ import { DisciplineStateService } from '../../services/disciplineState.service';
 import { SocketService } from '../../services/socket.service';
 
 export class DisciplineSubscriber {
+    private static isInitialized = false;
+
     static initialize() {
+        if (this.isInitialized) {
+            console.warn('[DisciplineSubscriber] Already initialized. Skipping duplicate initialization.');
+            return;
+        }
+
         const service = container.resolve(DisciplineStateService);
         const socketService = SocketService.getInstance();
 
@@ -28,6 +35,7 @@ export class DisciplineSubscriber {
             }
         });
 
+        this.isInitialized = true;
         console.log('[DisciplineSubscriber] Initialized');
     }
 }

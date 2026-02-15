@@ -54,8 +54,10 @@ DisciplineSubscriber.initialize();
 app.set('trust proxy', 1);
 
 // Security headers
+const isDev = process.env.NODE_ENV === 'development';
+
 app.use(helmet({
-    contentSecurityPolicy: {
+    contentSecurityPolicy: isDev ? false : {
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
@@ -68,7 +70,7 @@ app.use(helmet({
             frameSrc: ["'none'"]
         }
     },
-    crossOriginEmbedderPolicy: true,
+    crossOriginEmbedderPolicy: !isDev,
     crossOriginOpenerPolicy: true,
     crossOriginResourcePolicy: { policy: "cross-origin" },
     dnsPrefetchControl: true,
@@ -88,10 +90,10 @@ app.use(helmet({
 const corsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
         const allowedOrigins = [
-            process.env.FRONTEND_URL,
+            process.env.FRONTEND_URL?.replace(/\/$/, ''), // Normalize: remove trailing slash
             'http://localhost:5173',
             'http://localhost:3000'
-        ].filter(Boolean);
+        ].filter(Boolean) as string[];
 
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -100,8 +102,8 @@ const corsOptions = {
         }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY'],
     exposedHeaders: ['X-Total-Count', 'X-Page-Number'],
     maxAge: 600
 };
@@ -111,19 +113,30 @@ app.use(cors(corsOptions));
 if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('dev'));
 }
-app.use(express.json());
+
+// NOTE: Stripe webhook MUST come before express.json() if not using raw parser inside the router
+// But we have express.raw() in the router, so we can keep the order if we're careful.
+app.use(express.json({
+    verify: (req: any, res, buf) => {
+        if (req.originalUrl.startsWith('/api/v1/billing/webhook')) {
+            req.rawBody = buf;
+        }
+    }
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Global Middleware
 app.use(ipWhitelistMiddleware);
-app.use(apiKeyMiddleware);
 app.use(versionMiddleware);
 
 // API V1 Router
 const v1Router = express.Router();
 
+// Apply API Key globally to V1 except auth/public
 v1Router.use('/auth', authLimiter, authRoutes);
-v1Router.use(apiLimiter); // Apply global API limiter to subsequent routes
+
+v1Router.use(apiLimiter);
+v1Router.use(apiKeyMiddleware); // Scoped to non-auth v1 routes
 
 v1Router.use('/user', userRoutes);
 v1Router.use('/admin', adminRoutes);
@@ -135,7 +148,6 @@ v1Router.use('/actions', policyEnforcementMiddleware, actionRoutes);
 
 v1Router.use('/outcomes', outcomeRoutes);
 v1Router.use('/policies', policyRoutes);
-// v1Router.use('/trajectory', trajectoryRoutes);
 v1Router.use('/discipline', disciplineRoutes);
 
 // Mount V1 Router

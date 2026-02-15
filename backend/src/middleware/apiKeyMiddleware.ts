@@ -6,6 +6,12 @@ import { Logger } from '../utils/logger';
 import { isModuleActive, ModuleId } from '../kernel/moduleRegistry';
 
 export const apiKeyMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    // Skip for public routes or health checks
+    const publicPaths = ['/api/v1/auth', '/api/docs', '/health', '/api/v1/billing/webhook'];
+    if (publicPaths.some(path => req.originalUrl.startsWith(path))) {
+        return next();
+    }
+
     // Feature Flag: Skip if Integration module is inactive
     if (!isModuleActive(ModuleId.INTEGRATION)) {
         return next();

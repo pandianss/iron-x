@@ -7,12 +7,14 @@ import AppRouter from './routers/AppRouter';
 
 console.log('App.tsx loaded');
 
+const basename = import.meta.env.VITE_APP_BASENAME || '/';
+
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <DisciplineProvider>
-          <Router>
+          <Router basename={basename}>
             <Routes>
               {/* App Routes - delegated to AppRouter */}
               <Route path="/dashboard/*" element={<AppRouter />} />
@@ -23,7 +25,10 @@ function App() {
               <Route path="/org/*" element={<AppRouter />} />
               <Route path="/billing/*" element={<AppRouter />} />
 
-              {/* Marketing Routes & Fallback - delegated to MarketingRouter */}
+              {/* Explicit root resolution */}
+              <Route path="/" element={<MarketingRouter />} />
+
+              {/* Catch-all Fallback */}
               <Route path="*" element={<MarketingRouter />} />
             </Routes>
           </Router>

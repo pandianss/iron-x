@@ -5,6 +5,7 @@ import { AuthContext, type User } from './AuthContextInstance';
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
         const initializeAuth = async () => {
@@ -21,6 +22,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     localStorage.removeItem('token');
                 }
             }
+            setIsInitialized(true);
         };
 
         initializeAuth();
@@ -39,6 +41,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.removeItem('token');
         localStorage.removeItem('user');
     };
+
+    if (!isInitialized) {
+        return null; // or a loading spinner
+    }
 
     return (
         <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!token }}>

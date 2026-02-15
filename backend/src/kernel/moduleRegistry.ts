@@ -24,6 +24,15 @@ export enum ModuleId {
     TRAJECTORY = 'TRAJECTORY'
 }
 
+// Module definitions
+export const MODULE_REGISTRY = {
+    [ModuleId.AUTH]: () => import('../modules/auth/auth.module'),
+    [ModuleId.USER]: () => import('../modules/user/user.module'),
+    [ModuleId.ACTION]: () => import('../modules/actions/action.module'),
+    [ModuleId.GOAL]: () => import('../modules/goals/goal.module'),
+    // ... other modules would be registered here as factories
+};
+
 export const ACTIVE_MODULES: ModuleId[] = [
     ModuleId.AUTH,
     ModuleId.USER,

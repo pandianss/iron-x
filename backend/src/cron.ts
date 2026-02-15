@@ -6,6 +6,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { Logger } from './utils/logger';
 
 export const startCronJobs = () => {
+    if (process.env.CRON_ENABLED === 'false') {
+        Logger.info('[Cron] Scheduler disabled via CRON_ENABLED flag.');
+        return;
+    }
+
+    // Leader-election hook: In a multi-instance env, only one should run cron.
+    // Future: Add Redis-based lock check here.
+
+    Logger.info('[Cron] Initializing scheduler...');
+
     // Run every hour to check for missed actions and violations
     cron.schedule('0 * * * *', async () => {
         Logger.info('[Cron] Enqueuing hourly discipline cycle...');

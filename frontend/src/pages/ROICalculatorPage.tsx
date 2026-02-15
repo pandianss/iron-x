@@ -17,7 +17,7 @@ const ROICalculatorPage: React.FC = () => {
             <div className="max-w-4xl mx-auto">
                 <header className="mb-12 text-center">
                     <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-iron-400 to-iron-100 bg-clip-text text-transparent">
-                        The Cost of Discipline Drift
+                        Infrastructure Impact Analysis
                     </h1>
                     <p className="text-xl text-neutral-400">
                         Calculate how much "approximate execution" is costing your organization.
@@ -29,7 +29,7 @@ const ROICalculatorPage: React.FC = () => {
                     <div className="space-y-8 bg-neutral-800 p-8 rounded-xl border border-neutral-700">
                         <div>
                             <label className="block text-sm font-medium text-neutral-300 mb-2">
-                                Number of Employees
+                                Operator Count (Nodes)
                             </label>
                             <input
                                 type="range"
@@ -59,7 +59,7 @@ const ROICalculatorPage: React.FC = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-neutral-300 mb-2">
-                                "Drift Hours" per Week (per Employee)
+                                Discipline Drift per Week (per Node)
                             </label>
                             <p className="text-xs text-neutral-500 mb-2">
                                 Time lost to context switching, unclear priorities, or lack of SOP adherence.
@@ -79,14 +79,14 @@ const ROICalculatorPage: React.FC = () => {
                     {/* Results */}
                     <div className="bg-neutral-800 p-8 rounded-xl border border-neutral-700 flex flex-col justify-center items-center text-center">
                         <div className="mb-8">
-                            <h3 className="text-lg text-neutral-400 mb-2">Potential Annual Savings</h3>
+                            <h3 className="text-lg text-neutral-400 mb-2">Annual System Recovery</h3>
                             <div className="text-5xl font-bold text-green-400">
                                 ${annualSavings.toLocaleString()}
                             </div>
                         </div>
 
                         <div className="mb-8">
-                            <h3 className="text-lg text-neutral-400 mb-2">Annual Iron-X Cost (Est.)</h3>
+                            <h3 className="text-lg text-neutral-400 mb-2">Infrastructure Investment (Est.)</h3>
                             <div className="text-3xl font-mono text-white">
                                 ${ironXCost.toLocaleString()}
                             </div>
@@ -103,7 +103,7 @@ const ROICalculatorPage: React.FC = () => {
                             onClick={() => navigate('/register')}
                             className="bg-white text-black px-8 py-4 rounded-lg font-bold hover:bg-neutral-200 transition-colors w-full"
                         >
-                            Stop the Drift. Start Iron-X.
+                            Initialize Infrastructure. Stop the Drift.
                         </button>
                     </div>
                 </div>

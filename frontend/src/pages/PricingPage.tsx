@@ -24,45 +24,45 @@ const PricingPage: React.FC = () => {
     const tiers = [
         {
             id: 'FREE',
-            name: 'Iron-X Free',
+            name: 'Iron-X EVAL',
             price: '$0',
             features: [
-                'Max 3 Actions',
-                'Max 3 Goals',
+                'Max 3 Actions / Node',
+                'Max 3 Goals / Node',
                 'Soft Enforcement Only',
-                'Basic Tracking'
+                'Basic Compliance Tracking'
             ],
-            cta: 'Current Plan',
+            cta: 'Current Evaluation',
             disabled: true
         },
         {
             id: 'INDIVIDUAL_PRO',
-            name: 'Iron-X Pro',
-            price: '$29/mo',
+            name: 'Iron-X OPERATOR',
+            price: '$29/node',
             features: [
                 'Unlimited Actions',
                 'Unlimited Goals',
                 'Hard Enforcement Mode',
                 'Strict Mode Lockouts',
-                '90-Day Analytics',
-                'Priority Support'
+                '90-Day Performance Analytics',
+                'Priority Technical Support'
             ],
-            cta: 'Upgrade to Pro',
+            cta: 'Initialize Operator Node',
             disabled: false
         },
         {
             id: 'TEAM_ENTERPRISE',
-            name: 'Iron-X Enterprise',
-            price: '$149/seat',
+            name: 'Iron-X INSTITUTIONAL',
+            price: '$149/cluster',
             features: [
-                'Everything in Pro',
-                'Unlimited Teams',
-                'Organization Policies',
-                'SSO / SAML',
-                'Audit Log Export',
-                'Dedicated Success Manager'
+                'Everything in Operator',
+                'Unlimited Institutional Clusters',
+                'Organization Governance Policies',
+                'SSO / SAML Integration',
+                'Immutable Audit Log Export',
+                'Dedicated Infrastructure Analyst'
             ],
-            cta: 'Contact Sales',
+            cta: 'Contact Architecture Team',
             disabled: false
         }
     ];
@@ -105,10 +105,10 @@ const PricingPage: React.FC = () => {
         <div className="min-h-screen bg-iron-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="text-center">
                 <h2 className="text-3xl font-extrabold text-iron-900 sm:text-4xl">
-                    Simple, Transparent Pricing
+                    Infrastructure Licensing Tiers
                 </h2>
                 <p className="mt-4 text-xl text-iron-600">
-                    Invest in your operational discipline.
+                    Invest in your institutional discipline.
                 </p>
                 {currentTier !== 'FREE' && (
                     <button

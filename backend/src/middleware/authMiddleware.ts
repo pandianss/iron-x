@@ -23,9 +23,9 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     }
 
     try {
-        const payload = verifyToken(token);
+        const payload = verifyToken(token) as any;
 
-        if (!payload.userId) {
+        if (!payload || !payload.userId) {
             throw new Error('Invalid token payload');
         }
 

@@ -20,9 +20,8 @@ body {
     font-family: var(--font-mono);
     margin: 0;
     padding: 0;
-    overflow: hidden;
-    -webkit-font-smoothing: none;
-    /* Crisper technical look */
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Technical aesthetics */
@@ -191,4 +190,63 @@ body {
     border-bottom: 2px solid var(--iron-400);
     border-right: 2px solid var(--iron-400);
     pointer-events: none;
+}
+
+/* Global Slider Hardening */
+input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: crosshair;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    background: #52525b;
+    /* iron-600 */
+    border-radius: 9999px;
+    border: 1px solid #27272a;
+    /* iron-800 */
+}
+
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    background: #52525b;
+    border-radius: 9999px;
+    border: 1px solid #27272a;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    background: #d4d4d8;
+    /* iron-300 */
+    cursor: crosshair;
+    margin-top: -6px;
+    /* Centers thumb on 8px track */
+    border: 2px solid #0a0a0a;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+}
+
+input[type=range]::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #a1a1aa;
+    cursor: crosshair;
+    border: 2px solid #0a0a0a;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+input[type=range]:hover::-webkit-slider-runnable-track {
+    background: #52525b;
+    /* iron-600 */
+}
+
+input[type=range]:hover::-moz-range-track {
+    background: #52525b;
 }

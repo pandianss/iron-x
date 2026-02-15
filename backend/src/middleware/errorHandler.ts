@@ -13,7 +13,7 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
 
         return res.status(err.statusCode).json({
             status: 'error',
-            error: err.message
+            message: err.message
         });
     }
 
@@ -22,13 +22,13 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
         if (err.code === 'P2002') {
             return res.status(400).json({
                 status: 'error',
-                error: `Duplicate field value: ${err.meta?.target}`
+                message: `Duplicate field value: ${err.meta?.target}`
             });
         }
         if (err.code === 'P2025') {
             return res.status(404).json({
                 status: 'error',
-                error: 'Record not found'
+                message: 'Record not found'
             });
         }
     }
@@ -37,6 +37,6 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
     Logger.error('[Unhandled Error] ', { error: err });
     res.status(500).json({
         status: 'error',
-        error: 'Internal Server Error'
+        message: 'Internal Server Error'
     });
 };

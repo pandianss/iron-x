@@ -24,144 +24,163 @@ const PricingPage: React.FC = () => {
     const tiers = [
         {
             id: 'FREE',
-            name: 'Iron-X EVAL',
+            name: 'EVAL',
             price: '$0',
+            subtitle: 'Node Evaluation',
             features: [
                 'Max 3 Actions / Node',
-                'Max 3 Goals / Node',
-                'Soft Enforcement Only',
-                'Basic Compliance Tracking'
+                'SOFT Enforcement',
+                'Basic Compliance Engine',
+                'Local Audit Stream'
             ],
             cta: 'Current Evaluation',
             disabled: true
         },
         {
             id: 'INDIVIDUAL_PRO',
-            name: 'Iron-X OPERATOR',
-            price: '$29/node',
+            name: 'OPERATOR',
+            price: '$49',
+            subtitle: 'Mission-Critical Node',
             features: [
                 'Unlimited Actions',
-                'Unlimited Goals',
-                'Hard Enforcement Mode',
-                'Strict Mode Lockouts',
-                '90-Day Performance Analytics',
-                'Priority Technical Support'
+                'HARD Enforcement (Lockouts)',
+                'Discipline Trajectory Engine',
+                '90-Day Audit Retention',
+                'Operational API Access'
             ],
-            cta: 'Initialize Operator Node',
+            cta: 'Initialize Node',
             disabled: false
         },
         {
             id: 'TEAM_ENTERPRISE',
-            name: 'Iron-X INSTITUTIONAL',
-            price: '$149/cluster',
+            name: 'INSTITUTIONAL',
+            price: 'CUSTOM',
+            subtitle: 'Governance Cluster',
             features: [
-                'Everything in Operator',
-                'Unlimited Institutional Clusters',
-                'Organization Governance Policies',
-                'SSO / SAML Integration',
-                'Immutable Audit Log Export',
-                'Dedicated Infrastructure Analyst'
+                'Institutional Policy Clusters',
+                'Immutable Audit Protocol',
+                'SAML / Architecture SSO',
+                'Dedicated System Analyst',
+                'On-Premise Resilience'
             ],
-            cta: 'Contact Architecture Team',
+            cta: 'Contact Architecture',
             disabled: false
         }
     ];
 
-
     const handleUpgrade = async (tierId: string) => {
         if (tierId === 'TEAM_ENTERPRISE') {
-            window.location.assign('mailto:sales@iron-x.com?subject=Enterprise Inquiry');
+            window.location.assign('mailto:enterprise@iron-x.com?subject=Institutional Deployment Inquiry');
             return;
         }
 
         try {
-            // Use mock price IDs for now. In prod, these come from env or config.
             const priceId = tierId === 'INDIVIDUAL_PRO' ? 'price_pro_monthly' : 'price_enterprise_seats';
             const { url } = await BillingClient.createCheckoutSession(priceId, window.location.href, window.location.href);
             if (url) {
                 window.location.assign(url);
             } else {
-                alert('Failed to initiate checkout.');
+                alert('Checkout initialization failed.');
             }
         } catch (err) {
             console.error('Upgrade error:', err);
-            alert('Error initiating upgrade. Please try again.');
-        }
-    };
-
-    const handleManageBilling = async () => {
-        try {
-            const { url } = await BillingClient.createPortalSession(window.location.href);
-            if (url) {
-                window.location.href = url;
-            }
-        } catch (err) {
-            console.error('Portal error:', err);
-            alert('Error opening billing portal.');
+            alert('Encountered error during initialization.');
         }
     };
 
     return (
-        <div className="min-h-screen bg-iron-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-                <h2 className="text-3xl font-extrabold text-iron-900 sm:text-4xl">
-                    Infrastructure Licensing Tiers
-                </h2>
-                <p className="mt-4 text-xl text-iron-600">
-                    Invest in your institutional discipline.
-                </p>
-                {currentTier !== 'FREE' && (
-                    <button
-                        onClick={handleManageBilling}
-                        className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
-                    >
-                        Manage Billing & Subscription
-                    </button>
-                )}
-            </div>
+        <div className="min-h-screen bg-black text-white py-24 px-6 infrastructure-bg">
+            <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-24">
+                    <h2 className="text-5xl md:text-6xl font-bold font-display uppercase tracking-tight mb-6">
+                        Infrastructure Licensing
+                    </h2>
+                    <p className="text-xl text-neutral-500 font-mono">
+                        Scale from node evaluation to distributed institutional governance.
+                    </p>
+                    {currentTier !== 'FREE' && (
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const { url } = await BillingClient.createPortalSession(window.location.href);
+                                    if (url) window.location.href = url;
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            }}
+                            className="mt-8 inline-flex items-center px-6 py-2 border border-iron-700 text-xs font-mono uppercase tracking-widest text-iron-400 hover:text-white transition-colors"
+                        >
+                            [ Manage Deployment Cluster ]
+                        </button>
+                    )}
+                </div>
 
-            <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
-                {tiers.map((tier) => {
-                    const isCurrent = currentTier === tier.id;
-                    return (
-                        <div key={tier.id} className={`border border-iron-200 rounded-lg shadow-sm divide-y divide-iron-200 bg-white ${isCurrent ? 'ring-2 ring-indigo-500' : ''}`}>
-                            <div className="p-6">
-                                <h3 className="text-lg leading-6 font-medium text-iron-900">{tier.name}</h3>
-                                <p className="mt-4">
-                                    <span className="text-4xl font-extrabold text-iron-900">{tier.price}</span>
-                                    {tier.price !== '$0' && <span className="text-base font-medium text-iron-500">/mo</span>}
-                                </p>
-                                <button
-                                    onClick={() => !isCurrent && handleUpgrade(tier.id)}
-                                    disabled={isCurrent}
-                                    className={`mt-8 block w-full py-2 px-4 border border-transparent rounded-md text-center text-sm font-medium ${isCurrent
-                                        ? 'bg-green-100 text-green-800 cursor-default'
-                                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                        }`}
-                                >
-                                    {isCurrent ? 'Current Plan' : tier.cta}
-                                </button>
-                            </div>
-                            <div className="pt-6 pb-8 px-6">
-                                <h4 className="text-sm font-medium text-iron-900 tracking-wide uppercase">What's included</h4>
-                                <ul className="mt-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {tiers.map((tier) => {
+                        const isCurrent = currentTier === tier.id;
+                        const isOperator = tier.id === 'INDIVIDUAL_PRO';
+
+                        return (
+                            <div
+                                key={tier.id}
+                                className={`p-10 bg-iron-950/30 border glass-panel flex flex-col hardened-border
+                                    ${isOperator ? 'border-iron-400' : 'border-iron-800'}
+                                    ${isCurrent ? 'ring-1 ring-white/20' : ''}`}
+                            >
+                                <div className="mb-10">
+                                    <h3 className="text-xs font-mono text-iron-500 mb-4 uppercase tracking-[0.4em]">{tier.subtitle}</h3>
+                                    <div className="text-4xl font-bold text-white mb-2 font-display uppercase">{tier.name}</div>
+                                    <div className="flex items-baseline gap-2 mb-6">
+                                        <span className="text-3xl font-bold text-white font-display tabular-nums">
+                                            {tier.price}
+                                        </span>
+                                        {tier.price.startsWith('$') && tier.price !== '$0' && (
+                                            <span className="text-xs font-mono text-iron-500 uppercase">/ node / mo</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <ul className="space-y-4 mb-12 flex-grow border-t border-iron-800 pt-8">
                                     {tier.features.map((feature) => (
-                                        <li key={feature} className="flex space-x-3">
-                                            <span className="text-green-500">✓</span>
-                                            <span className="text-base text-iron-500">{feature}</span>
+                                        <li key={feature} className="flex items-start gap-3 text-xs uppercase tracking-widest font-mono text-neutral-400">
+                                            <span className="text-iron-600">▸</span>
+                                            {feature}
                                         </li>
                                     ))}
                                 </ul>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
 
-            <div className="text-center mt-8">
-                <button onClick={() => navigate('/')} className="text-indigo-600 hover:text-indigo-500">
-                    &larr; Back to Dashboard
-                </button>
+                                <button
+                                    onClick={() => !isCurrent && handleUpgrade(tier.id)}
+                                    disabled={isCurrent}
+                                    className={`w-full py-4 font-bold font-display uppercase tracking-widest text-sm transition-all
+                                        ${isCurrent
+                                            ? 'bg-iron-900 text-iron-500 cursor-default border border-iron-800'
+                                            : isOperator
+                                                ? 'bg-white text-black hover:bg-neutral-200 shadow-lg shadow-iron-500/10'
+                                                : 'border border-iron-700 text-iron-200 hover:bg-white hover:text-black'
+                                        }`}
+                                >
+                                    {isCurrent ? 'Active State' : tier.cta}
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="text-center mt-24">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="text-iron-600 font-mono text-xs uppercase tracking-[0.4em] hover:text-white transition-colors"
+                    >
+                        [ Return to System Node ]
+                    </button>
+                    <div className="mt-8 flex justify-center gap-8 opacity-20 grayscale">
+                        {/* Technical Badges Placeholder */}
+                        <div className="w-12 h-12 border border-white" />
+                        <div className="w-12 h-12 border border-white rotate-45" />
+                        <div className="w-12 h-12 border border-white rounded-full" />
+                    </div>
+                </div>
             </div>
         </div>
     );

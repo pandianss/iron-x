@@ -28,7 +28,7 @@ export const getAuditLogs = async (req: Request, res: Response) => {
 export const updateSystemConfig = async (req: Request, res: Response) => {
     try {
         const { key, value } = req.body;
-        const actorId = req.user?.userId;
+        const actorId = (req as any).user?.userId;
 
         await prisma.systemConfig.upsert({
             where: { config_key: key },

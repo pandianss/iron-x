@@ -10,7 +10,7 @@ export class TeamController {
     createTeam = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { name } = req.body;
-            const ownerId = req.user!.userId;
+            const ownerId = (req as any).user!.userId;
 
             const team = await prisma.team.create({
                 data: {
@@ -36,7 +36,7 @@ export class TeamController {
     addMember = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { teamId, email, role } = req.body;
-            const requesterId = req.user!.userId;
+            const requesterId = (req as any).user!.userId;
 
             const membership = await prisma.teamMember.findUnique({
                 where: { team_id_user_id: { team_id: teamId, user_id: requesterId } }
@@ -84,7 +84,7 @@ export class TeamController {
     getTeamStats = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { teamId } = req.params as { teamId: string };
-            const requesterId = req.user!.userId;
+            const requesterId = (req as any).user!.userId;
 
             const membership = await prisma.teamMember.findUnique({
                 where: { team_id_user_id: { team_id: teamId, user_id: requesterId } }
@@ -131,7 +131,7 @@ export class TeamController {
         try {
             const { ReportService } = await import('../../services/report.service');
             const { teamId } = req.params as { teamId: string };
-            const requesterId = req.user!.userId;
+            const requesterId = (req as any).user!.userId;
 
             const membership = await prisma.teamMember.findUnique({
                 where: { team_id_user_id: { team_id: teamId, user_id: requesterId } }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import client from '../api/client';
-import { X, Calendar, Activity, AlertCircle } from 'lucide-react';
+import { X, Activity, AlertCircle } from 'lucide-react';
 
 interface WeeklyReportData {
     period: { start: string; end: string };

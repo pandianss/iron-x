@@ -21,7 +21,7 @@ export const TrustControlService = {
      * (Reuses logic from EvidenceService but explicit for exports)
      */
     signExport(data: any): string {
-        const crypto = require('crypto');
+        const crypto = require('crypto'); // eslint-disable-line @typescript-eslint/no-require-imports
         return crypto.createHmac('sha256', process.env.EXPORT_SECRET || 'default_secret').update(JSON.stringify(data)).digest('hex');
     }
 };

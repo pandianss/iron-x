@@ -1,5 +1,7 @@
-import { getTomorrowPreview, getAnticipatoryWarnings, TomorrowPreviewData, Warning } from '../api/trajectory';
+import { useState, useEffect } from 'react';
+import { getTomorrowPreview, getAnticipatoryWarnings, type TomorrowPreviewData, type Warning } from '../api/trajectory';
 import { Calendar, AlertTriangle, CheckCircle, Info, Siren } from 'lucide-react';
+
 
 const TomorrowPreview: React.FC = () => {
     const [data, setData] = useState<TomorrowPreviewData | null>(null);
@@ -69,7 +71,7 @@ const TomorrowPreview: React.FC = () => {
 
             {warnings.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
-                    {warnings.map((w, i) => (
+                    {warnings.map((w: Warning, i: number) => (
                         <div key={i} className={`text-xs p-2 rounded flex items-start ${w.severity === 'HIGH' ? 'bg-red-50 text-red-700' : 'bg-yellow-50 text-yellow-700'
                             }`}>
                             <Siren className="w-4 h-4 mr-2 flex-shrink-0" />

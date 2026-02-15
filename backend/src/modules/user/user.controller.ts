@@ -12,7 +12,7 @@ export class UserController {
     updateEnforcementMode = async (req: Request, res: Response) => {
         try {
             const { mode } = req.body;
-            const userId = req.user!.userId;
+            const userId = (req as any).user!.userId;
 
             if (!['NONE', 'SOFT', 'HARD'].includes(mode)) {
                 return res.status(400).json({ error: 'Invalid mode' });
@@ -27,7 +27,7 @@ export class UserController {
     };
 
     getProfile = async (req: Request, res: Response) => {
-        const userId = req.user!.userId;
+        const userId = (req as any).user!.userId;
         const user = await prisma.user.findUnique({
             where: { user_id: userId }
         });

@@ -49,13 +49,12 @@ async function verifyAssignment() {
             return;
         }
 
-        // @ts-ignore
+        // @ts-expect-error - Intentionally testing invalid input
         if (user.role && user.role.name === 'Employee') {
             console.log('SUCCESS: User assigned "Employee" role automatically.');
-            // @ts-ignore
+            // @ts-expect-error - Intentionally testing invalid input
             console.log('Role ID:', user.role.role_id);
         } else {
-            // @ts-ignore
             console.error('FAILURE: User has wrong role:', user.role);
         }
 

@@ -1,5 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
+import client from '../api/client';
 
 interface Goal {
     goal_id: string;
@@ -22,19 +22,8 @@ const GoalList: React.FC<GoalListProps> = ({ refreshTrigger }) => {
     useEffect(() => {
         const fetchGoals = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3000/goals', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch goals');
-                }
-
-                const data = await response.json();
-                setGoals(data);
+                const response = await client.get<Goal[]>('/goals');
+                setGoals(response.data);
             } catch (err) {
                 setError('Error loading goals');
                 console.error(err);

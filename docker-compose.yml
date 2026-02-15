@@ -20,7 +20,9 @@ services:
       - "6379:6379"
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      target: dev
     container_name: iron_backend
     ports:
       - "3000:3000"
@@ -33,9 +35,12 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+    command: npm run dev
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      target: dev
     container_name: iron_frontend
     ports:
       - "5173:5173"
@@ -46,6 +51,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    command: npm run dev -- --host
 
 volumes:
   postgres_data:

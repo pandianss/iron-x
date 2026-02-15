@@ -14,7 +14,7 @@ async function runVerification() {
             body: JSON.stringify({ email, password: 'password', timezone: 'UTC' })
         });
 
-        let loginData = await regRes.json();
+        const loginData = await regRes.json();
         const token = loginData.token;
         const userId = loginData.user.id;
         console.log('   User ID:', userId);

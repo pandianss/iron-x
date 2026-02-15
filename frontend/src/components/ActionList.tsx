@@ -1,5 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
+import client from '../api/client';
 
 interface Action {
     action_id: string;
@@ -23,14 +23,8 @@ const ActionList: React.FC<ActionListProps> = ({ refreshTrigger }) => {
     useEffect(() => {
         const fetchActions = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3000/actions', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setActions(data);
-                }
+                const response = await client.get<Action[]>('/actions');
+                setActions(response.data);
             } catch (err) {
                 console.error(err);
             } finally {

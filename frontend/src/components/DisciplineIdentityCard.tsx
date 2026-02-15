@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getTrajectoryIdentity, TrajectoryIdentity } from '../api/trajectory';
+import { getTrajectoryIdentity, type TrajectoryIdentity } from '../api/trajectory';
 
 const DisciplineIdentityCard: React.FC = () => {
     const [data, setData] = useState<TrajectoryIdentity | null>(null);

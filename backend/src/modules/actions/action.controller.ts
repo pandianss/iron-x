@@ -15,7 +15,7 @@ export class ActionController {
             is_strict
         } = req.body;
 
-        const userId = req.user?.userId;
+        const userId = (req as any).user?.userId;
         if (!userId) return res.sendStatus(401);
 
         // Convert time string to Date if necessary
@@ -49,7 +49,7 @@ export class ActionController {
     };
 
     getActions = async (req: Request, res: Response) => {
-        const userId = req.user?.userId;
+        const userId = (req as any).user?.userId;
         if (!userId) return res.sendStatus(401);
 
         try {

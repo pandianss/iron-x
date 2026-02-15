@@ -1,3 +1,4 @@
+/* eslint-disable */
 const RedisMock = require('redis-mock');
 
 // redis-mock exports { createClient: ... } usually, or similar.
@@ -13,7 +14,7 @@ class Redis {
     }
     async info() { return "redis_version:6.0.0"; }
     // Proxy methods to redis-mock client if needed, or just stub basic ones
-    on(event: string, callback: Function) { return this; }
+    on(event: string, callback: (...args: any[]) => void) { return this; }
     async quit() { return 'OK'; }
     async disconnect() { return 'OK'; }
 

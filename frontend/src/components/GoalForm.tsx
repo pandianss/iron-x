@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import client from '../api/client';
 
 interface GoalFormProps {
     onGoalCreated: () => void;
@@ -21,23 +21,11 @@ const GoalForm: React.FC<GoalFormProps> = ({ onGoalCreated }) => {
         }
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:3000/goals', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    deadline: deadline || null
-                })
+            await client.post('/goals', {
+                title,
+                description,
+                deadline: deadline || null
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to create goal');
-            }
 
             setTitle('');
             setDescription('');

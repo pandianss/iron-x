@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import client from '../api/client';
 
 interface Goal {
     goal_id: string;
@@ -14,7 +14,7 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [goalId, setGoalId] = useState('');
-    const [frequencyType, setFrequencyType] = useState('daily');
+    const [frequencyType] = useState('daily');
     const [windowStart, setWindowStart] = useState('09:00');
     const [windowDuration, setWindowDuration] = useState('30');
     const [isStrict, setIsStrict] = useState(true);
@@ -24,14 +24,8 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
     useEffect(() => {
         const fetchGoals = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3000/goals', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setGoals(data);
-                }
+                const response = await client.get<Goal[]>('/goals');
+                setGoals(response.data);
             } catch (err) {
                 console.error('Failed to load goals', err);
             }
@@ -53,27 +47,15 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
             : { type: 'custom', rule: 'weekly' }; // Placeholder for now
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:3000/actions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    goal_id: goalId || null,
-                    frequency_rule: frequencyRule,
-                    window_start_time: windowStart,
-                    window_duration_minutes: parseInt(windowDuration),
-                    is_strict: isStrict
-                })
+            await client.post('/actions', {
+                title,
+                description,
+                goal_id: goalId || null,
+                frequency_rule: frequencyRule,
+                window_start_time: windowStart,
+                window_duration_minutes: parseInt(windowDuration),
+                is_strict: isStrict
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to create action');
-            }
 
             setTitle('');
             setDescription('');
@@ -155,7 +137,7 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
                         id="strict-mode"
                         type="checkbox"
                         checked={isStrict}
-                        onChange={() => { }} // Read-only as per spec "No ability to disable enforcement logic" or maybe just default ON and disabled? Spec says "Strict mode (default ON) -> No ability to disable enforcement logic" implies it might be forced.
+                        onChange={() => { }} // Read-only as per spec
                         disabled
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />

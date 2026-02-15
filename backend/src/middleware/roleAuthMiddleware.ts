@@ -5,7 +5,7 @@ import { Logger } from '../utils/logger';
 export const requireRole = (allowedRoles: string[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.user?.userId;
+            const userId = (req as any).user?.userId;
 
             if (!userId) {
                 return res.status(401).json({ error: 'Unauthorized: No user ID found' });

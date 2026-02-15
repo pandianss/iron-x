@@ -6,7 +6,7 @@ import prisma from '../../db';
 export class GoalController {
     createGoal = async (req: Request, res: Response) => {
         const { title, description, deadline } = req.body;
-        const userId = req.user?.userId;
+        const userId = (req as any).user?.userId;
         if (!userId) return res.sendStatus(401);
 
         try {
@@ -26,7 +26,7 @@ export class GoalController {
     };
 
     getGoals = async (req: Request, res: Response) => {
-        const userId = req.user?.userId;
+        const userId = (req as any).user?.userId;
         if (!userId) return res.sendStatus(401);
 
         try {

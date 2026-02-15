@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -14,7 +14,7 @@ const RegisterPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3000/auth/register', { email, password, timezone });
+            const response = await client.post('/auth/register', { email, password, timezone });
             login(response.data.token, response.data.user);
             navigate('/');
         } catch (err: any) {

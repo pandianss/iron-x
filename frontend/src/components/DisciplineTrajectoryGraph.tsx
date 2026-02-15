@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getTrajectoryHistory, getProjectedScore, TrajectoryData, PredictionData } from '../api/trajectory';
+import { getTrajectoryHistory, getProjectedScore, type TrajectoryData, type PredictionData } from '../api/trajectory';
 
 const DisciplineTrajectoryGraph: React.FC = () => {
     const [data, setData] = useState<TrajectoryData | null>(null);

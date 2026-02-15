@@ -211,6 +211,336 @@ Where: ∀ policy p ∈ Policy_Set,
                     </div>
                 </div>
             </section>
+
+            {/* How It Works Section */}
+            <section className="py-32 px-6 bg-gradient-to-b from-neutral-950 to-black">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-white">
+                        How It Works
+                    </h2>
+                    <p className="text-center text-neutral-400 mb-20 max-w-2xl mx-auto">
+                        Three deterministic steps to structural discipline enforcement
+                    </p>
+
+                    <div className="space-y-16">
+                        {/* Step 1 */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div className="order-2 md:order-1">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="w-12 h-12 rounded-full bg-iron-700 flex items-center justify-center text-white font-bold text-xl">1</div>
+                                    <h3 className="text-2xl font-bold text-white">Define Policies</h3>
+                                </div>
+                                <p className="text-neutral-300 mb-6">
+                                    Establish binding governance rules at the organizational, departmental, or team level
+                                </p>
+                                <ul className="space-y-3 text-neutral-400">
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Set action frequency requirements and deadline constraints</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Configure enforcement modes (SOFT warnings or HARD lockouts)</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Define hierarchical inheritance rules for policy cascading</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="order-1 md:order-2 bg-neutral-900/50 border border-iron-800 rounded-2xl p-8 h-64 flex items-center justify-center">
+                                <p className="text-neutral-500 font-mono text-sm">[Policy Configuration Interface]</p>
+                            </div>
+                        </div>
+
+                        {/* Step 2 */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div className="bg-neutral-900/50 border border-iron-800 rounded-2xl p-8 h-64 flex items-center justify-center">
+                                <p className="text-neutral-500 font-mono text-sm">[Real-Time Compliance Dashboard]</p>
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="w-12 h-12 rounded-full bg-iron-700 flex items-center justify-center text-white font-bold text-xl">2</div>
+                                    <h3 className="text-2xl font-bold text-white">Monitor Compliance</h3>
+                                </div>
+                                <p className="text-neutral-300 mb-6">
+                                    Track behavioral drift and policy violations across your entire organization in real-time
+                                </p>
+                                <ul className="space-y-3 text-neutral-400">
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Identity profiling shows each user's compliance trajectory</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Predictive violation horizon alerts before lockouts occur</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Immutable audit logs for SOC 2 and regulatory compliance</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div className="order-2 md:order-1">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="w-12 h-12 rounded-full bg-iron-700 flex items-center justify-center text-white font-bold text-xl">3</div>
+                                    <h3 className="text-2xl font-bold text-white">Enforce Automatically</h3>
+                                </div>
+                                <p className="text-neutral-300 mb-6">
+                                    The system executes non-negotiable consequences when policies are violated
+                                </p>
+                                <ul className="space-y-3 text-neutral-400">
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Hard mode locks out users/systems until compliance is restored</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Soft mode provides escalating warnings with deadline countdowns</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-iron-400 mt-1">▸</span>
+                                        <span>Exception requests require manager approval with audit trail</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="order-1 md:order-2 bg-neutral-900/50 border border-iron-800 rounded-2xl p-8 h-64 flex items-center justify-center">
+                                <p className="text-neutral-500 font-mono text-sm">[Enforcement Execution Engine]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Testimonials Section */}
+            <section className="py-32 px-6 bg-black border-y border-neutral-900">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-white">
+                        Trusted by High-Performance Organizations
+                    </h2>
+                    <p className="text-center text-neutral-400 mb-20 max-w-2xl mx-auto">
+                        Organizations that refuse to fail choose Iron-X
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Testimonial Placeholder 1 */}
+                        <div className="p-8 rounded-2xl bg-neutral-900/50 border border-neutral-800">
+                            <div className="mb-6">
+                                <div className="flex gap-1 mb-4">
+                                    {[...Array(5)].map((_, i) => (
+                                        <span key={i} className="text-iron-400">★</span>
+                                    ))}
+                                </div>
+                                <p className="text-neutral-300 italic mb-6">
+                                    "[Customer testimonial highlighting ROI, time savings, or compliance improvements]"
+                                </p>
+                            </div>
+                            <div className="border-t border-neutral-800 pt-6">
+                                <p className="font-bold text-white">[Customer Name]</p>
+                                <p className="text-sm text-neutral-500">[Title, Company]</p>
+                            </div>
+                        </div>
+
+                        {/* Testimonial Placeholder 2 */}
+                        <div className="p-8 rounded-2xl bg-neutral-900/50 border border-neutral-800">
+                            <div className="mb-6">
+                                <div className="flex gap-1 mb-4">
+                                    {[...Array(5)].map((_, i) => (
+                                        <span key={i} className="text-iron-400">★</span>
+                                    ))}
+                                </div>
+                                <p className="text-neutral-300 italic mb-6">
+                                    "[Customer testimonial highlighting enforcement effectiveness or behavioral transformation]"
+                                </p>
+                            </div>
+                            <div className="border-t border-neutral-800 pt-6">
+                                <p className="font-bold text-white">[Customer Name]</p>
+                                <p className="text-sm text-neutral-500">[Title, Company]</p>
+                            </div>
+                        </div>
+
+                        {/* Testimonial Placeholder 3 */}
+                        <div className="p-8 rounded-2xl bg-neutral-900/50 border border-neutral-800">
+                            <div className="mb-6">
+                                <div className="flex gap-1 mb-4">
+                                    {[...Array(5)].map((_, i) => (
+                                        <span key={i} className="text-iron-400">★</span>
+                                    ))}
+                                </div>
+                                <p className="text-neutral-300 italic mb-6">
+                                    "[Customer testimonial highlighting system reliability or audit readiness]"
+                                </p>
+                            </div>
+                            <div className="border-t border-neutral-800 pt-6">
+                                <p className="font-bold text-white">[Customer Name]</p>
+                                <p className="text-sm text-neutral-500">[Title, Company]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Pricing Section */}
+            <section className="py-32 px-6 bg-gradient-to-b from-black to-neutral-950">
+                <div className="max-w-7xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-white">
+                        Choose Your Enforcement Level
+                    </h2>
+                    <p className="text-center text-neutral-400 mb-20 max-w-2xl mx-auto">
+                        Start with soft enforcement, scale to hard lockouts as your organization matures
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* FREE Tier */}
+                        <div className="p-8 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-iron-700 transition-all">
+                            <div className="mb-8">
+                                <h3 className="text-2xl font-bold text-white mb-2">FREE</h3>
+                                <p className="text-neutral-400 mb-6">For individuals exploring discipline systems</p>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-4xl font-bold text-white">$0</span>
+                                    <span className="text-neutral-500">/month</span>
+                                </div>
+                            </div>
+                            <ul className="space-y-4 mb-8">
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Up to 3 actions per month</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>SOFT enforcement mode only</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Basic compliance dashboard</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>7-day audit log retention</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Community support</span>
+                                </li>
+                            </ul>
+                            <Link
+                                to="/register"
+                                className="block w-full text-center px-6 py-3 rounded-lg border border-neutral-700 text-white hover:bg-neutral-900 transition-colors"
+                            >
+                                Start Free
+                            </Link>
+                        </div>
+
+                        {/* PRO Tier */}
+                        <div className="p-8 rounded-2xl bg-gradient-to-br from-iron-900/20 to-neutral-900 border-2 border-iron-600 hover:border-iron-500 transition-all relative">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-iron-600 text-white px-4 py-1 rounded-full text-sm font-bold">
+                                MOST POPULAR
+                            </div>
+                            <div className="mb-8">
+                                <h3 className="text-2xl font-bold text-white mb-2">PRO</h3>
+                                <p className="text-neutral-400 mb-6">For teams enforcing operational discipline</p>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-4xl font-bold text-white">$49</span>
+                                    <span className="text-neutral-500">/user/month</span>
+                                </div>
+                            </div>
+                            <ul className="space-y-4 mb-8">
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Unlimited actions</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>HARD enforcement mode (lockouts)</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Advanced trajectory analytics</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>90-day audit log retention</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Team collaboration (up to 10 users)</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Priority email support</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>API access</span>
+                                </li>
+                            </ul>
+                            <Link
+                                to="/register"
+                                className="block w-full text-center px-6 py-3 rounded-lg bg-iron-600 text-white hover:bg-iron-500 transition-colors font-bold"
+                            >
+                                Start Pro Trial
+                            </Link>
+                        </div>
+
+                        {/* ENTERPRISE Tier */}
+                        <div className="p-8 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-iron-700 transition-all">
+                            <div className="mb-8">
+                                <h3 className="text-2xl font-bold text-white mb-2">ENTERPRISE</h3>
+                                <p className="text-neutral-400 mb-6">For organizations requiring institutional governance</p>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-4xl font-bold text-white">Custom</span>
+                                </div>
+                            </div>
+                            <ul className="space-y-4 mb-8">
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Everything in PRO</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Unlimited users</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>SSO & SAML authentication</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Unlimited audit log retention</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Dedicated account manager</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>Custom SLA & uptime guarantees</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-neutral-300">
+                                    <span className="text-iron-400 mt-1">✓</span>
+                                    <span>On-premise deployment option</span>
+                                </li>
+                            </ul>
+                            <a
+                                href="mailto:enterprise@iron-x.com"
+                                className="block w-full text-center px-6 py-3 rounded-lg border border-neutral-700 text-white hover:bg-neutral-900 transition-colors"
+                            >
+                                Contact Sales
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="mt-16 text-center">
+                        <p className="text-neutral-500 text-sm">
+                            All plans include SOC 2 Type II compliance, 99.9% uptime SLA, and encrypted data storage
+                        </p>
+                    </div>
+                </div>
+            </section>
         </MarketingLayout>
     );
 };

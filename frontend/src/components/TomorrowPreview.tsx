@@ -28,55 +28,55 @@ const TomorrowPreview: React.FC = () => {
         fetchData();
     }, [refreshTrigger]);
 
-    if (loading) return <div className="animate-pulse h-24 bg-iron-100 rounded-lg"></div>;
+    if (loading) return <div className="animate-pulse h-24 bg-iron-900/20 border border-iron-900"></div>;
     if (!data) return null;
 
     const getRiskColor = (risk: string) => {
         switch (risk) {
-            case 'High Risk': return 'text-red-600 bg-red-50 border-red-200';
-            case 'Medium Risk': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-            default: return 'text-green-600 bg-green-50 border-green-200';
+            case 'High Risk': return 'text-red-500 border-red-900/50 bg-red-900/10';
+            case 'Medium Risk': return 'text-amber-500 border-amber-900/50 bg-amber-900/10';
+            default: return 'text-iron-400 border-iron-800 bg-iron-900/20';
         }
     };
 
     const getRiskIcon = (risk: string) => {
         switch (risk) {
-            case 'High Risk': return <AlertTriangle className="w-4 h-4 mr-1" />;
-            case 'Medium Risk': return <Info className="w-4 h-4 mr-1" />;
-            default: return <CheckCircle className="w-4 h-4 mr-1" />;
+            case 'High Risk': return <AlertTriangle className="w-3.5 h-3.5 mr-2" />;
+            case 'Medium Risk': return <Info className="w-3.5 h-3.5 mr-2" />;
+            default: return <CheckCircle className="w-3.5 h-3.5 mr-2 opacity-50" />;
         }
     };
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-iron-200 mt-6 md:mt-0 md:ml-6">
-            <h3 className="text-xs font-semibold text-iron-500 uppercase tracking-wider mb-2 flex items-center">
-                <Calendar className="w-3 h-3 mr-1" /> Tomorrow's Preview
+        <div className="bg-iron-950/40 p-5 border border-iron-900 hardened-border glass-panel">
+            <h3 className="text-[10px] font-bold text-iron-600 uppercase tracking-[0.3em] mb-6 flex items-center">
+                <Calendar className="w-3 h-3 mr-2 opacity-40" /> Forward Projection
             </h3>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-6">
                 <div>
-                    <div className="text-xl font-bold text-iron-900">{data.scheduledCount} Actions</div>
-                    <div className="text-xs text-iron-500">Scheduled for {new Date(data.date).toLocaleDateString()}</div>
+                    <div className="text-xl font-bold text-white uppercase tracking-tight font-display">{data.scheduledCount} Nodes Queued</div>
+                    <div className="text-[9px] text-iron-700 uppercase tracking-widest mt-1 tabular-nums">Epoch: {new Date(data.date).toLocaleDateString()}</div>
                 </div>
 
-                <div className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center ${getRiskColor(data.riskLevel)}`}>
+                <div className={`px-3 py-1 border text-[9px] font-bold uppercase tracking-widest flex items-center ${getRiskColor(data.riskLevel)}`}>
                     {getRiskIcon(data.riskLevel)}
                     {data.riskLevel}
                 </div>
             </div>
 
-            <div className="mt-2 text-xs text-iron-400">
-                {data.warning || (data.riskLevel === 'High Risk' ? 'Prepare for a tight schedule.' :
-                    data.riskLevel === 'Medium Risk' ? 'Moderate load expected.' :
-                        'Light schedule. Focus on quality.')}
+            <div className="text-[10px] text-iron-600 uppercase leading-relaxed italic border-l border-iron-800 pl-4 py-1">
+                {data.warning || (data.riskLevel === 'High Risk' ? 'Expect structural resistance.' :
+                    data.riskLevel === 'Medium Risk' ? 'Moderate variance projected.' :
+                        'Optimal operational path.')}
             </div>
 
             {warnings.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-iron-100">
+                <div className="mt-6 pt-4 border-t border-iron-900 space-y-2">
                     {warnings.map((w: Warning, i: number) => (
-                        <div key={i} className={`text-xs p-2 rounded flex items-start ${w.severity === 'HIGH' ? 'bg-red-50 text-red-700' : 'bg-yellow-50 text-yellow-700'
+                        <div key={i} className={`text-[9px] font-bold uppercase tracking-widest p-2 flex items-start border ${w.severity === 'HIGH' ? 'border-red-900/30 text-red-500' : 'border-amber-900/30 text-amber-500'
                             }`}>
-                            <Siren className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <Siren className="w-3.5 h-3.5 mr-3 flex-shrink-0 opacity-40" />
                             <span>{w.message}</span>
                         </div>
                     ))}

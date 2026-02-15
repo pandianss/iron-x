@@ -57,45 +57,50 @@ export const DisciplineStatusBar: React.FC = () => {
         || profile?.teams_owned[0];
 
     return (
-        <div className="w-full bg-iron-950 border-b border-iron-800 p-4 font-mono text-sm flex justify-between items-center">
+        <div className="w-full bg-iron-950/90 backdrop-blur-md border-b border-iron-900 px-6 py-4 font-mono text-sm flex justify-between items-center glass-panel relative z-50">
+            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-iron-800 to-transparent"></div>
 
-            <div className="grid grid-cols-4 gap-8 items-center flex-1">
-                <div className="flex flex-col">
-                    <span className="text-iron-500 text-xs uppercase tracking-wider">Discipline Score</span>
-                    <span className="text-3xl font-bold text-iron-100">{state.score}</span>
+            <div className="flex-1 grid grid-cols-4 gap-12 items-center">
+                <div className="flex flex-col border-l border-iron-900 pl-4">
+                    <span className="text-iron-600 text-[9px] uppercase tracking-[0.3em] mb-1">DS_Index (Realtime)</span>
+                    <span className="text-3xl font-bold text-white font-display tabular-nums leading-none">{state.score}</span>
                 </div>
 
-                <div className="flex flex-col">
-                    <span className="text-iron-500 text-xs uppercase tracking-wider">Status Classification</span>
-                    <span className={`text-xl font-bold ${getStatusColor(state.classification)}`}>{state.classification}</span>
+                <div className="flex flex-col border-l border-iron-900 pl-4">
+                    <span className="text-iron-600 text-[9px] uppercase tracking-[0.3em] mb-1">Operational Tier</span>
+                    <span className={`text-xl font-bold uppercase font-display tracking-tight leading-none ${getStatusColor(state.classification)}`}>
+                        {state.classification}
+                    </span>
                 </div>
 
-                <div className="flex flex-col">
-                    <span className="text-iron-500 text-xs uppercase tracking-wider">Policies Active</span>
-                    <span className="text-iron-300">{state.activeConstraints?.policiesActive ?? 0}</span>
+                <div className="flex flex-col border-l border-iron-900 pl-4">
+                    <span className="text-iron-600 text-[9px] uppercase tracking-[0.3em] mb-1">Policy Constraints</span>
+                    <span className="text-xl font-bold text-iron-300 font-display tabular-nums leading-none">
+                        {state.activeConstraints?.policiesActive ?? 0}
+                    </span>
                 </div>
 
-                <div className="flex flex-col">
-                    <span className="text-iron-500 text-xs uppercase tracking-wider">Violation Horizon</span>
-                    <span className="text-amber-500 font-bold">{state.violationHorizon?.daysUntilBreach ? `${state.violationHorizon.daysUntilBreach} days` : 'Stable'}</span>
+                <div className="flex flex-col border-l border-iron-900 pl-4">
+                    <span className="text-iron-600 text-[9px] uppercase tracking-[0.3em] mb-1">Violation Horizon</span>
+                    <span className={`text-xl font-bold font-display uppercase tracking-tight leading-none ${state.violationHorizon?.daysUntilBreach ? 'text-amber-500' : 'text-iron-500'}`}>
+                        {state.violationHorizon?.daysUntilBreach ? `${state.violationHorizon.daysUntilBreach} Cycles` : 'STABLE'}
+                    </span>
                 </div>
             </div>
 
             {managedTeam && (
-                <div className="ml-4 pl-4 border-l border-iron-800">
+                <div className="ml-8 pl-8 border-l-2 border-iron-900">
                     <button
                         onClick={() => setIsInviteModalOpen(true)}
-                        className="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md transition-colors text-xs uppercase font-bold tracking-wider"
+                        className="flex items-center gap-2 px-6 py-2 bg-white text-black hover:bg-iron-200 transition-all text-[10px] uppercase font-bold tracking-[0.2em] border border-white"
                     >
-                        <UserPlus size={16} />
-                        Invite
+                        <UserPlus size={14} className="stroke-[3]" />
+                        Initialize Node
                     </button>
-                    {/* Define modal here conditionally or outside */}
                     <InviteMemberModal
                         isOpen={isInviteModalOpen}
                         onClose={() => setIsInviteModalOpen(false)}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        teamId={managedTeam.team_id || (managedTeam as any).id /* handle potential schema diff if any */}
+                        teamId={managedTeam.team_id || (managedTeam as any).id}
                     />
                 </div>
             )}

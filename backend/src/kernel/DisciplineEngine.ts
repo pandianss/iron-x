@@ -56,7 +56,13 @@ export class DisciplineEngine {
         const score = await this.calculator.compute(context);
         const durationScoring = Date.now() - startScoring;
 
-        // 5. Emit Events
+        // 5. Apply Policy Enforcement (Phase 2)
+        // We dynamically import/resolve PolicyService to keep the engine modular
+        const { container } = await import('tsyringe');
+        const policyService = container.resolve((await import('../services/policy.service')).PolicyService);
+        await policyService.applyEnforcement(context.userId, score);
+
+        // 6. Emit Events
         const { domainEvents } = await import('./domain/events');
 
         domainEvents.emit(DomainEventType.KERNEL_CYCLE_COMPLETED, {

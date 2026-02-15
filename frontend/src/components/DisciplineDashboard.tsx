@@ -16,8 +16,6 @@ const DisciplineDashboard: React.FC = () => {
     const [stats, setStats] = useState<DashboardData['todayStats'] | null>(null);
 
     useEffect(() => {
-        // Fetch only today's stats if needed, or re-use the analytics endpoint
-        // For simplicity, re-using the logic but extracting just what we need
         const fetchStats = async () => {
             try {
                 const data = await AnalyticsClient.getDailyStats();
@@ -32,25 +30,25 @@ const DisciplineDashboard: React.FC = () => {
     }, []);
 
     return (
-        <div className="space-y-8 mb-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
                     <DisciplineIdentityCard />
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-8">
                     <TomorrowPreview />
                     {stats && (
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-iron-200">
-                            <h3 className="text-xs font-semibold text-iron-500 uppercase tracking-wider mb-2">Today's Pulse</h3>
-                            <div className="flex justify-between items-center">
-                                <div className="text-center">
-                                    <span className="block text-2xl font-bold text-green-600">{stats.executed}</span>
-                                    <span className="text-xs text-iron-400">Executed</span>
+                        <div className="bg-iron-950/40 p-6 border border-iron-900 hardened-border glass-panel">
+                            <h3 className="text-[10px] font-bold text-iron-500 uppercase tracking-[0.3em] mb-4">Today's Pulse</h3>
+                            <div className="flex justify-between items-center bg-black/30 p-4 border border-iron-900">
+                                <div className="text-center flex-1">
+                                    <span className="block text-2xl font-bold text-white font-display tabular-nums tracking-tight">{stats.executed}</span>
+                                    <span className="text-[9px] text-iron-600 uppercase tracking-widest">Executed</span>
                                 </div>
-                                <div className="w-px h-8 bg-iron-100 mx-4"></div>
-                                <div className="text-center">
-                                    <span className="block text-2xl font-bold text-red-600">{stats.missed}</span>
-                                    <span className="text-xs text-iron-400">Missed</span>
+                                <div className="w-px h-10 bg-iron-900"></div>
+                                <div className="text-center flex-1">
+                                    <span className="block text-2xl font-bold text-red-500 font-display tabular-nums tracking-tight">{stats.missed}</span>
+                                    <span className="text-[9px] text-iron-600 uppercase tracking-widest">Missed</span>
                                 </div>
                             </div>
                         </div>

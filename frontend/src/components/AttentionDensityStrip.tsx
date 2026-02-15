@@ -32,35 +32,37 @@ const AttentionDensityStrip: React.FC = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="animate-pulse h-12 bg-iron-50 rounded-lg border border-iron-100 mb-6"></div>;
+    if (loading) return <div className="animate-pulse h-12 bg-iron-900/20 border border-iron-900 mb-6"></div>;
     if (!data) return null;
 
     return (
-        <div className="bg-iron-900 text-iron-300 px-6 py-3 rounded-lg flex flex-wrap items-center justify-between mb-8 shadow-inner border border-iron-800">
-            <div className="flex items-center space-x-8">
-                <div className="flex items-center">
-                    <AlertCircle className="w-4 h-4 text-orange-500 mr-2" />
-                    <span className="text-xs font-medium uppercase tracking-wider text-iron-500 mr-2">At Risk</span>
-                    <span className="text-sm font-bold text-white">{data.usersAtRisk} users</span>
+        <div className="bg-iron-950/40 text-iron-300 px-6 py-4 border border-iron-900 hardened-border flex flex-wrap items-center justify-between mb-8 glass-panel relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-iron-500 opacity-20"></div>
+
+            <div className="flex items-center space-x-12">
+                <div className="flex items-center group">
+                    <AlertCircle className="w-3.5 h-3.5 text-iron-600 mr-2 group-hover:text-amber-500 transition-colors" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-iron-500 mr-3">Nodes at Risk</span>
+                    <span className="text-sm font-bold text-white tabular-nums">{data.usersAtRisk}</span>
                 </div>
 
-                <div className="flex items-center">
-                    <Shield className="w-4 h-4 text-indigo-500 mr-2" />
-                    <span className="text-xs font-medium uppercase tracking-wider text-iron-500 mr-2">Lockouts</span>
-                    <span className="text-sm font-bold text-white">{data.lockoutsThisWeek} this week</span>
+                <div className="flex items-center group">
+                    <Shield className="w-3.5 h-3.5 text-iron-600 mr-2 group-hover:text-red-600 transition-colors" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-iron-500 mr-3">Lockouts</span>
+                    <span className="text-sm font-bold text-white tabular-nums">{data.lockoutsThisWeek}</span>
                 </div>
 
-                <div className="flex items-center">
-                    <Activity className="w-4 h-4 text-green-500 mr-2" />
-                    <span className="text-xs font-medium uppercase tracking-wider text-iron-500 mr-2">Trend</span>
-                    <span className={`text-sm font-bold capitalize ${data.trend === 'stable' ? 'text-green-400' : 'text-orange-400'}`}>
+                <div className="flex items-center group">
+                    <Activity className="w-3.5 h-3.5 text-iron-600 mr-2 group-hover:text-iron-400 transition-colors" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-iron-500 mr-3">System Trend</span>
+                    <span className={`text-sm font-bold uppercase tabular-nums ${data.trend === 'stable' ? 'text-iron-400' : 'text-amber-500'}`}>
                         {data.trend}
                     </span>
                 </div>
             </div>
 
-            <div className="hidden md:flex items-center text-[10px] text-iron-600 uppercase font-bold tracking-widest">
-                <Zap className="w-3 h-3 mr-1" /> System Health Optimal
+            <div className="hidden md:flex items-center text-[10px] text-iron-700 uppercase font-bold tracking-[0.3em]">
+                <Zap className="w-3 h-3 mr-2 opacity-30" /> Operational Integrity: Optimal
             </div>
         </div>
     );

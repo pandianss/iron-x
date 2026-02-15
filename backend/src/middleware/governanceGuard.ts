@@ -56,27 +56,27 @@ export const governanceGuard = async (req: AuthRequest, res: Response, next: Nex
         const isLocked = DisciplinePolicy.isLocked(userState.locked_until);
 
         if (isLocked) {
-            // Optional: Allow GET requests to specific read-only zones if needed later.
-            // For now, adhere to "checkLockout" logic which was applied to mutation routes.
-            // If we apply this globally, we might lock them out of the dashboard!
-            // Strategy: Block mutations (POST/PUT/DELETE) strictly. Allow GET with warning header?
-            // The prompt said "Governance failures must log ... before rejecting".
+            // STRATEGY: Block all mutations (POST/PUT/DELETE) strictly. 
+            // Allow GET for situational awareness (Dashboard/Cockpit).
 
             if (req.method !== 'GET') {
                 kernelEvents.emitEvent(DomainEventType.LOCKOUT_ENFORCED, {
                     reason: 'Hard Lockout Active',
-                    lockedUntil: userState.locked_until
+                    lockedUntil: userState.locked_until,
+                    url: req.originalUrl,
+                    method: req.method
                 }, userId);
 
-                // console.log block removed in favor of AuditSubscriber
                 return res.status(403).json({
-                    error: 'Governance Lockdown Active. Compliance restoration required.',
-                    code: 'GOV_LOCKOUT',
-                    locked_until: userState.locked_until
+                    error: 'OPERATIONAL_LOCKDOWN',
+                    message: 'Governance Protocol Active: Your node is currently suspended due to discipline drift.',
+                    locked_until: userState.locked_until,
+                    code: 'GOV_LOCKOUT'
                 });
             } else {
-                // Add warning header for UI
-                res.setHeader('X-Iron-Governance-Status', 'LOCKED_READ_ONLY');
+                // Annotate GET requests with the lockdown status
+                res.setHeader('X-Iron-Governance-Status', 'RESTRICTED_LOCKED');
+                res.setHeader('X-Iron-Locked-Until', userState.locked_until?.toISOString() || '');
             }
         }
 

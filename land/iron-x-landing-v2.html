@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron-X | Execution Governance Middleware</title>
+    <style>
+        :root {
+            --iron-950: #0a0a0a;
+            --iron-900: #171717;
+            --iron-800: #262626;
+            --iron-700: #404040;
+            --iron-600: #525252;
+            --iron-500: #737373;
+            --iron-400: #a3a3a3;
+            --iron-300: #d4d4d4;
+            --iron-100: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--iron-950);
+            color: var(--iron-300);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .font-display {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.05em;
+        }
+
+        .font-mono {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 0.8em;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            background-image:
+                linear-gradient(rgba(23, 23, 23, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 23, 23, 0.8) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .status-badge {
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            color: var(--iron-500);
+            text-transform: uppercase;
+            border: 1px border var(--iron-800);
+            padding: 0.5rem 1rem;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 0.9;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            color: white;
+            max-width: 900px;
+        }
+
+        h1 span {
+            color: var(--iron-500);
+        }
+
+        .description {
+            font-size: 1.25rem;
+            color: var(--iron-400);
+            max-width: 600px;
+            margin-bottom: 4rem;
+            font-weight: 300;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .btn-primary {
+            background-color: white;
+            color: black;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 1px solid var(--iron-800);
+        }
+
+        .section {
+            padding: 8rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .philosophical-header {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .philosophical-description {
+            color: var(--iron-500);
+            text-align: center;
+            font-size: 1.125rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background-color: var(--iron-900);
+            border: 1px solid var(--iron-800);
+            padding: 3rem;
+            border-radius: 4px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .feature-card p {
+            color: var(--iron-500);
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--iron-900);
+            text-align: center;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero">
+        <div class="status-badge font-mono">STATUS: OPERATIONAL // SYSTEM: STRUCTURAL_ENFORCEMENT</div>
+        <h1 class="font-display">STRUCTURAL <span>ENFORCEMENT</span></h1>
+        <p class="description font-mono text-center">
+            Stop negotiating with your willpower. Iron-X replaces habit tracking with automated system lockouts. Access
+            is revokable. Compliance is structural.
+        </p>
+        <div class="cta-group">
+            <a href="#" class="btn btn-primary">Initialize_Enforcement</a>
+            <a href="#" class="btn btn-secondary">Review_Capabilities</a>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="philosophical-header font-display">Willpower Is A Vulnerability.</h2>
+        <p class="philosophical-description font-mono">
+            Iron-X provides the physical boundaries that human discipline lacks. We don't send notifications; we revoke
+            your capability to deviate through automated middleware lockouts.
+        </p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="font-mono" style="color: var(--iron-700); margin-bottom: 1rem;">CAPABILITY_01</div>
+                <h3>Automated Lockdown</h3>
+                <p>Hard access blocking across all routes when Discipline Scores breach policy thresholds. No manual
+                    override. No bypass.</p>
+            </div>
+            <div class="feature-card">
+                <div class="font-mono" style="color: var(--iron-700); margin-bottom: 1rem;">CAPABILITY_02</div>
+                <h3>Protocol MFA</h3>
+                <p>Security-hardened handshakes for high-governance operations. TOTP-mandated policy changes ensure
+                    system integrity.</p>
+            </div>
+            <div class="feature-card">
+                <div class="font-mono" style="color: var(--iron-700); margin-bottom: 1rem;">CAPABILITY_03</div>
+                <h3>Inertial Correction</h3>
+                <p>Visual pressure overlays predicting behavioral drift. Intervention triggers occur automatically,
+                    removing choice from the loop.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer font-mono">
+        IRON-X SYSTEM GOVERNANCE // v3.12 // SEC_CORE_ACTIVE
+    </div>
+
+</body>
+
+</html>

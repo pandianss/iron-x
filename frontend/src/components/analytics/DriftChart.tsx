@@ -30,19 +30,50 @@ export const DriftChart: React.FC = () => {
     if (data.length === 0) return <div className="h-full flex items-center justify-center text-iron-500 text-xs">No discipline history available</div>;
 
     return (
-        <div className="h-full w-full p-2">
-            <h3 className="text-iron-400 text-xs uppercase mb-2 font-bold tracking-wider">Discipline Drift</h3>
-            <div className="h-[180px] w-full">
+        <div className="h-full w-full p-4 flex flex-col relative z-10">
+            <h3 className="text-iron-600 text-[9px] uppercase mb-4 font-bold tracking-[0.3em] flex items-center">
+                <span className="w-1.5 h-1.5 bg-amber-500 mr-2"></span> Chrono Drift Analyzer
+            </h3>
+            <div className="flex-1 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                        <XAxis dataKey="date" stroke="#666" fontSize={10} tickLine={false} />
-                        <YAxis stroke="#666" fontSize={10} domain={[0, 100]} tickLine={false} />
-                        <Tooltip
-                            contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', color: '#fff' }}
-                            itemStyle={{ color: '#fbbf24' }}
+                        <CartesianGrid strokeDasharray="4 4" stroke="#1a1a1a" vertical={false} />
+                        <XAxis
+                            dataKey="date"
+                            stroke="#3f3f46"
+                            fontSize={9}
+                            tickLine={false}
+                            axisLine={false}
+                            dy={10}
                         />
-                        <Line type="monotone" dataKey="score" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3, fill: '#fbbf24' }} activeDot={{ r: 5 }} />
+                        <YAxis
+                            stroke="#3f3f46"
+                            fontSize={9}
+                            domain={[0, 100]}
+                            tickLine={false}
+                            axisLine={false}
+                            dx={-10}
+                        />
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: '#09090b',
+                                border: '1px solid #27272a',
+                                color: '#fff',
+                                borderRadius: '0px',
+                                fontSize: '10px',
+                                textTransform: 'uppercase',
+                                padding: '8px'
+                            }}
+                        />
+                        <Line
+                            type="stepAfter"
+                            dataKey="score"
+                            stroke="#ffffff"
+                            strokeWidth={1.5}
+                            dot={{ r: 0 }}
+                            activeDot={{ r: 4, fill: '#fff' }}
+                            className="drop-shadow-[0_0_5px_rgba(255,255,255,0.4)]"
+                        />
                     </LineChart>
                 </ResponsiveContainer>
             </div>

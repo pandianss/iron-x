@@ -80,6 +80,137 @@ const HomePage: React.FC = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Why Iron-X Section */}
+            <section className="py-32 px-6 bg-gradient-to-b from-black to-neutral-950">
+                <div className="max-w-5xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-white">
+                        Why <span className="text-iron-400">Iron-X</span>?
+                    </h2>
+                    <p className="text-center text-neutral-400 mb-16 max-w-3xl mx-auto text-lg">
+                        The name is a technical descriptor, not a brand metaphor. It signals infrastructure for organizations that treat discipline as an engineering problem.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+                        <div className="space-y-6">
+                            <h3 className="text-2xl font-bold text-iron-300 flex items-center gap-3">
+                                <span className="text-3xl">⚙️</span> The "Iron" Component
+                            </h3>
+                            <div className="space-y-4 text-neutral-300">
+                                <div className="pl-6 border-l-2 border-iron-700">
+                                    <h4 className="font-bold text-white mb-2">Unyielding Material Properties</h4>
+                                    <p className="text-sm text-neutral-400">Deterministic enforcement logic. Structural integrity under load. Immutability once deployed.</p>
+                                </div>
+                                <div className="pl-6 border-l-2 border-iron-700">
+                                    <h4 className="font-bold text-white mb-2">Metallurgical Hardening</h4>
+                                    <p className="text-sm text-neutral-400">Tempering soft intentions into hardened behavioral contracts through phase transformation.</p>
+                                </div>
+                                <div className="pl-6 border-l-2 border-iron-700">
+                                    <h4 className="font-bold text-white mb-2">Industrial-Grade Infrastructure</h4>
+                                    <p className="text-sm text-neutral-400">Load-bearing architecture for mission-critical operations. Built for permanence, not ephemeral usage.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <h3 className="text-2xl font-bold text-iron-300 flex items-center gap-3">
+                                <span className="text-3xl">✕</span> The "X" Component
+                            </h3>
+                            <div className="space-y-4 text-neutral-300">
+                                <div className="pl-6 border-l-2 border-iron-700">
+                                    <h4 className="font-bold text-white mb-2">Variable Placeholder</h4>
+                                    <p className="text-sm text-neutral-400">X represents the compliance gap—the delta between current state and required state.</p>
+                                </div>
+                                <div className="pl-6 border-l-2 border-iron-700">
+                                    <h4 className="font-bold text-white mb-2">Execution Marker</h4>
+                                    <p className="text-sm text-neutral-400">The checkbox symbol. Every X generates an immutable audit log entry.</p>
+                                </div>
+                                <div className="pl-6 border-l-2 border-iron-700">
+                                    <h4 className="font-bold text-white mb-2">Cross-Domain Intersection</h4>
+                                    <p className="text-sm text-neutral-400">Auth × Discipline × Enforcement. Individual × Team × Organization.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-neutral-900/50 border border-iron-800 rounded-2xl p-8">
+                        <h4 className="text-xl font-bold text-white mb-4 font-mono">Technical Specification</h4>
+                        <pre className="text-sm text-iron-300 overflow-x-auto">
+                            {`Iron-X := {
+  Enforcement_Mode ∈ {SOFT, HARD},
+  Policy_Set := P₁, P₂, ..., Pₙ,
+  Identity_Profile := Behavioral_Drift_Function(t),
+  Compliance_State := Boolean_Gate_Logic(),
+  Audit_Log := Immutable_Event_Stream
+}
+
+Where: ∀ policy p ∈ Policy_Set,
+       Execution_Allowed ⟺ Compliance_Check(p) = TRUE`}
+                        </pre>
+                    </div>
+                </div>
+            </section>
+
+            {/* What We're NOT Section */}
+            <section className="py-32 px-6 bg-black border-y border-neutral-900">
+                <div className="max-w-4xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-white">
+                        What Iron-X <span className="text-red-500">Is Not</span>
+                    </h2>
+                    <p className="text-center text-neutral-400 mb-16 max-w-2xl mx-auto">
+                        We explicitly reject patterns that treat discipline as a motivation problem.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="p-6 rounded-xl bg-neutral-950 border border-neutral-800">
+                            <div className="flex items-start gap-4">
+                                <span className="text-2xl">❌</span>
+                                <div>
+                                    <h3 className="font-bold text-white mb-2">Not Motivational Software</h3>
+                                    <p className="text-sm text-neutral-400">No "Achieve", "Elevate", or "Empower". We enforce, not inspire.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 rounded-xl bg-neutral-950 border border-neutral-800">
+                            <div className="flex items-start gap-4">
+                                <span className="text-2xl">❌</span>
+                                <div>
+                                    <h3 className="font-bold text-white mb-2">Not a Productivity Tracker</h3>
+                                    <p className="text-sm text-neutral-400">Not a "planner", "organizer", or "habit tracker". This is governance infrastructure.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 rounded-xl bg-neutral-950 border border-neutral-800">
+                            <div className="flex items-start gap-4">
+                                <span className="text-2xl">❌</span>
+                                <div>
+                                    <h3 className="font-bold text-white mb-2">Not Wellness Software</h3>
+                                    <p className="text-sm text-neutral-400">No mindfulness, self-care, or personal growth framing. This is professional ethics.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 rounded-xl bg-neutral-950 border border-neutral-800">
+                            <div className="flex items-start gap-4">
+                                <span className="text-2xl">❌</span>
+                                <div>
+                                    <h3 className="font-bold text-white mb-2">Not Gamified</h3>
+                                    <p className="text-sm text-neutral-400">No points, levels, or achievements. Compliance is binary, not scored.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-12 p-8 rounded-2xl bg-gradient-to-br from-iron-900/20 to-neutral-950 border border-iron-700">
+                        <p className="text-center text-lg text-iron-200 font-medium">
+                            "If a user can violate a policy, the <span className="text-white font-bold">system failed</span>, not the user."
+                        </p>
+                        <p className="text-center text-sm text-neutral-500 mt-2">— The No-Blame Principle</p>
+                    </div>
+                </div>
+            </section>
         </MarketingLayout>
     );
 };

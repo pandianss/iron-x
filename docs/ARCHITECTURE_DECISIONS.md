@@ -13,3 +13,10 @@
 - **Context**: Enforcement rules were implicit in code.
 - **Decision**: Elevate documentation to primary policy status. Docs are reviewed like code.
 - **Consequences**: Auditable and transparent enforcement logic.
+
+## ADR-003: Iron-X as Technical Infrastructure
+- **Date**: 2026-02-15
+- **Status**: Accepted
+- **Context**: System naming and positioning needed to reflect engineering-first philosophy.
+- **Decision**: Adopt "Iron-X" as a technical descriptor representing deterministic enforcement infrastructure. Explicitly reject motivational/productivity framing.
+- **Consequences**: Clear market positioning as governance infrastructure. See [TECHNICAL_RATIONALE.md](./TECHNICAL_RATIONALE.md) for full etymology.

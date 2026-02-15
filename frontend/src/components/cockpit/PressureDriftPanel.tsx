@@ -20,7 +20,12 @@ export const PressureDriftPanel: React.FC = () => {
 
     if (!data) return <div className="p-4 bg-iron-900 border border-iron-800 h-64 animate-pulse">Loading Pressure Metrics...</div>;
 
-    const getPressureColor = (level: string) => {
+    const getPressureColor = (level: string | number) => {
+        if (typeof level === 'number') {
+            if (level < 30) return 'text-iron-400';
+            if (level < 70) return 'text-amber-500';
+            return 'text-red-600';
+        }
         switch (level) {
             case 'LOW': return 'text-iron-400';
             case 'RISING': return 'text-amber-500';

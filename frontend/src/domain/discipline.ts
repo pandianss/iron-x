@@ -42,6 +42,9 @@ export interface PressureData {
         source: string;
         magnitude: number;
         direction: 'POSITIVE' | 'NEGATIVE';
+        threshold: number;
+        current: number;
+        timeToBreach: string;
     }>;
 }
 

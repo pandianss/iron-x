@@ -1,5 +1,16 @@
 import { api } from './api';
 
+export type SubscriptionTier = 'FREE' | 'INDIVIDUAL_PRO' | 'TEAM_ENTERPRISE';
+
+export interface Subscription {
+    subscription_id: string;
+    plan_tier: SubscriptionTier;
+    is_active: boolean;
+    is_locked: boolean;
+    end_date?: string;
+    grace_period_until?: string;
+}
+
 export const BillingClient = {
     createCheckoutSession: async (priceId: string, successUrl: string, cancelUrl: string) => {
         const response = await api.post('/billing/checkout', { priceId, successUrl, cancelUrl });
@@ -11,7 +22,7 @@ export const BillingClient = {
         return response.data;
     },
 
-    getSubscription: async () => {
+    getSubscription: async (): Promise<Subscription> => {
         // Currently only supports getting own subscription
         const response = await api.get('/subscription/me');
         return response.data;

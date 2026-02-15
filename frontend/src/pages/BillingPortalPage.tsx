@@ -1,13 +1,13 @@
- 
+
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { BillingClient } from '../domain/billing';
+import { BillingClient, type Subscription } from '../domain/billing';
 import { CreditCard, Shield, Activity, CheckCircle } from 'lucide-react';
 
 const BillingPortalPage: React.FC = () => {
     const { user } = useAuth();
-    const [subscription, setSubscription] = useState<unknown>(null);
+    const [subscription, setSubscription] = useState<Subscription | null>(null);
     const [loading, setLoading] = useState(true);
 
 

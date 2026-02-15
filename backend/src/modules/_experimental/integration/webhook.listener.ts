@@ -1,5 +1,6 @@
 
-import { domainEvents, DomainEventType } from '../../../kernel/domain/events';
+import { domainEvents } from '../../../kernel/domain/events';
+import { DomainEventType } from '../../../kernel/domain/types';
 import { container } from 'tsyringe';
 import { WebhookService } from './webhook.service';
 import prisma from '../../../db';

@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { container } from 'tsyringe';
+import prisma from './db';
 import authRoutes from './modules/auth/auth.routes';
 import stripeRoutes from './modules/billing/stripe.routes';
 import userRoutes from './modules/user/user.routes';
@@ -35,6 +37,9 @@ import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './infrastructure/swagger';
 
 dotenv.config();
+
+// Register PrismaClient in the container
+container.registerInstance('PrismaClient', prisma);
 
 const app = express();
 

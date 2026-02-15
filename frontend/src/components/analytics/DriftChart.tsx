@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { getDisciplineData } from '../../api/client';
+import { AnalyticsClient } from '../../domain/analytics';
 
 interface HistoryPoint {
     date: string;
@@ -14,7 +14,7 @@ export const DriftChart: React.FC = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const result = await getDisciplineData();
+                const result = await AnalyticsClient.getDisciplineData();
                 const formattedHistory = result.history.map((h: any) => ({
                     date: new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
                     score: h.score
@@ -27,11 +27,11 @@ export const DriftChart: React.FC = () => {
         loadData();
     }, []);
 
-    if (data.length === 0) return <div className="h-full flex items-center justify-center text-zinc-500 text-xs">No discipline history available</div>;
+    if (data.length === 0) return <div className="h-full flex items-center justify-center text-iron-500 text-xs">No discipline history available</div>;
 
     return (
         <div className="h-full w-full p-2">
-            <h3 className="text-zinc-400 text-xs uppercase mb-2 font-bold tracking-wider">Discipline Drift</h3>
+            <h3 className="text-iron-400 text-xs uppercase mb-2 font-bold tracking-wider">Discipline Drift</h3>
             <div className="h-[180px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data}>

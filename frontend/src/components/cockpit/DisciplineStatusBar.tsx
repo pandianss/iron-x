@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getDisciplineState, type DisciplineState } from '../../api/discipline';
-import { getProfile } from '../../api/client';
+import { DisciplineClient, type DisciplineState } from '../../domain/discipline';
+import { AuthClient } from '../../domain/auth';
 import { UserPlus } from 'lucide-react';
 import InviteMemberModal from '../InviteMemberModal';
 
@@ -29,8 +29,8 @@ export const DisciplineStatusBar: React.FC = () => {
         const fetchData = async () => {
             try {
                 const [disciplineData, profileData] = await Promise.all([
-                    getDisciplineState(),
-                    getProfile()
+                    DisciplineClient.getState(),
+                    AuthClient.getProfile()
                 ]);
                 setState(disciplineData);
                 setProfile(profileData);
@@ -43,15 +43,15 @@ export const DisciplineStatusBar: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
-    if (!state) return <div className="p-4 bg-zinc-900 border border-zinc-800 animate-pulse h-24">Loading System State...</div>;
+    if (!state) return <div className="p-4 bg-iron-900 border border-iron-800 animate-pulse h-24">Loading System State...</div>;
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'STRICT': return 'text-zinc-200'; // Neutral/White
-            case 'STABLE': return 'text-zinc-400';
+            case 'STRICT': return 'text-iron-200'; // Neutral/White
+            case 'STABLE': return 'text-iron-400';
             case 'DRIFTING': return 'text-amber-500';
             case 'BREACH': return 'text-red-600 animate-pulse';
-            default: return 'text-zinc-500';
+            default: return 'text-iron-500';
         }
     };
 
@@ -63,32 +63,32 @@ export const DisciplineStatusBar: React.FC = () => {
         || profile?.teams_owned[0];
 
     return (
-        <div className="w-full bg-zinc-950 border-b border-zinc-800 p-4 font-mono text-sm flex justify-between items-center">
+        <div className="w-full bg-iron-950 border-b border-iron-800 p-4 font-mono text-sm flex justify-between items-center">
 
             <div className="grid grid-cols-4 gap-8 items-center flex-1">
                 <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs uppercase tracking-wider">Discipline Score</span>
-                    <span className="text-3xl font-bold text-zinc-100">{state.score}</span>
+                    <span className="text-iron-500 text-xs uppercase tracking-wider">Discipline Score</span>
+                    <span className="text-3xl font-bold text-iron-100">{state.score}</span>
                 </div>
 
                 <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs uppercase tracking-wider">Status Classification</span>
+                    <span className="text-iron-500 text-xs uppercase tracking-wider">Status Classification</span>
                     <span className={`text-xl font-bold ${getStatusColor(state.status)}`}>{state.status}</span>
                 </div>
 
                 <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs uppercase tracking-wider">Time Since Violation</span>
-                    <span className="text-zinc-300">{state.timeSinceLastViolation}</span>
+                    <span className="text-iron-500 text-xs uppercase tracking-wider">Time Since Violation</span>
+                    <span className="text-iron-300">{state.timeSinceLastViolation}</span>
                 </div>
 
                 <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs uppercase tracking-wider">Next Enforcement Check</span>
+                    <span className="text-iron-500 text-xs uppercase tracking-wider">Next Enforcement Check</span>
                     <span className="text-amber-500 font-bold">{state.countdownToNextCheck}</span>
                 </div>
             </div>
 
             {managedTeam && (
-                <div className="ml-4 pl-4 border-l border-zinc-800">
+                <div className="ml-4 pl-4 border-l border-iron-800">
                     <button
                         onClick={() => setIsInviteModalOpen(true)}
                         className="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md transition-colors text-xs uppercase font-bold tracking-wider"

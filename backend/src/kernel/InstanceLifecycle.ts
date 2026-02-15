@@ -1,6 +1,8 @@
 
 import prisma from '../db';
 import { UserId, DisciplineContext } from './domain/types';
+import { DisciplinePolicy } from './policies/DisciplinePolicy';
+import { kernelEvents, DomainEventType } from './events/bus';
 
 export class InstanceLifecycle {
     async loadContext(userId: string): Promise<DisciplineContext> {
@@ -24,22 +26,9 @@ export class InstanceLifecycle {
             });
         }
 
-        const SYSTEM_DEFAULTS = {
-            max_misses: 3,
-            score_threshold: 50,
-            lockout_hours: 24
-        };
-
-        let rules = SYSTEM_DEFAULTS;
-        if (policyData?.rules) {
-            try {
-                rules = { ...SYSTEM_DEFAULTS, ...JSON.parse(policyData.rules) };
-            } catch (e) {
-                console.error(`Failed to parse policy rules`, e);
-            }
-        }
-
-        const mode = (policyData?.enforcement_mode || user.enforcement_mode || 'NONE') as any;
+        // 3. Resolve Policy via Pure Function
+        const rules = DisciplinePolicy.resolveRules(policyData?.rules);
+        const mode = DisciplinePolicy.resolveEnforcementMode(policyData?.enforcement_mode, user.enforcement_mode);
 
         // 3. Fetch Instances (Window: Start of Month to Now + Buffer?)
         // For scoring we need month data. For execution we need today.
@@ -166,6 +155,15 @@ export class InstanceLifecycle {
                 status: 'MISSED'
             }
         });
+
+        // Emit events for each missed instance
+        for (const id of instanceIds) {
+            kernelEvents.emitEvent(DomainEventType.VIOLATION_DETECTED, {
+                instanceId: id,
+                reason: 'Missed scheduled window',
+                policy: context.policy
+            }, context.userId);
+        }
 
         return instanceIds;
     }

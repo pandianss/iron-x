@@ -42,13 +42,15 @@ export const startCronJobs = () => {
     });
 
     // Run every Sunday at 2 AM for database maintenance
+    // Run every Sunday at 2 AM for database maintenance
     cron.schedule('0 2 * * 0', async () => {
         Logger.info('[Cron] Triggering weekly database maintenance...');
         try {
-            const { container } = await import('tsyringe');
-            const { OpsService } = await import('./modules/ops/ops.service');
-            const opsService = container.resolve(OpsService);
-            await opsService.runDatabaseMaintenance();
+            // const { container } = await import('tsyringe');
+            // const { OpsService } = await import('./modules/_experimental/ops/ops.service');
+            // const opsService = container.resolve(OpsService);
+            // await opsService.runDatabaseMaintenance();
+            Logger.info('[Cron] Database maintenance skipped (Ops module inactive)');
         } catch (error) {
             Logger.error('[Cron] Weekly maintenance failed:', error);
         }

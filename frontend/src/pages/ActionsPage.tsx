@@ -8,7 +8,7 @@ const ActionsPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Actions & Routines</h1>
+            <h1 className="text-3xl font-bold text-iron-900 mb-8">Actions & Routines</h1>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-1">
                     <ActionForm onActionCreated={() => setRefreshTrigger(prev => prev + 1)} />

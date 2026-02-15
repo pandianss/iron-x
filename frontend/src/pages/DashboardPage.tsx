@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import client from '../api/client';
+import { ScheduleClient, type ScheduledItem } from '../domain/schedule';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import DisciplineDashboard from '../components/DisciplineDashboard';
@@ -8,34 +8,16 @@ import AttentionDensityStrip from '../components/AttentionDensityStrip';
 import WeeklyReportModal from '../components/WeeklyReportModal';
 import { BookOpen } from 'lucide-react';
 
-interface ActionInstance {
-    instance_id: string;
-    action: {
-        title: string;
-        window_start_time: string;
-        window_duration_minutes: number;
-    };
-    scheduled_start_time: string;
-    scheduled_end_time: string;
-    status: string;
-    executed_at: string | null;
-}
-
 const DashboardPage: React.FC = () => {
     const { token, logout, user } = useAuth();
-    const [instances, setInstances] = useState<ActionInstance[]>([]);
+    const [instances, setInstances] = useState<ScheduledItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isReportOpen, setIsReportOpen] = useState(false);
 
     const fetchSchedule = async () => {
         try {
-            // Client already has interceptor for token if set up correctly, 
-            // but if AuthContext doesn't set it in client, we might need headers.
-            // Assuming client.ts handles it or we pass it (AuthContext usually sets axios default headers)
-            // Let's check client.ts. It has an interceptor? 
-            // For safety, passing header here too if client doesn't auto-attach from context.
-            const response = await client.get('/schedule/today');
-            setInstances(response.data);
+            const data = await ScheduleClient.getToday();
+            setInstances(data);
         } catch (error) {
             console.error('Error fetching schedule', error);
         } finally {
@@ -51,7 +33,7 @@ const DashboardPage: React.FC = () => {
 
     const handleLogExecution = async (instanceId: string) => {
         try {
-            await client.post(`/schedule/instances/${instanceId}/log`);
+            await ScheduleClient.logExecution(instanceId);
             setLastExecutionStatus('COMPLETED');
             fetchSchedule();
         } catch (error) {
@@ -62,12 +44,12 @@ const DashboardPage: React.FC = () => {
     if (loading) return <div>Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-iron-50 p-8">
             <div className="max-w-4xl mx-auto">
                 <AttentionDensityStrip />
 
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Today's Discipline</h1>
+                    <h1 className="text-3xl font-bold text-iron-900">Today's Discipline</h1>
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={() => setIsReportOpen(true)}
@@ -75,10 +57,10 @@ const DashboardPage: React.FC = () => {
                         >
                             <BookOpen className="w-4 h-4 mr-1" /> Weekly Report
                         </button>
-                        <Link to="/billing" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                        <Link to="/billing" className="text-iron-600 hover:text-iron-900 text-sm font-medium">
                             Plans & Billing
                         </Link>
-                        <Link to="/security" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                        <Link to="/security" className="text-iron-600 hover:text-iron-900 text-sm font-medium">
                             Security
                         </Link>
                         {user?.organization && (
@@ -95,14 +77,14 @@ const DashboardPage: React.FC = () => {
                 <div className="bg-white shadow rounded-lg p-6">
                     <h2 className="text-xl font-semibold mb-4">Daily Schedule</h2>
                     {instances.length === 0 ? (
-                        <p className="text-gray-500">No actions scheduled for today.</p>
+                        <p className="text-iron-500">No actions scheduled for today.</p>
                     ) : (
-                        <ul className="divide-y divide-gray-200">
+                        <ul className="divide-y divide-iron-200">
                             {instances.map((instance) => (
                                 <li key={instance.instance_id} className="py-4 flex justify-between items-center">
                                     <div>
                                         <h3 className="text-lg font-medium">{instance.action.title}</h3>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-sm text-iron-500">
                                             {new Date(instance.scheduled_start_time).toLocaleTimeString()} -
                                             {new Date(instance.scheduled_end_time).toLocaleTimeString()}
                                         </p>

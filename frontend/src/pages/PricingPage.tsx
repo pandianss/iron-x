@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import client, { createCheckoutSession, createPortalSession } from '../api/client';
+import { BillingClient } from '../domain/billing';
 import { useNavigate } from 'react-router-dom';
 
 interface Subscription {
@@ -14,8 +14,8 @@ const PricingPage: React.FC = () => {
     useEffect(() => {
         const fetchSubscription = async () => {
             try {
-                const res = await client.get<Subscription>('/subscription/me');
-                setCurrentTier(res.data.plan_tier);
+                const res = await BillingClient.getSubscription();
+                setCurrentTier(res.plan_tier);
             } catch (err) {
                 console.error(err);
             }
@@ -79,7 +79,7 @@ const PricingPage: React.FC = () => {
         try {
             // Use mock price IDs for now. In prod, these come from env or config.
             const priceId = tierId === 'INDIVIDUAL_PRO' ? 'price_pro_monthly' : 'price_enterprise_seats';
-            const { url } = await createCheckoutSession(priceId, window.location.href, window.location.href);
+            const { url } = await BillingClient.createCheckoutSession(priceId, window.location.href, window.location.href);
             if (url) {
                 window.location.href = url;
             } else {
@@ -93,7 +93,7 @@ const PricingPage: React.FC = () => {
 
     const handleManageBilling = async () => {
         try {
-            const { url } = await createPortalSession(window.location.href);
+            const { url } = await BillingClient.createPortalSession(window.location.href);
             if (url) {
                 window.location.href = url;
             }
@@ -104,12 +104,12 @@ const PricingPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-iron-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-                <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                <h2 className="text-3xl font-extrabold text-iron-900 sm:text-4xl">
                     Simple, Transparent Pricing
                 </h2>
-                <p className="mt-4 text-xl text-gray-600">
+                <p className="mt-4 text-xl text-iron-600">
                     Invest in your operational discipline.
                 </p>
                 {currentTier !== 'FREE' && (
@@ -126,12 +126,12 @@ const PricingPage: React.FC = () => {
                 {tiers.map((tier) => {
                     const isCurrent = currentTier === tier.id;
                     return (
-                        <div key={tier.id} className={`border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white ${isCurrent ? 'ring-2 ring-indigo-500' : ''}`}>
+                        <div key={tier.id} className={`border border-iron-200 rounded-lg shadow-sm divide-y divide-iron-200 bg-white ${isCurrent ? 'ring-2 ring-indigo-500' : ''}`}>
                             <div className="p-6">
-                                <h3 className="text-lg leading-6 font-medium text-gray-900">{tier.name}</h3>
+                                <h3 className="text-lg leading-6 font-medium text-iron-900">{tier.name}</h3>
                                 <p className="mt-4">
-                                    <span className="text-4xl font-extrabold text-gray-900">{tier.price}</span>
-                                    {tier.price !== '$0' && <span className="text-base font-medium text-gray-500">/mo</span>}
+                                    <span className="text-4xl font-extrabold text-iron-900">{tier.price}</span>
+                                    {tier.price !== '$0' && <span className="text-base font-medium text-iron-500">/mo</span>}
                                 </p>
                                 <button
                                     onClick={() => !isCurrent && handleUpgrade(tier.id)}
@@ -145,12 +145,12 @@ const PricingPage: React.FC = () => {
                                 </button>
                             </div>
                             <div className="pt-6 pb-8 px-6">
-                                <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase">What's included</h4>
+                                <h4 className="text-sm font-medium text-iron-900 tracking-wide uppercase">What's included</h4>
                                 <ul className="mt-6 space-y-4">
                                     {tier.features.map((feature) => (
                                         <li key={feature} className="flex space-x-3">
                                             <span className="text-green-500">✓</span>
-                                            <span className="text-base text-gray-500">{feature}</span>
+                                            <span className="text-base text-iron-500">{feature}</span>
                                         </li>
                                     ))}
                                 </ul>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTomorrowPreview, getAnticipatoryWarnings, type TomorrowPreviewData, type Warning } from '../api/trajectory';
+import { TrajectoryClient, type TomorrowPreviewData, type Warning } from '../domain/trajectory';
 import { Calendar, AlertTriangle, CheckCircle, Info, Siren } from 'lucide-react';
 
 
@@ -12,8 +12,8 @@ const TomorrowPreview: React.FC = () => {
         const fetchData = async () => {
             try {
                 const [previewData, warningsData] = await Promise.all([
-                    getTomorrowPreview(),
-                    getAnticipatoryWarnings()
+                    TrajectoryClient.getTomorrowPreview(),
+                    TrajectoryClient.getAnticipatoryWarnings()
                 ]);
                 setData(previewData);
                 setWarnings(warningsData);
@@ -26,7 +26,7 @@ const TomorrowPreview: React.FC = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="animate-pulse h-24 bg-gray-100 rounded-lg"></div>;
+    if (loading) return <div className="animate-pulse h-24 bg-iron-100 rounded-lg"></div>;
     if (!data) return null;
 
     const getRiskColor = (risk: string) => {
@@ -46,15 +46,15 @@ const TomorrowPreview: React.FC = () => {
     };
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6 md:mt-0 md:ml-6">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-iron-200 mt-6 md:mt-0 md:ml-6">
+            <h3 className="text-xs font-semibold text-iron-500 uppercase tracking-wider mb-2 flex items-center">
                 <Calendar className="w-3 h-3 mr-1" /> Tomorrow's Preview
             </h3>
 
             <div className="flex items-center justify-between">
                 <div>
-                    <div className="text-xl font-bold text-gray-900">{data.scheduledCount} Actions</div>
-                    <div className="text-xs text-gray-500">Scheduled for {new Date(data.date).toLocaleDateString()}</div>
+                    <div className="text-xl font-bold text-iron-900">{data.scheduledCount} Actions</div>
+                    <div className="text-xs text-iron-500">Scheduled for {new Date(data.date).toLocaleDateString()}</div>
                 </div>
 
                 <div className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center ${getRiskColor(data.riskLevel)}`}>
@@ -63,14 +63,14 @@ const TomorrowPreview: React.FC = () => {
                 </div>
             </div>
 
-            <div className="mt-2 text-xs text-gray-400">
+            <div className="mt-2 text-xs text-iron-400">
                 {data.warning || (data.riskLevel === 'High Risk' ? 'Prepare for a tight schedule.' :
                     data.riskLevel === 'Medium Risk' ? 'Moderate load expected.' :
                         'Light schedule. Focus on quality.')}
             </div>
 
             {warnings.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="mt-4 pt-4 border-t border-iron-100">
                     {warnings.map((w: Warning, i: number) => (
                         <div key={i} className={`text-xs p-2 rounded flex items-start ${w.severity === 'HIGH' ? 'bg-red-50 text-red-700' : 'bg-yellow-50 text-yellow-700'
                             }`}>

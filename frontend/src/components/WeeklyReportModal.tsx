@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import client from '../api/client';
+import { AnalyticsClient } from '../domain/analytics';
 import { X, Activity, AlertCircle } from 'lucide-react';
 
 interface WeeklyReportData {
@@ -25,9 +25,9 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
             const fetchReport = async () => {
                 setLoading(true);
                 try {
-                    const response = await client.get('/experience/report');
-                    if (response.status === 200) {
-                        setData(response.data);
+                    const data = await AnalyticsClient.getReport();
+                    if (data) {
+                        setData(data);
                     }
                 } catch (err) {
                     console.error(err);
@@ -46,12 +46,12 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
             <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-fade-in">
 
                 {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                <div className="flex justify-between items-center p-6 border-b border-iron-100">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Weekly Reflection</h2>
-                        <span className="text-xs text-gray-400 uppercase tracking-wider">Non-Judgmental Report</span>
+                        <h2 className="text-xl font-bold text-iron-900">Weekly Reflection</h2>
+                        <span className="text-xs text-iron-400 uppercase tracking-wider">Non-Judgmental Report</span>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <button onClick={onClose} className="text-iron-400 hover:text-iron-600">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -60,8 +60,8 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
                 <div className="p-6">
                     {loading ? (
                         <div className="animate-pulse space-y-4">
-                            <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-                            <div className="h-20 bg-gray-100 rounded"></div>
+                            <div className="h-4 bg-iron-100 rounded w-3/4"></div>
+                            <div className="h-20 bg-iron-100 rounded"></div>
                         </div>
                     ) : !data ? (
                         <div className="text-red-500 text-sm">Failed to load report.</div>
@@ -70,13 +70,13 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
 
                             {/* Stats Grid */}
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                                    <span className="block text-2xl font-bold text-gray-900">{Math.round((data.executed / data.total) * 100) || 0}%</span>
-                                    <span className="text-xs text-gray-500 uppercase">Execution Rate</span>
+                                <div className="bg-iron-50 p-4 rounded-lg text-center">
+                                    <span className="block text-2xl font-bold text-iron-900">{Math.round((data.executed / data.total) * 100) || 0}%</span>
+                                    <span className="text-xs text-iron-500 uppercase">Execution Rate</span>
                                 </div>
-                                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                                    <span className="block text-2xl font-bold text-gray-900">{data.total}</span>
-                                    <span className="text-xs text-gray-500 uppercase">Total Actions</span>
+                                <div className="bg-iron-50 p-4 rounded-lg text-center">
+                                    <span className="block text-2xl font-bold text-iron-900">{data.total}</span>
+                                    <span className="text-xs text-iron-500 uppercase">Total Actions</span>
                                 </div>
                             </div>
 
@@ -96,10 +96,10 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
 
                             {/* Insight */}
                             <div>
-                                <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                                    <AlertCircle className="w-4 h-4 mr-2 text-gray-400" /> Pattern Insight
+                                <h3 className="text-sm font-semibold text-iron-700 mb-2 flex items-center">
+                                    <AlertCircle className="w-4 h-4 mr-2 text-iron-400" /> Pattern Insight
                                 </h3>
-                                <p className="text-sm text-gray-600 bg-white border border-gray-200 p-3 rounded italic">
+                                <p className="text-sm text-iron-600 bg-white border border-iron-200 p-3 rounded italic">
                                     "{data.insight}"
                                 </p>
                             </div>
@@ -108,7 +108,7 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 bg-gray-50 text-center text-xs text-gray-400">
+                <div className="p-4 bg-iron-50 text-center text-xs text-iron-400">
                     This report is for your reflection. No action required.
                 </div>
             </div>

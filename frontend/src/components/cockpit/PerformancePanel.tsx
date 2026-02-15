@@ -8,18 +8,18 @@ export const PerformancePanel: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'audit' | 'velocity'>('audit');
 
     return (
-        <div className="flex-1 bg-zinc-900 border border-zinc-800 flex flex-col overflow-hidden">
-            <div className="flex border-b border-zinc-800">
+        <div className="flex-1 bg-iron-900 border border-iron-800 flex flex-col overflow-hidden">
+            <div className="flex border-b border-iron-800">
                 <button
                     onClick={() => setActiveTab('audit')}
-                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors ${activeTab === 'audit' ? 'text-white bg-zinc-800 border-r border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors ${activeTab === 'audit' ? 'text-white bg-iron-800 border-r border-iron-700' : 'text-iron-500 hover:text-iron-300'}`}
                 >
                     <List size={14} />
                     Audit Log
                 </button>
                 <button
                     onClick={() => setActiveTab('velocity')}
-                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors ${activeTab === 'velocity' ? 'text-white bg-zinc-800 border-x border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors ${activeTab === 'velocity' ? 'text-white bg-iron-800 border-x border-iron-700' : 'text-iron-500 hover:text-iron-300'}`}
                 >
                     <BarChart2 size={14} />
                     Team Velocity

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { acceptInvitation } from '../api/client';
+import { TeamClient } from '../domain/team';
 import { CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -25,7 +25,7 @@ const JoinTeamPage: React.FC = () => {
             }
 
             try {
-                const res = await acceptInvitation(token);
+                const res = await TeamClient.acceptInvitation(token);
                 setStatus('success');
                 setMessage(res.message);
                 setTimeout(() => navigate('/dashboard'), 3000);
@@ -41,18 +41,18 @@ const JoinTeamPage: React.FC = () => {
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-iron-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
                     <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500" />
-                    <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Authentication Required</h2>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <h2 className="mt-6 text-3xl font-extrabold text-iron-900">Authentication Required</h2>
+                    <p className="mt-2 text-sm text-iron-600">
                         Please log in or register to join the team.
                     </p>
                     <div className="mt-6 space-y-3">
                         <Link to={`/login?redirect=/join/${token}`} className="block w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
                             Log In
                         </Link>
-                        <Link to={`/register?redirect=/join/${token}`} className="block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <Link to={`/register?redirect=/join/${token}`} className="block w-full py-2 px-4 border border-iron-300 rounded-md shadow-sm text-sm font-medium text-iron-700 bg-white hover:bg-iron-50">
                             Register
                         </Link>
                     </div>
@@ -62,29 +62,29 @@ const JoinTeamPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-iron-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
                     {status === 'pending' && (
                         <div>
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                            <h2 className="mt-4 text-xl font-medium text-gray-900">Joining Team...</h2>
+                            <h2 className="mt-4 text-xl font-medium text-iron-900">Joining Team...</h2>
                         </div>
                     )}
 
                     {status === 'success' && (
                         <div>
                             <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                            <h2 className="mt-4 text-2xl font-bold text-gray-900">Success!</h2>
-                            <p className="mt-2 text-gray-600">{message}</p>
-                            <p className="mt-4 text-sm text-gray-500">Redirecting to dashboard...</p>
+                            <h2 className="mt-4 text-2xl font-bold text-iron-900">Success!</h2>
+                            <p className="mt-2 text-iron-600">{message}</p>
+                            <p className="mt-4 text-sm text-iron-500">Redirecting to dashboard...</p>
                         </div>
                     )}
 
                     {status === 'error' && (
                         <div>
                             <AlertTriangle className="mx-auto h-12 w-12 text-red-500" />
-                            <h2 className="mt-4 text-xl font-bold text-gray-900">Error</h2>
+                            <h2 className="mt-4 text-xl font-bold text-iron-900">Error</h2>
                             <p className="mt-2 text-red-600">{message}</p>
                             <Link to="/dashboard" className="mt-6 inline-flex items-center text-indigo-600 hover:text-indigo-500">
                                 Go to Dashboard <ArrowRight className="ml-1 h-4 w-4" />

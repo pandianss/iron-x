@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { ComplianceService } from '../modules/compliance/compliance.service';
+import { ComplianceService } from '../modules/_experimental/compliance/compliance.service';
 import { AuditService } from '../modules/audit/audit.service';
 
 export const getFrameworkStatus = async (req: Request, res: Response) => {

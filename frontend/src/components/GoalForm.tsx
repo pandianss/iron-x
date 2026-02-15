@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import client from '../api/client';
+import { GoalClient } from '../domain/goals';
 
 interface GoalFormProps {
     onGoalCreated: () => void;
@@ -21,7 +21,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onGoalCreated }) => {
         }
 
         try {
-            await client.post('/goals', {
+            await GoalClient.create({
                 title,
                 description,
                 deadline: deadline || null
@@ -43,31 +43,31 @@ const GoalForm: React.FC<GoalFormProps> = ({ onGoalCreated }) => {
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                    <label className="block text-sm font-medium text-iron-700">Title</label>
                     <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                        className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                         placeholder="e.g., Learn TypeScript"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <label className="block text-sm font-medium text-iron-700">Description</label>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                        className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                         placeholder="Optional details..."
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Deadline</label>
+                    <label className="block text-sm font-medium text-iron-700">Deadline</label>
                     <input
                         type="date"
                         value={deadline}
                         onChange={(e) => setDeadline(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                        className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
                 </div>
                 <button

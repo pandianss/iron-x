@@ -1,7 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { getTeamVelocity, getProfile } from '../../api/client';
+import { TeamClient } from '../../domain/team';
+import { AuthClient } from '../../domain/auth';
 
 interface VelocityPoint {
     userId: string;
@@ -16,13 +17,13 @@ export const TeamVelocityChart: React.FC = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const profile = await getProfile();
+                const profile = await AuthClient.getProfile();
                 // Find a team managed by user
                 const managedTeam = profile.team_memberships.find((m: any) => m.role === 'MANAGER' || m.team.owner_id === profile.user_id)?.team
                     || profile.teams_owned[0];
 
                 if (managedTeam) {
-                    const result = await getTeamVelocity(managedTeam.team_id || (managedTeam as any).id);
+                    const result = await TeamClient.getVelocity(managedTeam.team_id || (managedTeam as any).id);
                     // Mask emails for privacy in demo
                     const formattedData = result.map((r: any) => ({
                         ...r,
@@ -39,12 +40,12 @@ export const TeamVelocityChart: React.FC = () => {
         loadData();
     }, []);
 
-    if (loading) return <div className="h-full flex items-center justify-center text-zinc-500 text-xs">Loading Team Data...</div>;
-    if (data.length === 0) return <div className="h-full flex items-center justify-center text-zinc-500 text-xs">No team data or not a manager</div>;
+    if (loading) return <div className="h-full flex items-center justify-center text-iron-500 text-xs">Loading Team Data...</div>;
+    if (data.length === 0) return <div className="h-full flex items-center justify-center text-iron-500 text-xs">No team data or not a manager</div>;
 
     return (
         <div className="h-full w-full p-2">
-            <h3 className="text-zinc-400 text-xs uppercase mb-2 font-bold tracking-wider">Team Velocity (Discipline Score)</h3>
+            <h3 className="text-iron-400 text-xs uppercase mb-2 font-bold tracking-wider">Team Velocity (Discipline Score)</h3>
             <div className="h-[180px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} layout="vertical">

@@ -8,9 +8,9 @@ const DisciplineTrajectoryGraph: React.FC = () => {
 
     const loading = historyLoading || projectionLoading;
 
-    if (loading) return <div className="animate-pulse h-64 bg-gray-100 rounded-lg"></div>;
+    if (loading) return <div className="animate-pulse h-64 bg-iron-100 rounded-lg"></div>;
     if (historyError) return <div className="p-4 text-red-500 bg-red-50 rounded-lg border border-red-100">Error: {historyError}</div>;
-    if (!data || data.history.length === 0) return <div className="p-4 text-gray-400">No trajectory data.</div>;
+    if (!data || data.history.length === 0) return <div className="p-4 text-iron-400">No trajectory data.</div>;
 
     // Simple SVG Graph
     const height = 200;
@@ -46,15 +46,15 @@ const DisciplineTrajectoryGraph: React.FC = () => {
     }
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-iron-200 mt-6">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Discipline Trajectory</h3>
+                <h3 className="text-xs font-semibold text-iron-500 uppercase tracking-wider">Discipline Trajectory</h3>
                 <div className="flex space-x-2 text-xs">
                     {[30, 60, 90].map(d => (
                         <button
                             key={d}
                             onClick={() => setDays(d)}
-                            className={`px-2 py-1 rounded ${days === d ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-50'}`}
+                            className={`px-2 py-1 rounded ${days === d ? 'bg-indigo-100 text-indigo-700' : 'text-iron-500 hover:bg-iron-50'}`}
                         >
                             {d}d
                         </button>
@@ -125,7 +125,7 @@ const DisciplineTrajectoryGraph: React.FC = () => {
                     })}
                 </svg>
             </div>
-            <div className="text-xs text-center text-gray-400 mt-2">
+            <div className="text-xs text-center text-iron-400 mt-2">
                 Use hover to see details. Red dots indicate misses.
             </div>
         </div>

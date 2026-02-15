@@ -1,10 +1,16 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
-import { ApiKeyService } from '../modules/integration/api_key.service';
+import { ApiKeyService } from '../modules/_experimental/integration/api_key.service';
 import { Logger } from '../utils/logger';
+import { isModuleActive, ModuleId } from '../kernel/moduleRegistry';
 
 export const apiKeyMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    // Feature Flag: Skip if Integration module is inactive
+    if (!isModuleActive(ModuleId.INTEGRATION)) {
+        return next();
+    }
+
     const authHeader = req.headers['authorization'];
 
     if (!authHeader || !authHeader.startsWith('Bearer ix_')) {

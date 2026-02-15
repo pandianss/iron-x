@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import client from '../api/client';
-
-interface Goal {
-    goal_id: string;
-    title: string;
-}
+import { ActionClient } from '../domain/actions';
+import { GoalClient, type Goal } from '../domain/goals';
 
 interface ActionFormProps {
     onActionCreated: () => void;
@@ -24,8 +20,8 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
     useEffect(() => {
         const fetchGoals = async () => {
             try {
-                const response = await client.get<Goal[]>('/goals');
-                setGoals(response.data);
+                const data = await GoalClient.getAll();
+                setGoals(data);
             } catch (err) {
                 console.error('Failed to load goals', err);
             }
@@ -47,7 +43,7 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
             : { type: 'custom', rule: 'weekly' }; // Placeholder for now
 
         try {
-            await client.post('/actions', {
+            await ActionClient.create({
                 title,
                 description,
                 goal_id: goalId || null,
@@ -79,29 +75,29 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                    <label className="block text-sm font-medium text-iron-700">Title</label>
                     <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                        className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <label className="block text-sm font-medium text-iron-700">Description</label>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                        className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Link to Goal (Optional)</label>
+                    <label className="block text-sm font-medium text-iron-700">Link to Goal (Optional)</label>
                     <select
                         value={goalId}
                         onChange={(e) => setGoalId(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                        className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     >
                         <option value="">-- None --</option>
                         {goals.map(g => (
@@ -111,24 +107,24 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Start Time</label>
+                        <label className="block text-sm font-medium text-iron-700">Start Time</label>
                         <input
                             type="time"
                             value={windowStart}
                             onChange={(e) => setWindowStart(e.target.value)}
                             required
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                            className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Duration (mins)</label>
+                        <label className="block text-sm font-medium text-iron-700">Duration (mins)</label>
                         <input
                             type="number"
                             min="5"
                             value={windowDuration}
                             onChange={(e) => setWindowDuration(e.target.value)}
                             required
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                            className="mt-1 block w-full rounded-md border-iron-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                         />
                     </div>
                 </div>
@@ -139,9 +135,9 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
                         checked={isStrict}
                         onChange={() => { }} // Read-only as per spec
                         disabled
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-iron-300 rounded"
                     />
-                    <label htmlFor="strict-mode" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="strict-mode" className="ml-2 block text-sm text-iron-900">
                         Strict Mode (Enforced)
                     </label>
                 </div>

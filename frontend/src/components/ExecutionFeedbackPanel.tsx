@@ -25,30 +25,30 @@ const ExecutionFeedbackPanel: React.FC<FeedbackProps> = ({ status, onClose }) =>
     const habitDelta = status === 'COMPLETED' ? '+1' : '+0.5';
 
     return (
-        <div className="fixed bottom-6 right-6 bg-white border border-gray-200 shadow-xl rounded-lg p-4 w-64 animate-slide-up z-50">
+        <div className="fixed bottom-6 right-6 bg-white border border-iron-200 shadow-xl rounded-lg p-4 w-64 animate-slide-up z-50">
             <div className="flex justify-between items-start mb-2">
-                <h4 className="text-sm font-semibold text-gray-900">Execution Logged</h4>
-                <button onClick={() => { setVisible(false); onClose(); }} className="text-gray-400 hover:text-gray-600">
+                <h4 className="text-sm font-semibold text-iron-900">Execution Logged</h4>
+                <button onClick={() => { setVisible(false); onClose(); }} className="text-iron-400 hover:text-iron-600">
                     <X className="w-4 h-4" />
                 </button>
             </div>
 
             <div className="space-y-2">
                 <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600">Status</span>
+                    <span className="text-iron-600">Status</span>
                     <span className={`font-mono font-bold ${status === 'COMPLETED' ? 'text-green-600' : 'text-yellow-600'}`}>
                         {status}
                     </span>
                 </div>
 
-                <div className="h-px bg-gray-100 my-2"></div>
+                <div className="h-px bg-iron-100 my-2"></div>
 
                 <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500">Proj. Score Impact</span>
+                    <span className="text-iron-500">Proj. Score Impact</span>
                     <span className="text-indigo-600 font-medium">{scoreDelta}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500">Habit Strength</span>
+                    <span className="text-iron-500">Habit Strength</span>
                     <span className="text-indigo-600 font-medium">{habitDelta}</span>
                 </div>
             </div>

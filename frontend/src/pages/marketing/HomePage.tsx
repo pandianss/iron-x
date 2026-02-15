@@ -13,7 +13,7 @@ const HomePage: React.FC = () => {
                 <div className="relative z-10 max-w-4xl mx-auto">
                     <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8">
                         Discipline is <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-iron-400 to-iron-100">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#a1a1aa] to-[#f4f4f5]">
                             Infrastructure
                         </span>
                     </h1>
@@ -437,7 +437,7 @@ Where: ∀ policy p ∈ Policy_Set,
 
                         {/* PRO Tier */}
                         <div className="p-8 rounded-2xl bg-gradient-to-br from-iron-900/20 to-neutral-900 border-2 border-iron-600 hover:border-iron-500 transition-all relative">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-iron-600 text-white px-4 py-1 rounded-full text-sm font-bold">
+                            <div className="absolute -top-4 left-1/2 -traniron-x-1/2 bg-iron-600 text-white px-4 py-1 rounded-full text-sm font-bold">
                                 MOST POPULAR
                             </div>
                             <div className="mb-8">

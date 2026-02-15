@@ -1,13 +1,9 @@
 import { useEffect } from 'react';
 import { useApi } from './useApi';
-import {
-    getTrajectoryHistory,
-    getProjectedScore,
-    getTrajectoryIdentity,
-} from '../api/trajectory';
+import { TrajectoryClient } from '../domain/trajectory';
 
 export const useTrajectoryHistory = (days: number = 30) => {
-    const { data, loading, error, execute } = useApi(getTrajectoryHistory);
+    const { data, loading, error, execute } = useApi(TrajectoryClient.getHistory);
 
     useEffect(() => {
         execute(days);
@@ -17,7 +13,7 @@ export const useTrajectoryHistory = (days: number = 30) => {
 };
 
 export const useTrajectoryProjection = () => {
-    const { data, loading, error, execute } = useApi(getProjectedScore);
+    const { data, loading, error, execute } = useApi(TrajectoryClient.getProjectedScore);
 
     useEffect(() => {
         execute();
@@ -27,7 +23,7 @@ export const useTrajectoryProjection = () => {
 };
 
 export const useTrajectoryIdentity = () => {
-    const { data, loading, error, execute } = useApi(getTrajectoryIdentity);
+    const { data, loading, error, execute } = useApi(TrajectoryClient.getIdentity);
 
     useEffect(() => {
         execute();

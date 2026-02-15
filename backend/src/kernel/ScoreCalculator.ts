@@ -1,20 +1,14 @@
 
 import { DisciplineContext } from './domain/types';
 import { domainEvents, DomainEventType } from './domain/events';
+import { ScoringPolicy } from './policies/ScoringPolicy';
 
 export class ScoreCalculator {
     async compute(context: DisciplineContext): Promise<number> {
         const { userId, instances, user } = context;
 
-        if (instances.length === 0) return 50; // Neutral start
-
-        const completed = instances.filter(i => i.status === 'COMPLETED').length;
-        const total = instances.filter(i => i.status !== 'PENDING').length;
-
-        if (total === 0) return 50;
-
-        const rate = completed / total;
-        const score = Math.round(rate * 100);
+        // Pure calculation
+        const score = ScoringPolicy.calculateScore(instances);
 
         const oldScore = user?.current_discipline_score || 50;
 

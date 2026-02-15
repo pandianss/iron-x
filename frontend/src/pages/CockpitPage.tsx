@@ -8,7 +8,7 @@ import { StrategySandbox } from '../components/cockpit/StrategySandbox';
 
 const CockpitPage: React.FC = () => {
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-300 font-sans selection:bg-amber-900 selection:text-amber-100 flex flex-col overflow-hidden">
+        <div className="min-h-screen bg-iron-950 text-iron-300 font-sans selection:bg-amber-900 selection:text-amber-100 flex flex-col overflow-hidden">
             {/* 1. Discipline Status Bar (Always Visible) */}
             <div className="flex-none z-50">
                 <DisciplineStatusBar />

@@ -12,24 +12,24 @@ import goalRoutes from './modules/goals/goal.routes';
 import actionRoutes from './modules/actions/action.routes';
 import outcomeRoutes from './modules/outcomes/outcome.routes';
 import policyRoutes from './modules/policies/policy.routes';
-import trajectoryRoutes from './modules/trajectory/trajectory.routes';
+
 import disciplineRoutes from './modules/discipline/discipline.routes';
 import subscriptionRoutes from './modules/subscription/subscription.routes';
-import complianceRoutes from './modules/compliance/compliance.routes';
+
 import ssoRoutes from './modules/auth/sso.routes';
 import auditRoutes from './modules/audit/audit.routes';
 import analyticsRoutes from './modules/analytics/analytics.routes';
-import securityRoutes from './modules/security/security.routes';
+// import securityRoutes from './modules/security/security.routes';
 import organizationRoutes from './modules/organization/organization.routes';
-import integrationRoutes from './modules/integration/integration.routes';
-import opsRoutes from './modules/ops/ops.routes';
+// import integrationRoutes from './modules/integration/integration.routes';
+// import opsRoutes from './modules/ops/ops.routes';
 
 import { apiLimiter, authLimiter } from './middleware/rateLimitMiddleware';
 import { policyEnforcementMiddleware } from './middleware/policyEnforcementMiddleware';
 import { ipWhitelistMiddleware } from './middleware/ipWhitelistMiddleware';
 import { apiKeyMiddleware } from './middleware/apiKeyMiddleware';
 import { versionMiddleware } from './middleware/versionMiddleware';
-import { initializeWebhookListeners } from './modules/integration/webhook.listener';
+// import { initializeWebhookListeners } from './modules/integration/webhook.listener';
 import { errorHandler } from './middleware/errorHandler';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './infrastructure/swagger';
@@ -39,7 +39,7 @@ dotenv.config();
 const app = express();
 
 // Initialize domain event listeners for webhooks
-initializeWebhookListeners();
+// initializeWebhookListeners();
 
 app.set('trust proxy', 1);
 
@@ -125,19 +125,19 @@ v1Router.use('/actions', policyEnforcementMiddleware, actionRoutes);
 
 v1Router.use('/outcomes', outcomeRoutes);
 v1Router.use('/policies', policyRoutes);
-v1Router.use('/trajectory', trajectoryRoutes);
+// v1Router.use('/trajectory', trajectoryRoutes);
 v1Router.use('/discipline', disciplineRoutes);
 
 // Mount V1 Router
 v1Router.use('/subscription', subscriptionRoutes);
-v1Router.use('/compliance', complianceRoutes);
+// v1Router.use('/compliance', complianceRoutes);
 v1Router.use('/sso', ssoRoutes); // /api/v1/sso
 v1Router.use('/audit', auditRoutes); // /api/v1/audit
 v1Router.use('/analytics', analyticsRoutes); // /api/v1/analytics
-v1Router.use('/security', securityRoutes); // /api/v1/security
+// v1Router.use('/security', securityRoutes); // /api/v1/security
 v1Router.use('/organizations', organizationRoutes); // /api/v1/organizations
-v1Router.use('/integration', integrationRoutes); // /api/v1/integration
-v1Router.use('/ops', opsRoutes); // /api/v1/ops
+// v1Router.use('/integration', integrationRoutes); // /api/v1/integration
+// v1Router.use('/ops', opsRoutes); // /api/v1/ops
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1', v1Router);

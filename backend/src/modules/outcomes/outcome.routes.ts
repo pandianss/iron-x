@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { container } from 'tsyringe';
 import { OutcomeController } from './outcome.controller';
-import { outcomeGovernanceMiddleware } from '../../middleware/outcomeGovernanceMiddleware';
+import { governanceGuard } from '../../middleware/governanceGuard';
 
 const router = Router();
 const outcomeController = container.resolve(OutcomeController);
 
-router.use(outcomeGovernanceMiddleware);
+router.use(governanceGuard);
 
 router.get('/user/:userId', outcomeController.getUserOutcomes);
 router.get('/team/:teamId', outcomeController.getTeamOutcomes);

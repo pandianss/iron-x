@@ -32,34 +32,34 @@ const AttentionDensityStrip: React.FC = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="animate-pulse h-12 bg-gray-50 rounded-lg border border-gray-100 mb-6"></div>;
+    if (loading) return <div className="animate-pulse h-12 bg-iron-50 rounded-lg border border-iron-100 mb-6"></div>;
     if (!data) return null;
 
     return (
-        <div className="bg-gray-900 text-gray-300 px-6 py-3 rounded-lg flex flex-wrap items-center justify-between mb-8 shadow-inner border border-gray-800">
+        <div className="bg-iron-900 text-iron-300 px-6 py-3 rounded-lg flex flex-wrap items-center justify-between mb-8 shadow-inner border border-iron-800">
             <div className="flex items-center space-x-8">
                 <div className="flex items-center">
                     <AlertCircle className="w-4 h-4 text-orange-500 mr-2" />
-                    <span className="text-xs font-medium uppercase tracking-wider text-gray-500 mr-2">At Risk</span>
+                    <span className="text-xs font-medium uppercase tracking-wider text-iron-500 mr-2">At Risk</span>
                     <span className="text-sm font-bold text-white">{data.usersAtRisk} users</span>
                 </div>
 
                 <div className="flex items-center">
                     <Shield className="w-4 h-4 text-indigo-500 mr-2" />
-                    <span className="text-xs font-medium uppercase tracking-wider text-gray-500 mr-2">Lockouts</span>
+                    <span className="text-xs font-medium uppercase tracking-wider text-iron-500 mr-2">Lockouts</span>
                     <span className="text-sm font-bold text-white">{data.lockoutsThisWeek} this week</span>
                 </div>
 
                 <div className="flex items-center">
                     <Activity className="w-4 h-4 text-green-500 mr-2" />
-                    <span className="text-xs font-medium uppercase tracking-wider text-gray-500 mr-2">Trend</span>
+                    <span className="text-xs font-medium uppercase tracking-wider text-iron-500 mr-2">Trend</span>
                     <span className={`text-sm font-bold capitalize ${data.trend === 'stable' ? 'text-green-400' : 'text-orange-400'}`}>
                         {data.trend}
                     </span>
                 </div>
             </div>
 
-            <div className="hidden md:flex items-center text-[10px] text-gray-600 uppercase font-bold tracking-widest">
+            <div className="hidden md:flex items-center text-[10px] text-iron-600 uppercase font-bold tracking-widest">
                 <Zap className="w-3 h-3 mr-1" /> System Health Optimal
             </div>
         </div>

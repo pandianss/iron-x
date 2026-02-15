@@ -1,13 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
+import { governanceGuard } from './governanceGuard';
 
+/**
+ * @deprecated Use governanceGuard instead.
+ */
 export const outcomeGovernanceMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    // 1. Log Access
-    console.log(`[GOVERNANCE] Outcome Data Access: ${req.method} ${req.originalUrl} by ${req.ip}`);
-
-    // 2. Add Disclaimer Header for Safeguards
-    res.setHeader('X-Outcome-Disclaimer', 'Outcome data is for operational improvement only. Not for punitive HR use.');
-
-    // 3. (Optional) RBAC checks could go here, but assumed handled by auth middleware
-
-    next();
+    console.warn('[DEPRECATED] outcomeGovernanceMiddleware usage detected. Please migrate to governanceGuard.');
+    return governanceGuard(req as any, res, next);
 };

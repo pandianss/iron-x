@@ -3,6 +3,7 @@ import { autoInjectable } from 'tsyringe';
 import prisma from '../../db';
 import { AuthRequest } from '../../middleware/authMiddleware';
 import { NotFoundError } from '../../utils/AppError';
+import { kernelEvents, DomainEventType } from '../../kernel/events/bus';
 
 @autoInjectable()
 export class ActionController {
@@ -43,6 +44,12 @@ export class ActionController {
                     is_strict: is_strict ?? true,
                 },
             });
+
+            kernelEvents.emitEvent(DomainEventType.ACTION_CREATED, {
+                actionId: action.action_id,
+                title: action.title
+            }, userId);
+
             res.status(201).json(action);
         } catch (error) {
             next(error);

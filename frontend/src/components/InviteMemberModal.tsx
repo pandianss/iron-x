@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { X, Mail, Shield } from 'lucide-react';
-import { sendInvitation } from '../api/client';
+import { TeamClient } from '../domain/team';
 
 interface InviteMemberModalProps {
     isOpen: boolean;
@@ -21,7 +21,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ isOpen, onClose, 
         setMessage(null);
 
         try {
-            await sendInvitation(teamId, email, role);
+            await TeamClient.sendInvitation(teamId, email, role);
             setMessage({ type: 'success', text: 'Invitation sent successfully!' });
             setEmail('');
             setTimeout(() => {
@@ -40,10 +40,10 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ isOpen, onClose, 
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <div className="bg-iron-900 border border-iron-800 rounded-lg shadow-xl w-full max-w-md p-6 relative">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 text-iron-500 hover:text-white transition-colors"
                 >
                     <X size={20} />
                 </button>
@@ -52,7 +52,7 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ isOpen, onClose, 
                     <Mail className="mr-2 text-indigo-500" size={20} />
                     Invite Team Member
                 </h2>
-                <p className="text-zinc-500 text-sm mb-6">
+                <p className="text-iron-500 text-sm mb-6">
                     Add a new member to your team. They will receive an email with a link to join.
                 </p>
 
@@ -64,34 +64,34 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ isOpen, onClose, 
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-medium text-zinc-400 mb-1">Email Address</label>
+                        <label className="block text-xs font-medium text-iron-400 mb-1">Email Address</label>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500" size={16} />
+                            <Mail className="absolute left-3 top-1/2 transform -traniron-y-1/2 text-iron-500" size={16} />
                             <input
                                 type="email"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 pl-10 pr-4 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                                className="w-full bg-iron-950 border border-iron-800 rounded-md py-2 pl-10 pr-4 text-white placeholder-iron-600 focus:outline-none focus:border-indigo-500 transition-colors"
                                 placeholder="colleague@example.com"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-zinc-400 mb-1">Role</label>
+                        <label className="block text-xs font-medium text-iron-400 mb-1">Role</label>
                         <div className="relative">
-                            <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500" size={16} />
+                            <Shield className="absolute left-3 top-1/2 transform -traniron-y-1/2 text-iron-500" size={16} />
                             <select
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 pl-10 pr-4 text-white focus:outline-none focus:border-indigo-500 appearance-none"
+                                className="w-full bg-iron-950 border border-iron-800 rounded-md py-2 pl-10 pr-4 text-white focus:outline-none focus:border-indigo-500 appearance-none"
                             >
                                 <option value="MEMBER">Member</option>
                                 <option value="MANAGER">Manager</option>
                             </select>
                         </div>
-                        <p className="text-xs text-zinc-600 mt-1">Managers can invite others and modify team settings.</p>
+                        <p className="text-xs text-iron-600 mt-1">Managers can invite others and modify team settings.</p>
                     </div>
 
                     <div className="pt-2">

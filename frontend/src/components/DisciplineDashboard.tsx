@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import client from '../api/client';
+import { AnalyticsClient } from '../domain/analytics';
 import DisciplineIdentityCard from './DisciplineIdentityCard';
 import DisciplineTrajectoryGraph from './DisciplineTrajectoryGraph';
 import TomorrowPreview from './TomorrowPreview';
@@ -20,9 +20,9 @@ const DisciplineDashboard: React.FC = () => {
         // For simplicity, re-using the logic but extracting just what we need
         const fetchStats = async () => {
             try {
-                const response = await client.get('/analytics/daily');
-                if (response.status === 200 && response.data?.todayStats) {
-                    setStats(response.data.todayStats);
+                const data = await AnalyticsClient.getDailyStats();
+                if (data?.todayStats) {
+                    setStats(data.todayStats);
                 }
             } catch (err) {
                 console.error(err);
@@ -40,17 +40,17 @@ const DisciplineDashboard: React.FC = () => {
                 <div className="space-y-6">
                     <TomorrowPreview />
                     {stats && (
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Today's Pulse</h3>
+                        <div className="bg-white p-4 rounded-lg shadow-sm border border-iron-200">
+                            <h3 className="text-xs font-semibold text-iron-500 uppercase tracking-wider mb-2">Today's Pulse</h3>
                             <div className="flex justify-between items-center">
                                 <div className="text-center">
                                     <span className="block text-2xl font-bold text-green-600">{stats.executed}</span>
-                                    <span className="text-xs text-gray-400">Executed</span>
+                                    <span className="text-xs text-iron-400">Executed</span>
                                 </div>
-                                <div className="w-px h-8 bg-gray-100 mx-4"></div>
+                                <div className="w-px h-8 bg-iron-100 mx-4"></div>
                                 <div className="text-center">
                                     <span className="block text-2xl font-bold text-red-600">{stats.missed}</span>
-                                    <span className="text-xs text-gray-400">Missed</span>
+                                    <span className="text-xs text-iron-400">Missed</span>
                                 </div>
                             </div>
                         </div>

@@ -1,11 +1,10 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
+
 
 const MarketingNavbar: React.FC = () => {
-    const { isAuthenticated } = useAuth();
-    const navigate = useNavigate();
+
 
     return (
         <nav className="fixed top-0 w-full z-50 bg-neutral-900/80 backdrop-blur-md border-b border-neutral-800">
@@ -24,24 +23,15 @@ const MarketingNavbar: React.FC = () => {
                         </div>
                     </div>
                     <div>
-                        {isAuthenticated ? (
-                            <button
-                                onClick={() => navigate('/dashboard')}
-                                className="bg-iron-600 hover:bg-iron-500 text-white px-4 py-2 rounded-md text-sm font-medium"
+                        <div className="flex space-x-4">
+                            <Link to="/login" className="text-neutral-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</Link>
+                            <Link
+                                to="/register"
+                                className="bg-white text-black hover:bg-neutral-200 px-4 py-2 rounded-md text-sm font-medium"
                             >
-                                Dashboard
-                            </button>
-                        ) : (
-                            <div className="flex space-x-4">
-                                <Link to="/login" className="text-neutral-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</Link>
-                                <Link
-                                    to="/register"
-                                    className="bg-white text-black hover:bg-neutral-200 px-4 py-2 rounded-md text-sm font-medium"
-                                >
-                                    Get Started
-                                </Link>
-                            </div>
-                        )}
+                                Get Started
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

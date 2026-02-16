@@ -3,7 +3,6 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import HomePage from '../pages/marketing/HomePage';
 import IndustryPage from '../pages/marketing/IndustryPage';
 import PricingPage from '../pages/PricingPage';
-import ROICalculatorPage from '../pages/ROICalculatorPage';
 import JoinTeamPage from '../pages/JoinTeamPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
@@ -15,7 +14,6 @@ const MarketingRouter: React.FC = () => {
             <Route path="/solutions/:industry" element={<IndustryPage />} />
             <Route path="/solutions" element={<Navigate to="/" replace />} />
             <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/roi-calculator" element={<ROICalculatorPage />} />
             <Route path="/join/:token" element={<JoinTeamPage />} />
 
             {/* Auth Routes - Public but often entry points to App */}

@@ -14,14 +14,7 @@ export enum ModuleId {
     BILLING = 'BILLING',
     SUBSCRIPTION = 'SUBSCRIPTION',
     ORGANIZATION = 'ORGANIZATION',
-    TEAM = 'TEAM',
-
-    // Experimental / Deprecated (Inactive by default)
-    OPS = 'OPS',
-    INTEGRATION = 'INTEGRATION',
-    SECURITY = 'SECURITY',
-    COMPLIANCE = 'COMPLIANCE',
-    TRAJECTORY = 'TRAJECTORY'
+    TEAM = 'TEAM'
 }
 
 // Module definitions
@@ -30,7 +23,6 @@ export const MODULE_REGISTRY = {
     [ModuleId.USER]: () => import('../modules/user/user.module'),
     [ModuleId.ACTION]: () => import('../modules/actions/action.module'),
     [ModuleId.GOAL]: () => import('../modules/goals/goal.module'),
-    // ... other modules would be registered here as factories
 };
 
 export const ACTIVE_MODULES: ModuleId[] = [

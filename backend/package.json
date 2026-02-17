@@ -36,6 +36,7 @@
     "node-cron": "^4.2.1",
     "otplib": "^13.3.0",
     "qrcode": "^1.5.4",
+    "razorpay": "^2.9.6",
     "reflect-metadata": "^0.2.2",
     "socket.io": "^4.8.3",
     "stripe": "^20.3.1",

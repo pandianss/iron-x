@@ -335,6 +335,9 @@ model Subscription {
   grace_period_until DateTime?
   stripe_customer_id String?       @unique
   stripe_subscription_id String?   @unique
+  razorpay_customer_id String?     @unique
+  razorpay_subscription_id String? @unique
+  razorpay_order_id String?        @unique
   metadata        String? // JSON for payment/cust_id
   created_at      DateTime         @default(now())
   updated_at      DateTime         @updatedAt

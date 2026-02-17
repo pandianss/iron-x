@@ -22,6 +22,16 @@ export const BillingClient = {
         return response.data;
     },
 
+    createRazorpaySubscription: async (planId: string) => {
+        const response = await api.post('/razorpay/subscribe', { planId });
+        return response.data;
+    },
+
+    verifyRazorpayPayment: async (paymentResponse: any) => {
+        const response = await api.post('/razorpay/verify', paymentResponse);
+        return response.data;
+    },
+
     getSubscription: async (): Promise<Subscription> => {
         // Currently only supports getting own subscription
         const response = await api.get('/subscription/me');

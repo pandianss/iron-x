@@ -7,6 +7,7 @@ import { container } from 'tsyringe';
 import prisma from './db';
 import authRoutes from './modules/auth/auth.routes';
 import stripeRoutes from './modules/billing/stripe.routes';
+import razorpayRoutes from './modules/billing/razorpay.routes';
 import userRoutes from './modules/user/user.routes';
 import adminRoutes from './routes/v1/adminRoutes';
 import teamRoutes from './modules/team/team.routes';
@@ -166,6 +167,7 @@ app.use('/api/v1', v1Router);
 
 // Stripe routes (can be outside v1Router if they have a different base path or specific middleware needs)
 app.use('/api/v1/billing', stripeRoutes);
+app.use('/api/v1/razorpay', razorpayRoutes);
 
 // Create HTTP server
 import { createServer } from 'http';

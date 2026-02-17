@@ -83,7 +83,7 @@ const MarketingFooter: React.FC = () => {
     );
 };
 
-const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export default function MarketingLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-black text-white selection:bg-iron-500 selection:text-white font-mono">
             <MarketingNavbar />
@@ -95,4 +95,3 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
     );
 };
 
-export default MarketingLayout;

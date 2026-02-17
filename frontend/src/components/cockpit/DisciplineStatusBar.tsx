@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDiscipline } from '../../hooks/useDiscipline';
 import { AuthClient } from '../../domain/auth';
 import { UserPlus } from 'lucide-react';
@@ -20,7 +20,7 @@ interface UserProfile {
     }>;
 }
 
-export const DisciplineStatusBar: React.FC = () => {
+export function DisciplineStatusBar() {
     const { state } = useDiscipline();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
 interface FeedbackProps {
@@ -6,7 +6,7 @@ interface FeedbackProps {
     onClose: () => void;
 }
 
-const ExecutionFeedbackPanel: React.FC<FeedbackProps> = ({ status, onClose }) => {
+export default function ExecutionFeedbackPanel({ status, onClose }: FeedbackProps) {
     const [visible, setVisible] = useState(true);
 
     useEffect(() => {
@@ -56,6 +56,4 @@ const ExecutionFeedbackPanel: React.FC<FeedbackProps> = ({ status, onClose }) =>
             <div className="absolute top-0 left-0 w-1 h-full bg-green-900/50"></div>
         </div>
     );
-};
-
-export default ExecutionFeedbackPanel;
+}

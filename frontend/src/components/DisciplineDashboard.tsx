@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnalyticsClient } from '../domain/analytics';
 import DisciplineIdentityCard from './DisciplineIdentityCard';
 import DisciplineTrajectoryGraph from './DisciplineTrajectoryGraph';
@@ -12,7 +12,7 @@ interface DashboardData {
     todayStats: { executed: number; missed: number };
 }
 
-const DisciplineDashboard: React.FC = () => {
+export default function DisciplineDashboard() {
     const [stats, setStats] = useState<DashboardData['todayStats'] | null>(null);
 
     useEffect(() => {
@@ -59,6 +59,5 @@ const DisciplineDashboard: React.FC = () => {
             <DisciplineTrajectoryGraph />
         </div>
     );
-};
+}
 
-export default DisciplineDashboard;

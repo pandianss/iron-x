@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DisciplineClient, type Warning } from '../../domain/discipline';
 import { AnalyticsClient } from '../../domain/analytics';
 import { TrendingDown, CheckCircle, AlertTriangle } from 'lucide-react';
 
-export const ViolationHorizon: React.FC = () => {
+export function ViolationHorizon() {
     const [warnings, setWarnings] = useState<Warning[]>([]);
     const [projections, setProjections] = useState<unknown>(null);
 

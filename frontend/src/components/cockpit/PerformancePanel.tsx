@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AuditLog } from './AuditLog';
-import { TeamVelocityChart } from '../analytics/TeamVelocityChart';
+import TeamVelocityChart from '../analytics/TeamVelocityChart';
 import { BarChart2, List } from 'lucide-react';
 
-export const PerformancePanel: React.FC = () => {
+export function PerformancePanel() {
     const [activeTab, setActiveTab] = useState<'audit' | 'velocity'>('audit');
 
     return (

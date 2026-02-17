@@ -9,12 +9,12 @@ import SecuritySettingsPage from '../pages/SecuritySettingsPage';
 import OrganizationDashboardPage from '../pages/OrganizationDashboardPage';
 import BillingPortalPage from '../pages/BillingPortalPage';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { isAuthenticated } = useAuth();
     return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
-const AppRouter: React.FC = () => {
+const AppRouter = () => {
     return (
         <Routes>
             <Route

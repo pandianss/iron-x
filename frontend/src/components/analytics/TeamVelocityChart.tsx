@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { TeamClient } from '../../domain/team';
 import { AuthClient } from '../../domain/auth';
@@ -19,7 +19,11 @@ interface TeamMember {
     };
 }
 
-export const TeamVelocityChart: React.FC = () => {
+interface TeamVelocityChartProps {
+    teamId?: string;
+}
+
+export default function TeamVelocityChart({ teamId: _teamId }: TeamVelocityChartProps) {
     const [data, setData] = useState<VelocityPoint[]>([]);
     const [loading, setLoading] = useState(true);
 

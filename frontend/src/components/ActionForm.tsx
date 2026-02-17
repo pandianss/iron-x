@@ -6,7 +6,7 @@ interface ActionFormProps {
     onActionCreated: () => void;
 }
 
-const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
+export default function ActionForm({ onActionCreated }: ActionFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [goalId, setGoalId] = useState('');
@@ -152,4 +152,3 @@ const ActionForm: React.FC<ActionFormProps> = ({ onActionCreated }) => {
     );
 };
 
-export default ActionForm;

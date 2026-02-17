@@ -3,8 +3,7 @@ import { TrajectoryClient, type TomorrowPreviewData, type Warning } from '../dom
 import { Calendar, AlertTriangle, CheckCircle, Info, Siren } from 'lucide-react';
 import { useDiscipline } from '../hooks/useDiscipline';
 
-
-const TomorrowPreview: React.FC = () => {
+export default function TomorrowPreview() {
     const { refreshTrigger } = useDiscipline();
     const [data, setData] = useState<TomorrowPreviewData | null>(null);
     const [warnings, setWarnings] = useState<Warning[]>([]);
@@ -86,4 +85,3 @@ const TomorrowPreview: React.FC = () => {
     );
 };
 
-export default TomorrowPreview;

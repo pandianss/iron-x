@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AnalyticsClient } from '../../domain/analytics';
 import { Play, RotateCcw, TrendingUp, TrendingDown, Target } from 'lucide-react';
 
-export const StrategySandbox: React.FC = () => {
+export function StrategySandbox() {
     const [type, setType] = useState<'ADHERENCE_BOOST' | 'BUFFER_INCREASE' | 'STRICT_MODE_TOGGLE'>('ADHERENCE_BOOST');
     const [value, setValue] = useState(0.1);
     const [result, setResult] = useState<unknown>(null);

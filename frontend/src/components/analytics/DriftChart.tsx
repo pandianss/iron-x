@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AnalyticsClient } from '../../domain/analytics';
 
@@ -8,7 +8,11 @@ interface HistoryPoint {
     score: number;
 }
 
-export const DriftChart: React.FC = () => {
+interface DriftChartProps {
+    teamId?: string;
+}
+
+export default function DriftChart({ teamId: _teamId }: DriftChartProps) {
     const [data, setData] = useState<HistoryPoint[]>([]);
 
     useEffect(() => {

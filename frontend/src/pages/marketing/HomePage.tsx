@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import MarketingLayout from '../../components/marketing/MarketingLayout';
 import { Activity, Lock, Target, Server, FileText, ChevronRight, AlertCircle, Users } from 'lucide-react';
 
-const HomePage: React.FC = () => {
+const HomePage = () => {
     return (
         <MarketingLayout>
             {/* 1. HERO SECTION */}

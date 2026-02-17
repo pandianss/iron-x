@@ -3,7 +3,7 @@ import { AuthClient } from '../domain/auth';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 
-const LoginPage: React.FC = () => {
+export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -104,4 +104,3 @@ const LoginPage: React.FC = () => {
     );
 };
 
-export default LoginPage;

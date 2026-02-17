@@ -5,7 +5,7 @@ interface GoalFormProps {
     onGoalCreated: () => void;
 }
 
-const GoalForm: React.FC<GoalFormProps> = ({ onGoalCreated }) => {
+export default function GoalForm({ onGoalCreated }: GoalFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [deadline, setDeadline] = useState('');
@@ -81,4 +81,3 @@ const GoalForm: React.FC<GoalFormProps> = ({ onGoalCreated }) => {
     );
 };
 
-export default GoalForm;

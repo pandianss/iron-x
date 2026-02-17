@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DisciplineClient, type ConstraintsData } from '../../domain/discipline';
 import { useDiscipline } from '../../hooks/useDiscipline';
 
-export const ActiveControlsPanel: React.FC = () => {
+export function ActiveControlsPanel() {
     const { refreshTrigger } = useDiscipline();
     const [data, setData] = useState<ConstraintsData | null>(null);
 

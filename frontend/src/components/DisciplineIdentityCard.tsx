@@ -1,7 +1,6 @@
-import React from 'react';
 import { useDiscipline } from '../hooks/useDiscipline';
 
-const DisciplineIdentityCard: React.FC = () => {
+export default function DisciplineIdentityCard() {
     const { identity: data, loading } = useDiscipline();
 
     if (loading) return <div className="animate-pulse h-32 bg-iron-900/20 border border-iron-900"></div>;
@@ -41,6 +40,5 @@ const DisciplineIdentityCard: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
-export default DisciplineIdentityCard;

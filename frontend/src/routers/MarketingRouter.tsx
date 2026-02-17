@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import HomePage from '../pages/marketing/HomePage';
 import IndustryPage from '../pages/marketing/IndustryPage';
@@ -7,7 +6,7 @@ import JoinTeamPage from '../pages/JoinTeamPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 
-const MarketingRouter: React.FC = () => {
+const MarketingRouter = () => {
     return (
         <Routes>
             <Route path="/" element={<HomePage />} />

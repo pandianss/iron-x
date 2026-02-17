@@ -1,4 +1,3 @@
-import React from 'react';
 import { DisciplineStatusBar } from '../components/cockpit/DisciplineStatusBar';
 import { PressureDriftPanel } from '../components/cockpit/PressureDriftPanel';
 import { ActiveControlsPanel } from '../components/cockpit/ActiveControlsPanel';
@@ -7,7 +6,7 @@ import { PerformancePanel } from '../components/cockpit/PerformancePanel';
 import { StrategySandbox } from '../components/cockpit/StrategySandbox';
 import { useDiscipline } from '../hooks/useDiscipline';
 
-const CockpitPage: React.FC = () => {
+export default function CockpitPage() {
     const { state } = useDiscipline();
 
     // Determine lockout state
@@ -106,4 +105,3 @@ const CockpitPage: React.FC = () => {
     );
 };
 
-export default CockpitPage;

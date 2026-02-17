@@ -5,7 +5,7 @@ import { OrganizationClient } from '../domain/organization';
 import { IntegrationClient } from '../domain/integration';
 import { AnalyticsClient } from '../domain/analytics';
 
-const OrganizationDashboardPage: React.FC = () => {
+export default function OrganizationDashboardPage() {
     const { slug } = useParams<{ slug: string }>();
     const [org, setOrg] = useState<any>(null);
     const [stats, setStats] = useState<any>(null);
@@ -250,4 +250,3 @@ const OrganizationDashboardPage: React.FC = () => {
     );
 };
 
-export default OrganizationDashboardPage;

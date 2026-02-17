@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScheduleClient, type ScheduledItem } from '../domain/schedule';
 import { useAuth } from '../hooks/useAuth';
 import { useDiscipline } from '../hooks/useDiscipline';
@@ -9,7 +9,7 @@ import AttentionDensityStrip from '../components/AttentionDensityStrip';
 import WeeklyReportModal from '../components/WeeklyReportModal';
 import { BookOpen } from 'lucide-react';
 
-const DashboardPage: React.FC = () => {
+export default function DashboardPage() {
     const { token, logout, user } = useAuth();
     const { refresh: refreshDiscipline } = useDiscipline();
     const [instances, setInstances] = useState<ScheduledItem[]>([]);
@@ -184,4 +184,3 @@ const DashboardPage: React.FC = () => {
     );
 };
 
-export default DashboardPage;

@@ -6,7 +6,7 @@ interface GoalListProps {
     refreshTrigger: number;
 }
 
-const GoalList: React.FC<GoalListProps> = ({ refreshTrigger }) => {
+export default function GoalList({ refreshTrigger }: GoalListProps) {
     const [goals, setGoals] = useState<Goal[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -60,4 +60,3 @@ const GoalList: React.FC<GoalListProps> = ({ refreshTrigger }) => {
     );
 };
 
-export default GoalList;

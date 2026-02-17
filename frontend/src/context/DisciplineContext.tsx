@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { DisciplineClient, type DisciplineState } from '../domain/discipline';
 import { TrajectoryClient, type TrajectoryIdentity } from '../domain/trajectory';
 import { SocketClient } from '../domain/socket';
 import { useAuth } from '../hooks/useAuth';
 import { DisciplineContext } from './DisciplineContextInstance';
 
-export const DisciplineProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DisciplineProvider = ({ children }: { children: React.ReactNode }) => {
     const { token } = useAuth();
     const [state, setState] = useState<DisciplineState | null>(null);
     const [identity, setIdentity] = useState<TrajectoryIdentity | null>(null);

@@ -9,7 +9,7 @@ interface InviteMemberModalProps {
     teamId: string; // We need teamId to invite
 }
 
-const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ isOpen, onClose, teamId }) => {
+export default function InviteMemberModal({ isOpen, onClose, teamId }: InviteMemberModalProps) {
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('MEMBER');
     const [loading, setLoading] = useState(false);
@@ -110,4 +110,3 @@ const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ isOpen, onClose, 
     );
 };
 
-export default InviteMemberModal;

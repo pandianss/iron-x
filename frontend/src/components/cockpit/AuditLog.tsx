@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DisciplineClient, type AuditEntry } from '../../domain/discipline';
 
-export const AuditLog: React.FC = () => {
+export function AuditLog() {
     const [history, setHistory] = useState<AuditEntry[]>([]);
 
     useEffect(() => {

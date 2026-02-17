@@ -1,11 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { TeamClient } from '../domain/team';
 import { CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
-const JoinTeamPage: React.FC = () => {
+export default function JoinTeamPage() {
     const { token } = useParams<{ token: string }>();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
@@ -98,4 +98,3 @@ const JoinTeamPage: React.FC = () => {
     );
 };
 
-export default JoinTeamPage;

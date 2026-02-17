@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ActionForm from '../components/ActionForm';
 import ActionList from '../components/ActionList';
 
-const ActionsPage: React.FC = () => {
+export default function ActionsPage() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     return (
@@ -21,4 +21,3 @@ const ActionsPage: React.FC = () => {
     );
 };
 
-export default ActionsPage;

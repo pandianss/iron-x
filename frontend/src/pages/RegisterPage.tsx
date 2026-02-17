@@ -3,7 +3,7 @@ import { AuthClient } from '../domain/auth';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 
-const RegisterPage: React.FC = () => {
+export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [timezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -120,4 +120,3 @@ const RegisterPage: React.FC = () => {
     );
 };
 
-export default RegisterPage;

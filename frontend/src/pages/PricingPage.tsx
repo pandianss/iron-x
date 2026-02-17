@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-const PricingPage: React.FC = () => {
+export default function PricingPage() {
     const [currentTier, setCurrentTier] = useState<string>('FREE');
     const navigate = useNavigate();
 
@@ -186,4 +186,3 @@ const PricingPage: React.FC = () => {
     );
 };
 
-export default PricingPage;

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
 import { AuthContext, type User } from './AuthContextInstance';
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [isInitialized, setIsInitialized] = useState(false);

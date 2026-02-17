@@ -1,9 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DisciplineClient, type PressureData } from '../../domain/discipline';
-import { DriftChart } from '../analytics/DriftChart';
+import DriftChart from '../analytics/DriftChart';
 
-export const PressureDriftPanel: React.FC = () => {
+export function PressureDriftPanel() {
     const [data, setData] = useState<PressureData | null>(null);
 
     useEffect(() => {

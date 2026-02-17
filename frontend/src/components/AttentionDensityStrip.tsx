@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Shield, AlertCircle, Activity, Zap } from 'lucide-react';
 
 interface DensityData {
@@ -7,13 +7,12 @@ interface DensityData {
     trend: 'stable' | 'volatile';
 }
 
-const AttentionDensityStrip: React.FC = () => {
+
+export default function AttentionDensityStrip() {
     const [data, setData] = useState<DensityData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simplified fetching - in a real app this might hit a separate analytics endpoint
-        // For Phase 3.5, we mock or use existing analytics if available
         const fetchData = async () => {
             try {
                 // Simulating a fetch delay
@@ -66,6 +65,5 @@ const AttentionDensityStrip: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
-export default AttentionDensityStrip;

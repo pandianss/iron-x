@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SecurityClient } from '../domain/security';
 import { AuthClient } from '../domain/auth';
 
-const SecuritySettingsPage: React.FC = () => {
+export default function SecuritySettingsPage() {
     const [mfaEnabled, setMfaEnabled] = useState(false);
     const [qrCode, setQrCode] = useState('');
     const [secret, setSecret] = useState('');
@@ -281,4 +281,3 @@ const SecuritySettingsPage: React.FC = () => {
     );
 };
 
-export default SecuritySettingsPage;

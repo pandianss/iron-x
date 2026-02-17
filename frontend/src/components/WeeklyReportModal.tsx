@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnalyticsClient } from '../domain/analytics';
 import { X, Activity, AlertCircle } from 'lucide-react';
 
@@ -16,7 +16,7 @@ interface WeeklyReportModalProps {
     onClose: () => void;
 }
 
-const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }) => {
+export default function WeeklyReportModal({ isOpen, onClose }: WeeklyReportModalProps) {
     const [data, setData] = useState<WeeklyReportData | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -121,4 +121,3 @@ const WeeklyReportModal: React.FC<WeeklyReportModalProps> = ({ isOpen, onClose }
     );
 };
 
-export default WeeklyReportModal;

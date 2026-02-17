@@ -5,7 +5,7 @@ interface ActionListProps {
     refreshTrigger: number;
 }
 
-const ActionList: React.FC<ActionListProps> = ({ refreshTrigger }) => {
+export default function ActionList({ refreshTrigger }: ActionListProps) {
     const [actions, setActions] = useState<Action[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -54,4 +54,3 @@ const ActionList: React.FC<ActionListProps> = ({ refreshTrigger }) => {
     );
 };
 
-export default ActionList;

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import GoalForm from '../components/GoalForm';
 import GoalList from '../components/GoalList';
 
-const GoalsPage: React.FC = () => {
+export default function GoalsPage() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const handleGoalCreated = () => {
@@ -25,4 +25,3 @@ const GoalsPage: React.FC = () => {
     );
 };
 
-export default GoalsPage;

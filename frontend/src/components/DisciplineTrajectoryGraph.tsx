@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTrajectoryHistory, useTrajectoryProjection } from '../hooks/useTrajectory';
 import { useDiscipline } from '../hooks/useDiscipline';
 
-const DisciplineTrajectoryGraph: React.FC = () => {
+export default function DisciplineTrajectoryGraph() {
     const { refreshTrigger } = useDiscipline();
     const [days, setDays] = useState(30);
     const { data, loading: historyLoading, error: historyError } = useTrajectoryHistory(days, refreshTrigger);
@@ -150,6 +150,5 @@ const DisciplineTrajectoryGraph: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
-export default DisciplineTrajectoryGraph;

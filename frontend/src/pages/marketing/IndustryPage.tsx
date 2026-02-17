@@ -50,7 +50,7 @@ const INDUSTRIES: Record<string, {
     }
 };
 
-const IndustryPage: React.FC = () => {
+const IndustryPage = () => {
     const { industry } = useParams<{ industry: string }>();
     const data = INDUSTRIES[industry?.toLowerCase() || ''];
 

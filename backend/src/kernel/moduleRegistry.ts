@@ -17,13 +17,8 @@ export enum ModuleId {
     TEAM = 'TEAM'
 }
 
-// Module definitions
-export const MODULE_REGISTRY = {
-    [ModuleId.AUTH]: () => import('../modules/auth/auth.module'),
-    [ModuleId.USER]: () => import('../modules/user/user.module'),
-    [ModuleId.ACTION]: () => import('../modules/actions/action.module'),
-    [ModuleId.GOAL]: () => import('../modules/goals/goal.module'),
-};
+// Module definitions - lazy factories will be added here as modules are formalized
+export const MODULE_REGISTRY = {};
 
 export const ACTIVE_MODULES: ModuleId[] = [
     ModuleId.AUTH,

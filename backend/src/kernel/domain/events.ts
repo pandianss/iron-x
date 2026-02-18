@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { UserId, InstanceId, PolicyId, DomainEventType } from './types';
+export { DomainEventType };
 
 
 export interface DomainEvent {

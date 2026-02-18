@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { singleton, inject } from 'tsyringe';
-import { SecurityService } from '../_experimental/security/security.service';
+import { SecurityService } from './security.service';
 import prisma from '../../db';
 import { AuthRequest } from '../../middleware/authMiddleware';
 import { AppError } from '../../utils/AppError';

@@ -2,7 +2,7 @@ import { singleton, inject } from 'tsyringe';
 import prisma from '../../db';
 import { hashPassword, comparePassword, generateToken } from '../../utils/auth';
 import { AppError } from '../../utils/AppError';
-import { SecurityService } from '../_experimental/security/security.service';
+import { SecurityService } from './security.service';
 
 @singleton()
 export class AuthService {

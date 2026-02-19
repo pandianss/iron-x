@@ -14,7 +14,14 @@ export enum ModuleId {
     BILLING = 'BILLING',
     SUBSCRIPTION = 'SUBSCRIPTION',
     ORGANIZATION = 'ORGANIZATION',
-    TEAM = 'TEAM'
+    TEAM = 'TEAM',
+
+    // Experimental/Placeholder (to resolve build errors)
+    OPS = 'OPS',
+    INTEGRATION = 'INTEGRATION',
+    SECURITY = 'SECURITY',
+    COMPLIANCE = 'COMPLIANCE',
+    TRAJECTORY = 'TRAJECTORY'
 }
 
 // Module definitions - lazy factories will be added here as modules are formalized

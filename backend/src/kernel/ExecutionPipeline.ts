@@ -7,7 +7,31 @@ export class ExecutionPipeline {
     constructor(private policyEvaluator: PolicyEvaluator) { }
 
     async detectViolations(context: DisciplineContext) {
-        // Future: Check for late execution or other policy violations
+        // Late Execution detection
+        const { rules, mode } = await this.policyEvaluator.evaluate(context);
+
+        const lateInstances = context.instances.filter(instance => {
+            if (instance.status === 'COMPLETED' && instance.executed_at && instance.scheduled_end_time) {
+                // If it was completed after the scheduled end time, it counts as a late execution violation
+                return instance.executed_at > instance.scheduled_end_time;
+            }
+            return false;
+        });
+
+        for (const instance of lateInstances) {
+            Logger.info(`[Kernel] Violation detected for ${context.userId}: LATE_EXECUTION action ${instance.instance_id}`);
+
+            domainEvents.emit(DomainEventType.VIOLATION_DETECTED, {
+                type: DomainEventType.VIOLATION_DETECTED,
+                timestamp: new Date(),
+                userId: context.userId,
+                payload: {
+                    instanceId: instance.instance_id,
+                    reason: 'LATE_EXECUTION',
+                    policyId: mode // 'HARD' or 'SOFT' acting as pseudo-policy ID for now
+                }
+            });
+        }
     }
 
     async handleViolations(userId: UserId, violations: string[], context: DisciplineContext) {

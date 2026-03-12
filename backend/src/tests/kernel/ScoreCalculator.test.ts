@@ -15,12 +15,28 @@ jest.mock('../../kernel/domain/events', () => ({
     }
 }));
 
+// Mock DB locally
+jest.mock('../../db', () => ({
+    __esModule: true,
+    default: {
+        disciplineScore: {
+            upsert: jest.fn(),
+        },
+        user: {
+            update: jest.fn(),
+        }
+    }
+}));
+import prisma from '../../db';
+
 describe('ScoreCalculator', () => {
     let calculator: ScoreCalculator;
 
     beforeEach(() => {
         calculator = new ScoreCalculator();
         mockEmit.mockClear();
+        (prisma.disciplineScore.upsert as jest.Mock).mockClear();
+        (prisma.user.update as jest.Mock).mockClear();
     });
 
     it('should return 50 if no instances exist', async () => {
@@ -37,6 +53,10 @@ describe('ScoreCalculator', () => {
         const context = TestFactory.createContext({ instances } as any);
         const score = await calculator.compute(context as any);
         expect(score).toBe(100);
+
+        // Verify Prisma calls
+        expect(prisma.disciplineScore.upsert).toHaveBeenCalledTimes(1);
+        expect(prisma.user.update).toHaveBeenCalledTimes(1);
     });
 
     it('should return 0 if all instances are MISSED', async () => {

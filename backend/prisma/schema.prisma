@@ -11,7 +11,8 @@ datasource db {
 model User {
   user_id                  String   @id @default(uuid())
   email                    String   @unique
-  password_hash            String
+  firebase_uid             String?  @unique
+  password_hash            String?
   timezone                 String
   current_discipline_score Int      @default(0)
   created_at               DateTime @default(now())
@@ -32,9 +33,14 @@ model User {
   // Phase 3.5: Experience Hardening
   discipline_classification   String   @default("UNRELIABLE") // 'UNRELIABLE', 'RECOVERING', 'STABLE', 'HIGH_RELIABILITY'
   classification_last_updated DateTime @default(now())
+  trust_tier                  String   @default("PROVISIONAL") // 'PROVISIONAL', 'STANDARD', 'TRUSTED', 'AUTONOMOUS'
+  public_score_enabled        Boolean  @default(false)
 
   audit_logs_actor  AuditLog[] @relation("AuditLogActor")
   audit_logs_target AuditLog[] @relation("AuditLogTarget")
+
+  witnessed_actions Action[]              @relation("ActionWitness")
+  witness_notifs    WitnessNotification[]
 
   outcomes Outcome[]
 
@@ -49,6 +55,8 @@ model User {
 
   org_id       String?
   organization Organization? @relation("OrgUsers", fields: [org_id], references: [org_id])
+
+  drift_analyses DriftAnalysis[]
 
   @@map("users")
 }
@@ -70,11 +78,11 @@ model Team {
   enforcement_policy String? // JSON or Config ID
   sso_config_id      String? @unique
 
-  sso_config SSOConfig? @relation(fields: [sso_config_id], references: [config_id])
-  outcomes   Outcome[]
+  sso_config  SSOConfig?       @relation(fields: [sso_config_id], references: [config_id])
+  outcomes    Outcome[]
+  invitations TeamInvitation[]
 
   @@map("teams")
-  invitations TeamInvitation[]
 }
 
 model Organization {
@@ -83,9 +91,9 @@ model Organization {
   slug       String   @unique
   created_at DateTime @default(now())
 
-  teams    Team[]
-  users    User[]          @relation("OrgUsers")
-  policies OrgPolicy[]
+  teams        Team[]
+  users        User[]        @relation("OrgUsers")
+  policies     OrgPolicy[]
   subscription Subscription?
 
   webhooks Webhook[]
@@ -98,8 +106,8 @@ model Webhook {
   webhook_id String   @id @default(uuid())
   org_id     String
   url        String
-  secret     String?  // For signing payloads
-  events     String   // Comma-separated list of events: 'violation.locked', 'goal.completed'
+  secret     String? // For signing payloads
+  events     String // Comma-separated list of events: 'violation.locked', 'goal.completed'
   is_active  Boolean  @default(true)
   created_at DateTime @default(now())
 
@@ -123,16 +131,16 @@ model ApiKey {
 }
 
 model OrgPolicy {
-  policy_id   String   @id @default(uuid())
-  org_id      String
+  policy_id    String       @id @default(uuid())
+  org_id       String
   organization Organization @relation(fields: [org_id], references: [org_id])
 
-  rule_name   String   // e.g., 'MIN_DISCIPLINE_SCORE'
-  rule_value  String
+  rule_name    String // e.g., 'MIN_DISCIPLINE_SCORE'
+  rule_value   String
   is_mandatory Boolean @default(false)
 
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("org_policies")
 }
@@ -208,10 +216,12 @@ model Action {
   window_start_time       DateTime
   window_duration_minutes Int
   is_strict               Boolean  @default(true)
+  witness_user_id         String?
   created_at              DateTime @default(now())
 
-  user User? @relation(fields: [user_id], references: [user_id])
-  goal Goal? @relation(fields: [goal_id], references: [goal_id])
+  user    User? @relation(fields: [user_id], references: [user_id])
+  witness User? @relation("ActionWitness", fields: [witness_user_id], references: [user_id])
+  goal    Goal? @relation(fields: [goal_id], references: [goal_id])
 
   intentions  ImplementationIntention[]
   instances   ActionInstance[]
@@ -248,6 +258,7 @@ model ActionInstance {
   prompts Prompt[]
 
   linked_outcomes OutcomeActionLink[]
+  witness_notifs  WitnessNotification[]
 
   @@map("action_instances")
 }
@@ -324,23 +335,23 @@ enum SubscriptionTier {
 }
 
 model Subscription {
-  subscription_id String           @id @default(uuid())
-  user_id         String?          @unique
-  org_id          String?          @unique
-  plan_tier       SubscriptionTier @default(FREE)
-  start_date      DateTime         @default(now())
-  end_date        DateTime?
-  is_active       Boolean          @default(true)
-  is_locked       Boolean          @default(false)
-  grace_period_until DateTime?
-  stripe_customer_id String?       @unique
-  stripe_subscription_id String?   @unique
-  razorpay_customer_id String?     @unique
-  razorpay_subscription_id String? @unique
-  razorpay_order_id String?        @unique
-  metadata        String? // JSON for payment/cust_id
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @updatedAt
+  subscription_id          String           @id @default(uuid())
+  user_id                  String?          @unique
+  org_id                   String?          @unique
+  plan_tier                SubscriptionTier @default(FREE)
+  start_date               DateTime         @default(now())
+  end_date                 DateTime?
+  is_active                Boolean          @default(true)
+  is_locked                Boolean          @default(false)
+  grace_period_until       DateTime?
+  stripe_customer_id       String?          @unique
+  stripe_subscription_id   String?          @unique
+  razorpay_customer_id     String?          @unique
+  razorpay_subscription_id String?          @unique
+  razorpay_order_id        String?          @unique
+  metadata                 String? // JSON for payment/cust_id
+  created_at               DateTime         @default(now())
+  updated_at               DateTime         @updatedAt
 
   user         User?         @relation(fields: [user_id], references: [user_id])
   organization Organization? @relation(fields: [org_id], references: [org_id])
@@ -487,4 +498,32 @@ model ControlMapping {
   system_config SystemConfig? @relation(fields: [system_config_key], references: [config_key])
 
   @@map("control_mappings")
+}
+
+model WitnessNotification {
+  notif_id   String   @id @default(uuid())
+  action_id  String
+  witness_id String
+  event      String // 'MISS', 'COMPLETED', 'LOCKOUT'
+  sent_at    DateTime @default(now())
+
+  action  ActionInstance @relation(fields: [action_id], references: [instance_id])
+  witness User           @relation(fields: [witness_id], references: [user_id])
+
+  @@map("witness_notifications")
+}
+
+model DriftAnalysis {
+  analysis_id              String   @id @default(uuid())
+  user_id                  String
+  primary_drift_pattern    String
+  root_cause_suggestion    String
+  recommended_adjustment   String
+  projected_score_recovery Float
+  confidence_level         String // 'LOW', 'MED', 'HIGH'
+  created_at               DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+
+  @@map("drift_analyses")
 }

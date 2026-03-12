@@ -28,9 +28,8 @@ export class DisciplineEngine {
         context.traceId = contextParams.traceId;
         context.timestamp = contextParams.timestamp;
 
-        // FREEZE CONTEXT to prevent shared mutable state issues in workers
-        // Shallow freeze sufficient for now
-        Object.freeze(context);
+        // Do not freeze context here, as it needs to track missed instance updates.
+        // Or if we must restrict it, do it later or provide a fresh context for scoring.
 
         const durationLifecycle = Date.now() - startLifecycle;
 
@@ -51,9 +50,14 @@ export class DisciplineEngine {
         await this.pipeline.detectViolations(context);
         const durationPipeline = Date.now() - startPipeline;
 
+        // Reload updated instances from DB so scoring uses correct current statuses
+        const freshContext = await this.lifecycle.loadContext(contextParams.userId);
+        freshContext.traceId = contextParams.traceId;
+        freshContext.timestamp = contextParams.timestamp;
+
         // 4. Compute Score (Pure)
         const startScoring = Date.now();
-        const score = await this.calculator.compute(context);
+        const score = await this.calculator.compute(freshContext);
         const durationScoring = Date.now() - startScoring;
 
         // 5. Apply Policy Enforcement (Phase 2)

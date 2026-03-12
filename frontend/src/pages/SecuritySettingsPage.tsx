@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { SecurityClient } from '../domain/security';
 import { AuthClient } from '../domain/auth';
 

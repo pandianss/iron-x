@@ -1,7 +1,7 @@
-
 import { DisciplineContext } from './domain/types';
 import { domainEvents, DomainEventType } from './domain/events';
 import { ScoringPolicy } from './policies/ScoringPolicy';
+import prisma from '../db';
 
 export class ScoreCalculator {
     async compute(context: DisciplineContext): Promise<number> {
@@ -24,6 +24,52 @@ export class ScoreCalculator {
                 }
             });
         }
+
+        // Persist score
+        const now = new Date();
+        const dateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        let executionRate = 0;
+        let onTimeRate = 0;
+
+        if (instances && instances.length > 0) {
+            const total = instances.filter(i => i.status !== 'PENDING').length;
+            if (total > 0) {
+                const completed = instances.filter(i => i.status === 'COMPLETED').length;
+                executionRate = completed / total;
+                // Currently no explicit difference between COMPLETED and ON_TIME mapped in status here, 
+                // but setting base fallback properties
+                onTimeRate = executionRate;
+            }
+        }
+
+        await prisma.disciplineScore.upsert({
+            where: {
+                user_id_date: {
+                    user_id: userId,
+                    date: dateOnly
+                }
+            },
+            update: {
+                score,
+                execution_rate: executionRate,
+                on_time_rate: onTimeRate,
+                calculated_at: now
+            },
+            create: {
+                user_id: userId,
+                date: dateOnly,
+                score,
+                execution_rate: executionRate,
+                on_time_rate: onTimeRate,
+                calculated_at: now
+            }
+        });
+
+        await prisma.user.update({
+            where: { user_id: userId },
+            data: { current_discipline_score: score }
+        });
 
         return score;
     }

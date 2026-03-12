@@ -1,5 +1,4 @@
-import React from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import DashboardPage from '../pages/DashboardPage';
 import CockpitPage from '../pages/CockpitPage';
@@ -9,73 +8,18 @@ import SecuritySettingsPage from '../pages/SecuritySettingsPage';
 import OrganizationDashboardPage from '../pages/OrganizationDashboardPage';
 import BillingPortalPage from '../pages/BillingPortalPage';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+export const ProtectedRoute = () => {
     const { isAuthenticated } = useAuth();
-    return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+    return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
-const AppRouter = () => {
-    return (
-        <Routes>
-            <Route
-                path="/dashboard"
-                element={
-                    <ProtectedRoute>
-                        <DashboardPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/cockpit"
-                element={
-                    <ProtectedRoute>
-                        <CockpitPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/goals"
-                element={
-                    <ProtectedRoute>
-                        <GoalsPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/actions"
-                element={
-                    <ProtectedRoute>
-                        <ActionsPage />
-                    </ProtectedRoute>
-                }
-            />
-            {/* /pricing moved to MarketingRouter */}
-            <Route
-                path="/security"
-                element={
-                    <ProtectedRoute>
-                        <SecuritySettingsPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/org/:slug"
-                element={
-                    <ProtectedRoute>
-                        <OrganizationDashboardPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/billing"
-                element={
-                    <ProtectedRoute>
-                        <BillingPortalPage />
-                    </ProtectedRoute>
-                }
-            />
-        </Routes>
-    );
+// Individual page exports for use in App.tsx flat routing
+export {
+    DashboardPage,
+    CockpitPage,
+    GoalsPage,
+    ActionsPage,
+    SecuritySettingsPage,
+    OrganizationDashboardPage,
+    BillingPortalPage,
 };
-
-export default AppRouter;

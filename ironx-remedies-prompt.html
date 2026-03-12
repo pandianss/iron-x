@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iron-X // Remediation Prompts</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2eb;
+    --bg2: #ede9e0;
+    --ink: #1a1814;
+    --ink-mid: #5a5650;
+    --ink-light: #9a9690;
+    --red: #c0392b;
+    --red-light: #f9eeec;
+    --amber: #d4820a;
+    --amber-light: #fdf4e3;
+    --green: #1a6640;
+    --green-light: #e8f4ee;
+    --rule: #d8d4cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Noise texture overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 40px 100px;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 12px;
+    animation: rise 0.5s ease both;
+  }
+
+  .brand {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+  }
+
+  .title {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-top: 8px;
+  }
+
+  .title em {
+    font-style: normal;
+    color: var(--red);
+  }
+
+  .issue-meta {
+    text-align: right;
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-light);
+    line-height: 2;
+  }
+
+  .tagline-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 48px;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    animation: rise 0.5s 0.05s ease both;
+  }
+
+  /* INTRO */
+  .intro {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 28px 32px;
+    margin-bottom: 48px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.85;
+    animation: rise 0.5s 0.1s ease both;
+    position: relative;
+  }
+
+  .intro::before {
+    content: 'SYSTEM PROMPT';
+    position: absolute;
+    top: -1px;
+    left: 32px;
+    background: var(--red);
+    color: white;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    padding: 3px 10px;
+    text-transform: uppercase;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+
+  .intro .hl { color: #ffd166; }
+  .intro .dim { color: #9a9688; }
+
+  /* CARDS */
+  .cards { display: flex; flex-direction: column; gap: 2px; }
+
+  .card {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    background: white;
+    border: 1px solid var(--rule);
+    overflow: hidden;
+    animation: rise 0.4s ease both;
+    transition: box-shadow 0.2s;
+  }
+
+  .card:hover { box-shadow: 4px 4px 0 var(--ink); }
+
+  .card:nth-child(1) { animation-delay: 0.12s; }
+  .card:nth-child(2) { animation-delay: 0.16s; }
+  .card:nth-child(3) { animation-delay: 0.20s; }
+  .card:nth-child(4) { animation-delay: 0.24s; }
+  .card:nth-child(5) { animation-delay: 0.28s; }
+  .card:nth-child(6) { animation-delay: 0.32s; }
+  .card:nth-child(7) { animation-delay: 0.36s; }
+  .card:nth-child(8) { animation-delay: 0.40s; }
+  .card:nth-child(9) { animation-delay: 0.44s; }
+
+  .card-index {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px 0 20px;
+    border-right: 1px solid var(--rule);
+  }
+
+  .card-num {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    margin-bottom: 6px;
+  }
+
+  .severity-pip {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .sev-critical .severity-pip { background: var(--red); }
+  .sev-high .severity-pip { background: var(--amber); }
+  .sev-growth .severity-pip { background: var(--green); }
+
+  .card-body { padding: 20px 24px; }
+
+  .card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .sev-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border: 1px solid;
+  }
+
+  .sev-critical .sev-label { color: var(--red); border-color: var(--red); background: var(--red-light); }
+  .sev-high .sev-label { color: var(--amber); border-color: var(--amber); background: var(--amber-light); }
+  .sev-growth .sev-label { color: var(--green); border-color: var(--green); background: var(--green-light); }
+
+  .problem-block {
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    line-height: 1.75;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+    padding-left: 12px;
+    border-left: 2px solid var(--rule);
+  }
+
+  .prompt-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 8px;
+  }
+
+  .prompt-text {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+    padding: 14px 16px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.85;
+    color: var(--ink);
+    white-space: pre-wrap;
+    position: relative;
+    cursor: pointer;
+    transition: border-left-color 0.15s;
+  }
+
+  .sev-critical .prompt-text { border-left-color: var(--red); }
+  .sev-high .prompt-text { border-left-color: var(--amber); }
+  .sev-growth .prompt-text { border-left-color: var(--green); }
+
+  .prompt-text:hover { background: var(--bg); }
+
+  .prompt-text .kw { font-weight: 700; }
+  .sev-critical .prompt-text .kw { color: var(--red); }
+  .sev-high .prompt-text .kw { color: var(--amber); }
+  .sev-growth .prompt-text .kw { color: var(--green); }
+
+  .copy-hint {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .prompt-text:hover .copy-hint { opacity: 1; }
+
+  .prompt-text.copied {
+    border-left-color: var(--green) !important;
+    background: var(--green-light);
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    margin: 40px 0 16px;
+    animation: rise 0.4s ease both;
+  }
+
+  .section-divider hr { border: none; border-top: 1px solid var(--rule); }
+
+  .section-divider span {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    white-space: nowrap;
+  }
+
+  /* MASTER PROMPT */
+  .master-block {
+    margin-top: 48px;
+    border: 2px solid var(--ink);
+    animation: rise 0.4s 0.5s ease both;
+  }
+
+  .master-header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .master-header span {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .master-body {
+    background: var(--bg2);
+    padding: 24px 28px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.9;
+    color: var(--ink);
+    white-space: pre-wrap;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .master-body:hover { background: var(--bg); }
+  .master-body.copied { background: var(--green-light); }
+
+  .master-body .s { color: var(--red); font-weight: 700; }
+  .master-body .g { color: var(--green); font-weight: 700; }
+  .master-body .h { color: var(--amber); font-weight: 700; }
+  .master-body .d { color: var(--ink-light); }
+
+  .copy-master {
+    position: absolute;
+    bottom: 14px;
+    right: 18px;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+  }
+
+  .copy-master:hover { background: var(--red); }
+  .copy-master.copied { background: var(--green); }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 32px 20px 60px; }
+    .title { font-size: 36px; }
+    .card { grid-template-columns: 1fr; }
+    .card-index { flex-direction: row; gap: 10px; padding: 12px 20px; border-right: none; border-bottom: 1px solid var(--rule); }
+    .masthead { grid-template-columns: 1fr; }
+    .issue-meta { text-align: left; margin-top: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div>
+      <div class="brand">Iron-X // Engineering Brief</div>
+      <div class="title">SHORTCOMINGS<br>&amp; <em>REMEDIES</em></div>
+    </div>
+    <div class="issue-meta">
+      <div>Compiled: 2026-02-27</div>
+      <div>Ref: IRON-X v2.1</div>
+      <div>9 Action Items</div>
+      <div>3 Priority Tiers</div>
+    </div>
+  </div>
+
+  <div class="tagline-bar">
+    <span>Click any prompt to copy it directly to clipboard</span>
+    <span>🔴 Critical &nbsp;·&nbsp; 🟡 High &nbsp;·&nbsp; 🟢 Growth</span>
+  </div>
+
+  <!-- INTRO PROMPT -->
+  <div class="intro">
+<span class="dim">// Pass this to your AI agent as the opening context block</span>
+
+You are a <span class="hl">senior full-stack engineer</span> working on Iron-X — a behavioural
+discipline enforcement platform built with Node.js/TypeScript, Prisma/PostgreSQL,
+and a React frontend. The system tracks user commitments, calculates a real-time
+Discipline Score (DS), and enforces hard lockouts on breach.
+
+Your task is to systematically address the following shortcomings. Work through
+them in priority order. For each item: <span class="hl">diagnose → implement → verify</span>.
+Write production-quality TypeScript. Do not leave stubs or TODOs.
+</div>
+
+  <!-- CRITICAL SECTION -->
+  <div class="section-divider" style="animation-delay:0.11s">
+    <hr/><span>🔴 Critical — Fix First</span><hr/>
+  </div>
+
+  <div class="cards" id="cards">
+
+    <!-- 1 -->
+    <div class="card sev-critical">
+      <div class="card-index">
+        <div class="card-num">01</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">DisciplineStateService — Incomplete Real-Data Queries</div>
+          <div class="sev-label">Critical</div>
+        </div>
+        <div class="problem-block">backend/src/services/disciplineState.service.ts exists but its methods return defaults or incomplete calculations. No real ActionInstance records are being queried. The frontend shows live-looking data that is entirely fictional.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Complete DisciplineStateService real-data implementation.</span>
+
+File: backend/src/services/disciplineState.service.ts
+
+Requirements:
+- getUserDisciplineState(userId) must query real ActionInstance records
+  from the last 30 days via Prisma
+- Calculate DS using: DS = (A_c / A_t) * 100 - (L_e * 0.5)
+- Derive classification: BREACH / DRIFTING / STABLE / HIGH_RELIABILITY
+  based on DS thresholds: <20, 20-49, 50-84, ≥85
+- Compute driftVectors: identify recurring miss patterns by day-of-week
+  and time-of-day from ActionInstance history
+- Compute violationHorizon: project days until DS hits 20 at current rate
+- Compute compositePressure: weighted aggregate of recent penalty events
+- All methods must be fully implemented — no placeholder returns
+
+Write the complete updated service file.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card sev-critical">
+      <div class="card-index">
+        <div class="card-num">02</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">Cron Job — Score Never Auto-Updates</div>
+          <div class="sev-label">Critical</div>
+        </div>
+        <div class="problem-block">current_discipline_score on the User model is never recalculated automatically. Enforcement only triggers if someone manually calls /discipline/refresh. Users can breach without the system knowing.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Implement hourly discipline score recalculation cron job.</span>
+
+File: backend/src/cron.ts (already exists — add to it)
+
+Requirements:
+- Schedule a job that runs every 60 minutes
+- For every user with at least one ActionInstance in the last 7 days:
+  1. Call DisciplineStateService.updateDisciplineScore(userId)
+  2. Update users.current_discipline_score in Postgres via Prisma
+  3. Update users.discipline_classification
+  4. If new DS crosses a lockout threshold, set users.locked_until
+     and users.enforcement_mode = 'HARD'
+  5. Emit a domain event: SCORE_UPDATED (already consumed by frontend
+     WebSocket via DisciplineSubscriber)
+- Log each recalculation with userId, old score, new score, delta
+- Handle errors per-user — one failure must not abort the batch
+
+Write the complete cron job implementation.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card sev-critical">
+      <div class="card-index">
+        <div class="card-num">03</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">Lockout Middleware — Not Live-Enforced</div>
+          <div class="sev-label">Critical</div>
+        </div>
+        <div class="problem-block">locked_until and enforcement_mode fields exist on User but policyEnforcementMiddleware does not check them on incoming requests. A locked user can still access the system freely.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Enforce lockout in policyEnforcementMiddleware.</span>
+
+File: backend/src/middleware/policyEnforcementMiddleware.ts
+
+Requirements:
+- After JWT auth resolves userId, query users.locked_until and
+  users.enforcement_mode from Postgres
+- If locked_until is in the future:
+  Return HTTP 423 Locked with body:
+  { code: 'HARD_LOCKOUT', lockedUntil: ISO_STRING, message: '...' }
+- If enforcement_mode = 'SOFT':
+  Attach req.restrictedMode = true (downstream handlers check this)
+- Exempt routes: POST /auth/*, GET /discipline/state, POST /discipline/refresh
+  (user must be able to see their score and acknowledge the lockout)
+- Cache the user enforcement state for 60s per userId to avoid
+  per-request DB hits (use in-memory Map with TTL)
+
+Write the complete updated middleware file.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+  </div><!-- end critical cards -->
+
+  <!-- HIGH SECTION -->
+  <div class="section-divider" style="animation-delay:0.22s">
+    <hr/><span>🟡 High Priority — Product Completeness</span><hr/>
+  </div>
+
+  <div class="cards">
+
+    <!-- 4 -->
+    <div class="card sev-high">
+      <div class="card-index">
+        <div class="card-num">04</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">No Incentive Layer — Pure Punishment Only</div>
+          <div class="sev-label">High</div>
+        </div>
+        <div class="problem-block">100% punitive with no reward path. Pure-punishment systems produce resentment and churn. The UI already has a LOW_SUPERVISION label — it needs to mean something real.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Implement the Trust Tier / reward system.</span>
+
+Requirements:
+- Add a trust_tier field to the User model in Prisma schema:
+  PROVISIONAL | STANDARD | TRUSTED | AUTONOMOUS
+- Create a TrustTierService that evaluates trust promotion:
+  DS ≥ 85 sustained for 30 days → promote to TRUSTED
+  TRUSTED + DS ≥ 90 for 60 days → promote to AUTONOMOUS (LOW_SUPERVISION)
+  DS drops below 50 → demote one tier
+- AUTONOMOUS users get:
+  - Relaxed lockout threshold (5 misses instead of 3)
+  - Longer grace window (+2hrs)
+  - Visible LOW_SUPERVISION badge in UI (already exists in DisciplineIdentityCard)
+- Add GET /discipline/trust-tier endpoint returning current tier,
+  days until next promotion, and requirements
+- Run tier evaluation inside the hourly cron job
+
+Write TrustTierService, Prisma migration, and the endpoint.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card sev-high">
+      <div class="card-index">
+        <div class="card-num">05</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">No Pre-Emptive Notifications</div>
+          <div class="sev-label">High</div>
+        </div>
+        <div class="problem-block">Enforcement is useless if users don't know a breach is coming. The communication module exists but sends nothing. Users discover lockouts after the fact.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Build anticipatory notification system using the communication module.</span>
+
+File: backend/src/communication/ (extend existing module)
+
+Notification triggers to implement:
+1. Action window closing in 2 hours → "⚠ Window closes in 2hr. DS at risk."
+2. Execution lag exceeds 2 hours → "-5 pts applied. 2 more hours → RESTRICTION."
+3. 2 consecutive misses → "LOCKOUT in 1 miss. Complete next action on time."
+4. DS crosses below 50 → "Classification: DRIFTING. Breach horizon: X days."
+5. DS recovers above 50 → "Classification restored: STABLE."
+6. Trust tier promotion → "Trust tier upgraded: TRUSTED."
+
+Delivery: email via existing email service + in-app via WebSocket SCORE_UPDATED
+Tone: match Iron-X communication protocol — terse, factual, no emoji
+Schedule: run notification checks inside the hourly cron job
+
+Write the NotificationService and wire it into the cron.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card sev-high">
+      <div class="card-index">
+        <div class="card-num">06</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">No Witness / Accountability Layer</div>
+          <div class="sev-label">High</div>
+        </div>
+        <div class="problem-block">Commitments made in private are broken in private. Team schema exists but no peer-witnessing of individual actions. The social accountability loop that drives real-world compliance is missing.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Implement witness assignment for Actions.</span>
+
+Prisma changes:
+- Add witness_user_id (optional FK → users) to Action model
+- Add WitnessNotification model: id, action_id, witness_id, event, sent_at
+
+API endpoints:
+- PATCH /actions/:id/witness — assign a witness (must be team member)
+- GET /actions/witnessing — list actions where I am the witness
+
+Witness notification events:
+- Action is missed → witness receives: "[User] missed: [action name]. DS impact: -10."
+- Action completed on time → witness receives: "[User] completed: [action name]."
+- Witnessed user enters lockout → witness receives: "[User] LOCKED. 3 consecutive misses."
+
+Frontend: add "Assign Witness" button to ActionForm (already exists as a component)
+Tone for all notifications: Iron-X protocol — factual, no praise/judgement framing
+
+Write the Prisma migration, service, endpoints, and notification triggers.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+  </div><!-- end high cards -->
+
+  <!-- GROWTH SECTION -->
+  <div class="section-divider" style="animation-delay:0.33s">
+    <hr/><span>🟢 Growth — Scale &amp; Moat</span><hr/>
+  </div>
+
+  <div class="cards">
+
+    <!-- 7 -->
+    <div class="card sev-growth">
+      <div class="card-index">
+        <div class="card-num">07</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">Enterprise Org Dashboard Missing</div>
+          <div class="sev-label">Growth</div>
+        </div>
+        <div class="problem-block">Organization, OrgPolicy, Team, SSO, ApiKey models all exist in the schema. The enterprise infrastructure is built but there is no org-level dashboard, ADS calculation, or admin controls surfaced.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Build enterprise organisation dashboard endpoints.</span>
+
+New endpoints under /api/v1/org/:orgId/:
+
+GET /dashboard — return:
+  { memberCount, activeCount, aggregateDisciplineScore (ADS),
+    classificationBreakdown, topViolations, complianceReadiness }
+
+ADS = mean(current_discipline_score) for all org users
+classificationBreakdown = count per classification tier
+complianceReadiness = % of SOC2/ISO27001 controls currently passing
+
+GET /members — list all members with individual DS, tier, last_active
+GET /compliance/report — existing endpoint, ensure org-scoped
+
+POST /policy — create/update OrgPolicy (enforcement_mode, lockout_threshold)
+  Changing policy must: log an AuditLog entry, re-evaluate all member scores
+
+Access control: only users with role = ORG_ADMIN can access these routes
+Wire into existing RBAC middleware
+
+Write all endpoints, the ADS calculation service, and role guard.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="card sev-growth">
+      <div class="card-index">
+        <div class="card-num">08</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">Public Trust Score Badge — The Moat</div>
+          <div class="sev-label">Growth</div>
+        </div>
+        <div class="problem-block">discipline_classification data is locked inside the app. Making it optionally public as an embeddable badge creates an external reputation signal — the network effect that makes Iron-X defensible.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Build public TrustScore badge API and embeddable widget.</span>
+
+Backend:
+- Add public_score_enabled (boolean, default false) to User model
+- GET /public/score/:userId — public endpoint (no auth required)
+  Returns: { classification, score, trustTier, verifiedSince }
+  Only works if public_score_enabled = true, else 404
+- GET /badge/:userId.svg — returns an SVG badge
+  Renders: classification label + DS score + "Verified by Iron-X"
+  Style: minimal, dark, matches Iron-X aesthetic
+  Cache-Control: max-age=3600
+
+Frontend:
+- Add "Make Score Public" toggle in user settings
+- Show embed code: <img src="https://ironx.io/badge/{userId}.svg" />
+- Show preview of the badge
+
+The badge becomes shareable on LinkedIn, GitHub profiles, portfolios.
+This is the viral distribution mechanism.
+
+Write the public endpoint, SVG generator, and settings UI component.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="card sev-growth">
+      <div class="card-index">
+        <div class="card-num">09</div>
+        <div class="severity-pip"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">No AI Drift Analysis</div>
+          <div class="sev-label">Growth</div>
+        </div>
+        <div class="problem-block">Rich behavioural data is collected but none of it feeds back as intelligence. Users know their score dropped — they don't know why or what to change. This is where AI turns enforcement into insight.</div>
+        <div class="prompt-label">Agent Prompt →</div>
+        <div class="prompt-text" onclick="copyThis(this)">
+<span class="kw">TASK: Build AI-powered drift analysis using the Anthropic API.</span>
+
+File: backend/src/services/aiAnalysis.service.ts (create new)
+
+Trigger: called weekly per user from cron, or on-demand via
+POST /discipline/analyse
+
+Data to pass to Claude:
+- Last 60 days of ActionInstance records (scheduled_time, status, lag_minutes)
+- User's current DS, classification, trust tier
+- Top 3 action categories with worst completion rates
+
+Prompt Claude to return JSON:
+{
+  "primaryDriftPattern": string,     // e.g. "Thursday AM window — 73% miss rate"
+  "rootCauseSuggestion": string,     // e.g. "Scheduling conflict pattern detected"
+  "recommendedAdjustment": string,   // e.g. "Shift 3 actions from Thu 9AM to Wed 7PM"
+  "projectedScoreRecovery": number,  // DS points recoverable if adjustment applied
+  "confidenceLevel": "LOW"|"MED"|"HIGH"
+}
+
+Tone instruction to Claude: Iron-X protocol — terse, analytical, no motivation.
+Store result in a new DriftAnalysis model. Surface via GET /discipline/analysis.
+
+Write the service, Prisma model, and endpoint.
+<div class="copy-hint">click to copy</div></div>
+      </div>
+    </div>
+
+  </div><!-- end growth cards -->
+
+  <!-- MASTER PROMPT -->
+  <div class="master-block">
+    <div class="master-header">
+      <span>Master Prompt // All 9 Items Combined</span>
+      <span style="color:#9a9688">Click body to copy</span>
+    </div>
+    <div class="master-body" id="master" onclick="copyMaster()">
+<span class="d">// Iron-X — Full Remediation Brief for AI Agent
+// Pass this as your system prompt + first user message</span>
+
+You are a senior full-stack engineer on Iron-X — a behavioural discipline
+enforcement platform (Node.js/TypeScript, Prisma/PostgreSQL, React).
+
+Work through the following 9 items in strict priority order.
+For each: diagnose the gap, implement the fix, verify it compiles.
+Write production-quality TypeScript. No stubs. No TODOs.
+
+<span class="s">═══ CRITICAL (implement first) ═══</span>
+
+<span class="s">[01] DisciplineStateService</span> — Complete all methods to query real
+ActionInstance records. Implement DS formula, classification logic,
+driftVectors, violationHorizon, compositePressure from live DB data.
+
+<span class="s">[02] Cron Job</span> — Add hourly job to recalculate DS for all active users.
+Update current_discipline_score, discipline_classification, locked_until.
+Emit SCORE_UPDATED domain event. Handle errors per-user.
+
+<span class="s">[03] Lockout Middleware</span> — policyEnforcementMiddleware must check
+locked_until and enforcement_mode on every authenticated request.
+Return HTTP 423 for locked users. Cache enforcement state 60s.
+
+<span class="h">═══ HIGH PRIORITY (product completeness) ═══</span>
+
+<span class="h">[04] Trust Tier System</span> — Add trust_tier field (PROVISIONAL → STANDARD
+→ TRUSTED → AUTONOMOUS). DS ≥ 85 for 30d = TRUSTED. AUTONOMOUS users
+get relaxed thresholds and LOW_SUPERVISION badge. Run in cron.
+
+<span class="h">[05] Notifications</span> — Build NotificationService for anticipatory alerts:
+2hr window warning, lag warning, 1-miss-to-lockout warning, DS recovery.
+Terse Iron-X tone. Deliver via email + WebSocket.
+
+<span class="h">[06] Witness Layer</span> — Add witness_user_id to Action model. Witnesses
+receive factual notifications on miss/complete/lockout events.
+Add assign-witness UI to ActionForm.
+
+<span class="g">═══ GROWTH (moat & scale) ═══</span>
+
+<span class="g">[07] Enterprise Dashboard</span> — Build /org/:id/dashboard with ADS
+(Aggregate Discipline Score), member breakdown, compliance readiness.
+Add OrgPolicy CRUD. Gate behind ORG_ADMIN role.
+
+<span class="g">[08] Public Badge API</span> — GET /badge/:userId.svg returns embeddable
+SVG trust score badge. Add public_score_enabled toggle in settings.
+This is the viral distribution mechanism.
+
+<span class="g">[09] AI Drift Analysis</span> — Weekly Claude API analysis of ActionInstance
+patterns. Returns primaryDriftPattern, rootCause, recommendedAdjustment,
+projectedScoreRecovery. Store in DriftAnalysis model.
+
+<span class="d">// Begin with item 01. Do not proceed to the next until the current
+// item compiles and its core logic is verified against the DB schema.</span>
+    <button class="copy-master" id="master-btn" onclick="copyMaster(event)">COPY ALL</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Iron-X Remediation Brief // v2.1</span>
+    <span>9 items · 3 tiers · 1 system</span>
+  </div>
+
+</div>
+
+<script>
+  function copyThis(el) {
+    const text = el.innerText.replace('click to copy', '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 1800);
+    });
+  }
+
+  function copyMaster(e) {
+    if (e) e.stopPropagation();
+    const el = document.getElementById('master');
+    const text = el.innerText.replace('COPY ALL', '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      el.classList.add('copied');
+      const btn = document.getElementById('master-btn');
+      btn.textContent = 'COPIED ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        el.classList.remove('copied');
+        btn.textContent = 'COPY ALL';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

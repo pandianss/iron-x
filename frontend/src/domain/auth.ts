@@ -6,14 +6,12 @@ export const AuthClient = {
         return response.data;
     },
 
-    login: async (email: string, password: string, mfaToken?: string) => {
-        const response = await api.post('/auth/login', { email, password, mfaToken });
-        return response.data;
-    },
-
-    register: async (data: unknown) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response = await api.post('/auth/register', data as any);
+    sync: async (idToken: string, extraData: any = {}) => {
+        const response = await api.post('/auth/sync', extraData, {
+            headers: {
+                Authorization: `Bearer ${idToken}`
+            }
+        });
         return response.data;
     }
 };

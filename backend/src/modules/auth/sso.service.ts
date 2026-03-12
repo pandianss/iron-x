@@ -18,29 +18,10 @@ export class SSOService {
         return redirectUrl;
     }
 
-    // Mock SAML Response Validation
+    // SAML Response Validation
     static async validateResponse(samlResponse: string): Promise<{ email: string; issuer: string }> {
         // In reality, verify signature using config.cert and parse XML.
-        // Here we assume the mock IDP sends back a base64 encoded JSON for simplicity in testing Phase 1.
-        // e.g. base64('{"email": "user@example.com", "issuer": "okta_id"}')
-
-        try {
-            const decoded = Buffer.from(samlResponse, 'base64').toString('ascii');
-            // Check if it's JSON (mock) or XML (real)
-            // We will support a simple mock format: "MOCK_SUCCESS:user@example.com:ISSUER_ID"
-
-            if (decoded.startsWith('MOCK_SUCCESS')) {
-                const parts = decoded.split(':');
-                return {
-                    email: parts[1],
-                    issuer: parts[2]
-                };
-            }
-
-            throw new Error('Invalid SAML Response format');
-        } catch (e) {
-            throw new Error('SAML validation failed');
-        }
+        throw new Error('Real SAML validation not yet implemented.');
     }
 
     static async getSSOConfig(domain: string) {

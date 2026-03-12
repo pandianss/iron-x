@@ -76,6 +76,14 @@ export const logExecution = async (req: AuthRequest, res: Response) => {
         });
 
         // EMIT EVENT
+        const { container } = await import('tsyringe');
+        const { WitnessService } = await import('../services/witness.service');
+        const witnessService = container.resolve(WitnessService);
+
+        if (status === 'COMPLETED' || status === 'LATE') {
+            await witnessService.handleActionCompleted(id);
+        }
+
         kernelEvents.emitEvent(DomainEventType.INSTANCE_STATUS_CHANGED, {
             instanceId: id,
             oldStatus: instance.status,

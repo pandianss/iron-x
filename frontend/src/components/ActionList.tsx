@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActionClient, type Action } from '../domain/actions';
 
 interface ActionListProps {

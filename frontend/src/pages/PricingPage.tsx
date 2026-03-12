@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BillingClient } from '../domain/billing';
 import { useNavigate } from 'react-router-dom';
 

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { BillingClient, type Subscription } from '../domain/billing';
 import { CreditCard, Shield, Activity, CheckCircle } from 'lucide-react';

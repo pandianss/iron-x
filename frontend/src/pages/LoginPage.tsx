@@ -1,33 +1,28 @@
 import React, { useState } from 'react';
-import { AuthClient } from '../domain/auth';
-import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [mfaToken, setMfaToken] = useState('');
-    const [mfaRequired, setMfaRequired] = useState(false);
-    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
-            const data = await AuthClient.login(email, password, mfaRequired ? mfaToken : undefined);
+            // Firebase Login
+            await signInWithEmailAndPassword(auth, email, password);
 
-            if (data.mfaRequired) {
-                setMfaRequired(true);
-                return;
-            }
-
-            login(data.token, data.user);
-            navigate('/cockpit'); // Navigate to cockpit as primary view
+            // The AuthContext onAuthStateChanged listener will fire, get the token,
+            // call AuthClient.sync, set the local state, and redirect logic if applicable.
+            // But we can just navigate here as well, knowing it succeeded.
+            navigate('/cockpit');
         } catch (err: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            setError((err as any).response?.data?.message || 'Login failed');
+            setError((err as any).message || 'Login failed');
         }
     };
 
@@ -38,65 +33,38 @@ export default function LoginPage() {
                 {error && <div className="text-red-400 bg-red-900/20 border border-red-900/50 p-3 rounded mb-4 text-sm text-center">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
-                    {!mfaRequired ? (
-                        <>
-                            <div className="mt-4">
-                                <label className="block text-iron-400 text-sm mb-1" htmlFor="email">Email</label>
-                                <input
-                                    type="email"
-                                    placeholder="terminal@iron-x.internal"
-                                    className="w-full px-4 py-3 bg-black border border-iron-800 text-white rounded-lg focus:outline-none focus:border-red-600 transition-colors"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="mt-4">
-                                <label className="block text-iron-400 text-sm mb-1">Password</label>
-                                <input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    className="w-full px-4 py-3 bg-black border border-iron-800 text-white rounded-lg focus:outline-none focus:border-red-600 transition-colors"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </>
-                    ) : (
-                        <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <label className="block text-iron-400 text-sm mb-1">2FA Code</label>
+                    <>
+                        <div className="mt-4">
+                            <label className="block text-iron-400 text-sm mb-1" htmlFor="email">Email</label>
                             <input
-                                type="text"
-                                placeholder="000000"
-                                className="w-full px-4 py-3 bg-black border border-iron-800 text-white rounded-lg text-center tracking-widest text-2xl font-mono focus:outline-none focus:border-red-600 transition-colors"
-                                value={mfaToken}
-                                onChange={(e) => setMfaToken(e.target.value)}
+                                type="email"
+                                placeholder="terminal@iron-x.internal"
+                                className="w-full px-4 py-3 bg-black border border-iron-800 text-white rounded-lg focus:outline-none focus:border-red-600 transition-colors"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
-                                autoFocus
                             />
-                            <p className="text-iron-500 text-xs mt-2 text-center uppercase tracking-tighter">Enter the 6-digit code from your authenticator</p>
                         </div>
-                    )}
+                        <div className="mt-4">
+                            <label className="block text-iron-400 text-sm mb-1">Password</label>
+                            <input
+                                type="password"
+                                placeholder="••••••••"
+                                className="w-full px-4 py-3 bg-black border border-iron-800 text-white rounded-lg focus:outline-none focus:border-red-600 transition-colors"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                    </>
 
                     <div className="flex flex-col gap-4 mt-8">
                         <button className="w-full px-6 py-3 text-white font-bold bg-red-600 rounded-lg hover:bg-red-700 active:scale-95 transition-all uppercase tracking-widest">
-                            {mfaRequired ? 'Verify & Enter' : 'Authorize'}
+                            Authorize
                         </button>
-                        {!mfaRequired && (
-                            <Link to="/register" className="text-xs text-iron-500 hover:text-white text-center transition-colors uppercase">
-                                New User? Register Access
-                            </Link>
-                        )}
-                        {mfaRequired && (
-                            <button
-                                type="button"
-                                onClick={() => setMfaRequired(false)}
-                                className="text-xs text-iron-500 hover:text-white text-center transition-colors uppercase"
-                            >
-                                Back to Password
-                            </button>
-                        )}
+                        <Link to="/register" className="text-xs text-iron-500 hover:text-white text-center transition-colors uppercase">
+                            New User? Register Access
+                        </Link>
                     </div>
                 </form>
             </div>

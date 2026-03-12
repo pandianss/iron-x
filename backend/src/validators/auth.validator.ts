@@ -21,3 +21,16 @@ export const VerifyMFASchema = z.object({
         token: z.string().length(6, "MFA token must be 6 digits")
     })
 });
+
+export const ForgotPasswordSchema = z.object({
+    body: z.object({
+        email: z.string().email("Invalid email format")
+    })
+});
+
+export const ResetPasswordSchema = z.object({
+    body: z.object({
+        token: z.string().min(1, "Reset token is required"),
+        newPassword: z.string().min(8, "Password must be at least 8 characters")
+    })
+});

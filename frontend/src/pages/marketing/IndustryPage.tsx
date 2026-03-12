@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import MarketingLayout from '../../components/marketing/MarketingLayout'; // Fix path if deeper
 import { ArrowRight, CheckCircle2 } from 'lucide-react';

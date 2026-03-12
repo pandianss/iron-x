@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { AuthClient } from '../domain/auth';
-import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
-
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebase';
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -10,25 +10,30 @@ export default function RegisterPage() {
     const [orgName, setOrgName] = useState('');
     const [orgSlug, setOrgSlug] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
-            const data = await AuthClient.register({
-                email,
-                password,
+            // 1. Create user in Firebase
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const idToken = await userCredential.user.getIdToken();
+
+            // 2. Sync extended data (org info, timezone) to our database IMMEDIATELY
+            await AuthClient.sync(idToken, {
                 timezone,
                 orgName: orgName || undefined,
                 orgSlug: orgSlug || undefined
             });
-            login(data.token, data.user);
+
+            // The AuthContext onAuthStateChanged listener will also fire and sync, 
+            // but providing the extended data here ensures the org is created.
+
             navigate('/cockpit');
         } catch (err: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const errorMessage = (err as any).response?.data?.message || 'Registration failed';
+            const errorMessage = (err as any).message || 'Registration failed';
             setError(errorMessage);
         }
     };

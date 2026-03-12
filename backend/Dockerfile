@@ -1,39 +1,38 @@
-# Base stage
-FROM node:22-alpine AS base
+# Iron-X Backend — Multi-stage Dockerfile
 
+# ─── Stage 1: Development ───────────────────────────────────────────────────
+FROM node:22-alpine AS dev
 WORKDIR /app
-
 COPY package*.json ./
-COPY prisma ./prisma/
-
-# Dev stage
-FROM base AS dev
 RUN npm ci
 COPY . .
+EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
-# Build stage
-FROM base AS builder
+# ─── Stage 2: Builder ───────────────────────────────────────────────────────
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
-RUN npx prisma generate
 
-# Production stage
+# ─── Stage 3: Production Runner ─────────────────────────────────────────────
 FROM node:22-alpine AS runner
-
 WORKDIR /app
 
-ENV NODE_ENV=production
-
-COPY package*.json ./
-COPY prisma ./prisma/
-
 # Install only production dependencies
-RUN npm ci --only=production --ignore-scripts && npx prisma generate
+COPY package*.json ./
+RUN npm ci --omit=dev
 
+# Copy compiled output and Prisma schema (needed at runtime for client)
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY prisma ./prisma
+
+# Run as non-root user for security
+RUN addgroup -S ironx && adduser -S ironx -G ironx
+USER ironx
 
 EXPOSE 3000
-
 CMD ["node", "dist/index.js"]

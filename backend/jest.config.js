@@ -18,5 +18,6 @@ module.exports = {
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
         '^uuid$': '<rootDir>/src/tests/mocks/uuid.ts',
+        '^otplib$': '<rootDir>/src/tests/mocks/otplib.ts',
     },
 };

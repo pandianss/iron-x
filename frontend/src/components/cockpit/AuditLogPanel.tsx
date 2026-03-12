@@ -1,4 +1,3 @@
-import React from 'react';
 import { History, ShieldAlert, BadgeCheck } from 'lucide-react';
 
 interface LogEntry {
@@ -13,7 +12,7 @@ interface AuditLogProps {
     logs: LogEntry[];
 }
 
-export const AuditLogPanel: React.FC<AuditLogProps> = ({ logs }) => {
+export function AuditLogPanel({ logs }: AuditLogProps) {
     return (
         <div className="w-full h-48 flex flex-col gap-3 p-4 panel-border bg-neutral-muted/50 overflow-hidden relative crt-flicker">
             <div className="flex items-center justify-between mb-1">
@@ -52,4 +51,5 @@ export const AuditLogPanel: React.FC<AuditLogProps> = ({ logs }) => {
             </div>
         </div>
     );
-};
+}
+

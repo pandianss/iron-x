@@ -38,12 +38,27 @@ export class PolicyService {
         );
 
         // 2. Determine if Score triggers Lockout
-        // Threshold check: if score is below the threshold, trigger lockout
-        if (mode === EnforcementMode.HARD && currentScore < rules.score_threshold) {
+        // Threshold check: if score is below the threshold, or there are too many recent misses, trigger lockout
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const recentMisses = await this.prisma.actionInstance.count({
+            where: {
+                user_id: userId,
+                status: 'MISSED',
+                scheduled_date: { gte: sevenDaysAgo }
+            }
+        });
+
+        const isScoreBreach = currentScore < rules.score_threshold;
+        const isMissBreach = recentMisses >= rules.max_misses;
+
+        if (mode === EnforcementMode.HARD && (isScoreBreach || isMissBreach)) {
             const now = new Date();
             const lockedUntil = new Date(now.getTime() + rules.lockout_hours * 60 * 60 * 1000);
 
-            Logger.warn(`[PolicyService] HARD Lockout Triggered for User ${userId}. Score ${currentScore} < Threshold ${rules.score_threshold}. Locked until ${lockedUntil.toISOString()}`);
+            const reason = isScoreBreach ? `Score ${currentScore} < Threshold ${rules.score_threshold}` : `Recent misses ${recentMisses} >= Max allowed ${rules.max_misses}`;
+            Logger.warn(`[PolicyService] HARD Lockout Triggered for User ${userId}. ${reason}. Locked until ${lockedUntil.toISOString()}`);
 
             await this.prisma.user.update({
                 where: { user_id: userId },
@@ -63,6 +78,8 @@ export class PolicyService {
                     details: JSON.stringify({
                         score: currentScore,
                         threshold: rules.score_threshold,
+                        recent_misses: recentMisses,
+                        max_misses: rules.max_misses,
                         lockout_hours: rules.lockout_hours,
                         locked_until: lockedUntil
                     })

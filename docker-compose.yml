@@ -1,55 +1,57 @@
 services:
   postgres:
-    image: postgres:15-alpine
-    container_name: iron_postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: iron_user
-      POSTGRES_PASSWORD: iron_password
-      POSTGRES_DB: iron_db
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-iron_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-iron_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-iron_user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
-    image: redis:alpine
-    container_name: iron_redis
-    ports:
-      - "6379:6379"
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
 
   backend:
     build:
       context: ./backend
-      target: dev
-    container_name: iron_backend
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: postgresql://iron_user:iron_password@postgres:5432/iron_db?schema=public
-      PORT: 3000
-      JWT_SECRET: super_secret_jwt_key_change_me
+      target: runner
+    restart: unless-stopped
     depends_on:
-      - postgres
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    command: npm run dev
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      PORT: ${PORT:-3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      API_URL: ${API_URL}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
 
   frontend:
     build:
       context: ./frontend
-      target: dev
-    container_name: iron_frontend
-    ports:
-      - "5173:5173"
-    environment:
-      VITE_API_URL: http://backend:3000
+      target: runner
+    restart: unless-stopped
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev -- --host
+    ports:
+      - "80:80"
 
 volumes:
   postgres_data:
+  redis_data:

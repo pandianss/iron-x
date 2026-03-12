@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MarketingLayout from '../../components/marketing/MarketingLayout';
 import { Activity, Lock, Target, Server, FileText, ChevronRight, AlertCircle, Users } from 'lucide-react';
@@ -279,73 +279,82 @@ const HomePage = () => {
         </MarketingLayout>
     );
 };
-
 /* --- SHARED COMPONENTS --- */
 
-const SelectionItem: React.FC<{ text: string }> = ({ text }) => (
-    <li className="flex items-center gap-3 text-neutral-300 font-mono text-sm group">
-        <span className="text-iron-500 group-hover:text-iron-400 transition-colors">⬢</span>
-        {text}
-    </li>
-);
+function SelectionItem({ text }: { text: string }) {
+    return (
+        <li className="flex items-center gap-3 text-neutral-300 font-mono text-sm group">
+            <span className="text-iron-500 group-hover:text-iron-400 transition-colors">⬢</span>
+            {text}
+        </li>
+    );
+}
 
-const RejectionItem: React.FC<{ text: string }> = ({ text }) => (
-    <li className="flex items-center gap-3 text-neutral-500 font-mono text-sm group">
-        <span className="text-red-900 group-hover:text-red-700 transition-colors">✕</span>
-        {text}
-    </li>
-);
+function RejectionItem({ text }: { text: string }) {
+    return (
+        <li className="flex items-center gap-3 text-neutral-500 font-mono text-sm group">
+            <span className="text-red-900 group-hover:text-red-700 transition-colors">✕</span>
+            {text}
+        </li>
+    );
+}
 
-const MechanismStep: React.FC<{ number: string; title: string; desc: string; side: 'left' | 'right' }> = ({ number, title, desc, side }) => (
-    <div className={`flex flex-col md:flex-row items-center gap-12 ${side === 'right' ? 'md:flex-row-reverse' : ''}`}>
-        <div className="flex-1 text-center md:text-right">
-            {side === 'left' && (
-                <>
-                    <h3 className="text-2xl font-bold text-white font-display mb-2 uppercase">{title}</h3>
-                    <p className="text-neutral-500 font-mono text-sm leading-relaxed">{desc}</p>
-                </>
-            )}
-        </div>
-        <div className="relative z-10 flex flex-col items-center">
-            <div className={`w-14 h-14 border border-iron-800 bg-neutral-900 flex items-center justify-center font-bold font-mono text-xl ${side === 'left' ? 'text-iron-400' : 'text-neutral-500'}`}>
-                {number}
+function MechanismStep({ number, title, desc, side }: { number: string; title: string; desc: string; side: 'left' | 'right' }) {
+    return (
+        <div className={`flex flex-col md:flex-row items-center gap-12 ${side === 'right' ? 'md:flex-row-reverse' : ''}`}>
+            <div className="flex-1 text-center md:text-right">
+                {side === 'left' && (
+                    <>
+                        <h3 className="text-2xl font-bold text-white font-display mb-2 uppercase">{title}</h3>
+                        <p className="text-neutral-500 font-mono text-sm leading-relaxed">{desc}</p>
+                    </>
+                )}
+            </div>
+            <div className="relative z-10 flex flex-col items-center">
+                <div className={`w-14 h-14 border border-iron-800 bg-neutral-900 flex items-center justify-center font-bold font-mono text-xl ${side === 'left' ? 'text-iron-400' : 'text-neutral-500'}`}>
+                    {number}
+                </div>
+            </div>
+            <div className="flex-1 text-center md:text-left">
+                {side === 'right' && (
+                    <>
+                        <h3 className="text-2xl font-bold text-white font-display mb-2 uppercase">{title}</h3>
+                        <p className="text-neutral-500 font-mono text-sm leading-relaxed">{desc}</p>
+                    </>
+                )}
             </div>
         </div>
-        <div className="flex-1 text-center md:text-left">
-            {side === 'right' && (
-                <>
-                    <h3 className="text-2xl font-bold text-white font-display mb-2 uppercase">{title}</h3>
-                    <p className="text-neutral-500 font-mono text-sm leading-relaxed">{desc}</p>
-                </>
-            )}
-        </div>
-    </div>
-);
+    );
+}
 
-const SignalBlock: React.FC<{ id: string; title: string; desc: string }> = ({ id, title, desc }) => (
-    <div className="bg-black p-10 flex flex-col items-start gap-4">
-        <span className="text-[10px] font-mono text-iron-700 uppercase tracking-widest leading-none">{id} // SIGNAL</span>
-        <h3 className="text-lg font-bold text-white font-display uppercase tracking-wider">{title}</h3>
-        <p className="text-sm text-neutral-500 font-mono leading-relaxed">{desc}</p>
-    </div>
-);
+function SignalBlock({ id, title, desc }: { id: string; title: string; desc: string }) {
+    return (
+        <div className="bg-black p-10 flex flex-col items-start gap-4">
+            <span className="text-[10px] font-mono text-iron-700 uppercase tracking-widest leading-none">{id} // SIGNAL</span>
+            <h3 className="text-lg font-bold text-white font-display uppercase tracking-wider">{title}</h3>
+            <p className="text-sm text-neutral-500 font-mono leading-relaxed">{desc}</p>
+        </div>
+    );
+}
 
-const ArchitectureLayer: React.FC<{ id: string; name: string; desc: string; icon: React.ReactNode }> = ({ id, name, desc, icon }) => (
-    <div className="group border border-iron-900 bg-neutral-950 p-6 flex gap-8 items-center hover:border-iron-500 transition-all cursor-crosshair">
-        <div className="text-xs font-mono text-iron-700">{id}</div>
-        <div className="p-3 bg-iron-900/50 text-iron-400 border border-iron-800 rounded-sm">
-            {icon}
+function ArchitectureLayer({ id, name, desc, icon }: { id: string; name: string; desc: string; icon: React.ReactNode }) {
+    return (
+        <div className="group border border-iron-900 bg-neutral-950 p-6 flex gap-8 items-center hover:border-iron-500 transition-all cursor-crosshair">
+            <div className="text-xs font-mono text-iron-700">{id}</div>
+            <div className="p-3 bg-iron-900/50 text-iron-400 border border-iron-800 rounded-sm">
+                {icon}
+            </div>
+            <div className="flex-grow">
+                <h4 className="text-xl font-bold text-white font-display uppercase tracking-widest mb-1">{name}</h4>
+                <p className="text-sm text-neutral-500 font-mono">{desc}</p>
+            </div>
         </div>
-        <div className="flex-grow">
-            <h4 className="text-xl font-bold text-white font-display uppercase tracking-widest mb-1">{name}</h4>
-            <p className="text-sm text-neutral-500 font-mono">{desc}</p>
-        </div>
-    </div>
-);
+    );
+}
 
 /* --- INTERACTIVE MODULES --- */
 
-const InitializationModule: React.FC = () => {
+function InitializationModule() {
     const [step, setStep] = useState(1);
 
     return (
@@ -427,21 +436,23 @@ const InitializationModule: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
-const ConfigOption: React.FC<{ title: string; desc: string; active?: boolean }> = ({ title, desc, active }) => (
-    <div className={`p-6 border transition-all cursor-pointer flex items-center justify-between group ${active ? 'border-white bg-white/5' : 'border-iron-900 bg-black hover:border-iron-700'}`}>
-        <div>
-            <h4 className={`text-lg font-bold font-display uppercase tracking-widest mb-1 ${active ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-300'}`}>{title}</h4>
-            <p className="text-xs font-mono text-iron-600">{desc}</p>
+function ConfigOption({ title, desc, active }: { title: string; desc: string; active?: boolean }) {
+    return (
+        <div className={`p-6 border transition-all cursor-pointer flex items-center justify-between group ${active ? 'border-white bg-white/5' : 'border-iron-900 bg-black hover:border-iron-700'}`}>
+            <div>
+                <h4 className={`text-lg font-bold font-display uppercase tracking-widest mb-1 ${active ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-300'}`}>{title}</h4>
+                <p className="text-xs font-mono text-iron-600">{desc}</p>
+            </div>
+            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${active ? 'border-white' : 'border-iron-800'}`}>
+                {active && <div className="w-2 h-2 rounded-full bg-white shadow-sm" />}
+            </div>
         </div>
-        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${active ? 'border-white' : 'border-iron-800'}`}>
-            {active && <div className="w-2 h-2 rounded-full bg-white shadow-sm" />}
-        </div>
-    </div>
-);
+    );
+}
 
-const GovernanceProjectionEngine: React.FC = () => {
+function GovernanceProjectionEngine() {
     const [drift, setDrift] = useState(12);
 
     return (
@@ -497,6 +508,6 @@ const GovernanceProjectionEngine: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
 export default HomePage;

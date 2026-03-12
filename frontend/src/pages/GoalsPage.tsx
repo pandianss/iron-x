@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import GoalForm from '../components/GoalForm';
 import GoalList from '../components/GoalList';
 

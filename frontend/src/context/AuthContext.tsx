@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AuthContext, type User } from './AuthContextInstance';
+import { auth } from '../config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { AuthClient } from '../domain/auth';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -7,38 +10,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        const initializeAuth = async () => {
-            const storedToken = localStorage.getItem('token');
-            const storedUser = localStorage.getItem('user');
-
-            if (storedToken && storedUser) {
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
                 try {
-                    setToken(storedToken);
-                    setUser(JSON.parse(storedUser));
+                    const idToken = await firebaseUser.getIdToken();
+                    setToken(idToken);
+
+                    // Sync with backend to get org context and user ID
+                    const data = await AuthClient.sync(idToken);
+                    setUser(data.user);
                 } catch (error) {
-                    console.error('Failed to parse user from local storage', error);
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
+                    console.error('Failed to sync user with backend:', error);
+                    setUser(null);
+                    setToken(null);
                 }
+            } else {
+                setUser(null);
+                setToken(null);
             }
             setIsInitialized(true);
-        };
+        });
 
-        initializeAuth();
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
     }, []);
 
     const login = (newToken: string, newUser: User) => {
         setToken(newToken);
         setUser(newUser);
-        localStorage.setItem('token', newToken);
-        localStorage.setItem('user', JSON.stringify(newUser));
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await auth.signOut();
+        } catch (error) {
+            console.error('Failed to sign out from Firebase', error);
+        }
         setToken(null);
         setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
     };
 
     if (!isInitialized) {

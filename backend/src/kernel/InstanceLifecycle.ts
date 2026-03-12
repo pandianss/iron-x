@@ -61,7 +61,8 @@ export class InstanceLifecycle {
                 status: i.status || 'PENDING',
                 scheduled_date: i.scheduled_date,
                 scheduled_start_time: i.scheduled_start_time,
-                scheduled_end_time: i.scheduled_end_time
+                scheduled_end_time: i.scheduled_end_time,
+                executed_at: i.executed_at || undefined
             })),
             policy: {
                 rules,
@@ -157,7 +158,13 @@ export class InstanceLifecycle {
         });
 
         // Emit events for each missed instance
+        const { container } = await import('tsyringe');
+        const { WitnessService } = await import('../services/witness.service');
+        const witnessService = container.resolve(WitnessService);
+
         for (const id of instanceIds) {
+            await witnessService.handleActionMissed(id);
+
             kernelEvents.emitEvent(DomainEventType.VIOLATION_DETECTED, {
                 instanceId: id,
                 reason: 'Missed scheduled window',

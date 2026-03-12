@@ -74,9 +74,27 @@ describe('ScoringPolicy', () => {
             expect(ScoringPolicy.calculateScore(instances)).toBe(100);
         });
 
-        it('should calculate correct score (50%)', () => {
-            const instances = [{ status: 'COMPLETED' }, { status: 'MISSED' }];
-            expect(ScoringPolicy.calculateScore(instances)).toBe(50);
+        it('should calculate correct score with late penalization (70% execution + 0% on-time = 70)', () => {
+            const instances = [
+                {
+                    status: 'COMPLETED',
+                    scheduled_end_time: new Date('2026-02-20T10:00:00Z'),
+                    executed_at: new Date('2026-02-20T11:00:00Z') // Late
+                }
+            ];
+            expect(ScoringPolicy.calculateScore(instances)).toBe(70);
+        });
+
+        it('should calculate correct score (50% execution + 100% on-time = 35 + 30 = 65)', () => {
+            const instances = [
+                {
+                    status: 'COMPLETED',
+                    scheduled_end_time: new Date('2026-02-20T10:00:00Z'),
+                    executed_at: new Date('2026-02-20T09:00:00Z') // On time
+                },
+                { status: 'MISSED' }
+            ];
+            expect(ScoringPolicy.calculateScore(instances)).toBe(65);
         });
 
         it('should calculate correct score (0%)', () => {

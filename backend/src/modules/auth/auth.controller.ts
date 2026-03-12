@@ -12,35 +12,44 @@ export class AuthController {
         @inject(EmailService) private emailService: EmailService
     ) { }
 
-    register = async (req: Request, res: Response, next: NextFunction) => {
+    sync = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await this.authService.register(req.body);
+            // The auth middleware has already validated the token and set req.user if they exist
+            // Wait, sync actually needs to CREATE the user if they don't exist yet, so we should
+            // read from the body, since we want to pass org parameters. OR we can grab the uid directly
+            // from the decoded token we expect the frontend to pass as Bearer token.
 
-            // Trigger Welcome Email
-            try {
-                await this.emailService.sendWelcomeEmail(result.user.email, result.user.email.split('@')[0]);
-            } catch (e) {
-                console.error('Failed to send welcome email:', e);
+            // To keep it simple, we expect the frontend to call this endpoint AFTER firebase login. 
+            // We'll read the email and uid from the Firebase token they pass in the Authorization header.
+            // But wait, our `authMiddleware.ts` was set up to block if user DOES NOT exist. 
+            // So we need a special path for sync, or we verify the token manually here!
+
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.split(' ')[1];
+
+            if (!token) {
+                return res.status(401).json({ error: 'Authentication required' });
             }
 
-            // Phase 6: Institutionalization - Assign Default Role
+            const { firebaseAuth } = require('../../config/firebase');
+            const decodedToken = await firebaseAuth.verifyIdToken(token);
+
+            const syncData = {
+                firebaseUid: decodedToken.uid,
+                email: decodedToken.email,
+                ...req.body // includes timezone, orgName, orgSlug
+            };
+
+            const result = await this.authService.syncUser(syncData);
+
+            // Phase 6: Institutionalization - Assign Default Role (if first time, but policyService handles idempotent checks)
             try {
                 await this.policyService.assignDefaultRole(result.user.id);
             } catch (e) {
-                console.error('Failed to assign default role:', e);
-                // Don't fail registration
+                // Ignore
             }
 
-            res.status(201).json(result);
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    login = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const result = await this.authService.login(req.body);
-            res.json(result);
+            res.status(200).json(result);
         } catch (error) {
             next(error);
         }

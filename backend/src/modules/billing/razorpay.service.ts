@@ -8,16 +8,20 @@ export class RazorpayService {
     private razorpay: Razorpay;
 
     constructor() {
+        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+            console.warn('Razorpay configuration is missing required environment variables.');
+        }
+
         this.razorpay = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_mock_id',
-            key_secret: process.env.RAZORPAY_KEY_SECRET || 'mock_secret',
+            key_id: process.env.RAZORPAY_KEY_ID || '',
+            key_secret: process.env.RAZORPAY_KEY_SECRET || '',
         });
     }
 
     async createCustomer(userId: string, email: string): Promise<string> {
         // Check if existing
-        const existingSub = await (prisma as any).subscription.findUnique({ where: { user_id: userId } });
-        if ((existingSub as any)?.razorpay_customer_id) return (existingSub as any).razorpay_customer_id;
+        const existingSub = await prisma.subscription.findUnique({ where: { user_id: userId } });
+        if (existingSub?.razorpay_customer_id) return existingSub.razorpay_customer_id;
 
         const customer = await this.razorpay.customers.create({
             email,
@@ -25,7 +29,7 @@ export class RazorpayService {
         } as any);
 
         // Update DB
-        await (prisma as any).subscription.upsert({
+        await prisma.subscription.upsert({
             where: { user_id: userId },
             update: { razorpay_customer_id: customer.id },
             create: {
@@ -49,7 +53,7 @@ export class RazorpayService {
         });
 
         // Store subscription ID in DB (initially inactive)
-        await (prisma as any).subscription.update({
+        await prisma.subscription.update({
             where: { user_id: userId },
             data: {
                 razorpay_subscription_id: subscription.id,
@@ -63,7 +67,8 @@ export class RazorpayService {
     async verifyPayment(userId: string, paymentResponse: any) {
         const { razorpay_payment_id, razorpay_subscription_id, razorpay_signature } = paymentResponse;
 
-        const secret = process.env.RAZORPAY_KEY_SECRET || 'mock_secret';
+        const secret = process.env.RAZORPAY_KEY_SECRET;
+        if (!secret) throw new Error('Razorpay secret not configured.');
         const body = razorpay_payment_id + "|" + razorpay_subscription_id;
 
         const expectedSignature = crypto
@@ -73,7 +78,7 @@ export class RazorpayService {
 
         if (expectedSignature === razorpay_signature) {
             // Update DB
-            await (prisma as any).subscription.update({
+            await prisma.subscription.update({
                 where: { user_id: userId },
                 data: {
                     razorpay_subscription_id: razorpay_subscription_id,
@@ -126,7 +131,7 @@ export class RazorpayService {
         const subscriptionId = subscription.id;
 
         if (subscriptionId) {
-            await (prisma as any).subscription.update({
+            await prisma.subscription.update({
                 where: { razorpay_subscription_id: subscriptionId },
                 data: {
                     is_active: isActive,
@@ -134,7 +139,7 @@ export class RazorpayService {
                 }
             });
         } else if (userId) {
-            await (prisma as any).subscription.update({
+            await prisma.subscription.update({
                 where: { user_id: userId },
                 data: {
                     is_active: isActive,

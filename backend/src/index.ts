@@ -1,27 +1,20 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
-import { validateConfig, ConfigError } from './utils/config.validator';
+import { validateConfig, getConfig } from './utils/config.validator';
 import { Logger } from './utils/logger';
 import prisma from './db';
 
 // Load environment variables immediately
 dotenv.config();
 
-try {
-    validateConfig();
-} catch (error) {
-    if (error instanceof ConfigError) {
-        console.error(`FATAL: ${error.message}`);
-        process.exit(1);
-    }
-    throw error;
-}
+// Validate config — exits process on failure in non-test mode
+validateConfig();
 
 import { app, httpServer } from './app';
 import { startCronJobs } from './cron';
 import { registerObservers } from './bootstrap/registerObservers';
 
-const port = process.env.PORT || 3000;
+const port = getConfig().PORT;
 
 const server = httpServer.listen(port, () => {
     Logger.info(`Server is running on port ${port}`);

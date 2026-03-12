@@ -27,6 +27,13 @@ export enum DisciplineStatus {
     STRICT = 'STRICT'
 }
 
+export interface DomainEvent {
+    type: DomainEventType;
+    timestamp: Date;
+    userId: string;
+    payload: any;
+}
+
 export interface DisciplineContext {
     userId: UserId;
     traceId: string;
@@ -42,6 +49,7 @@ export interface DisciplineContext {
         scheduled_date: Date;
         scheduled_start_time: Date;
         scheduled_end_time: Date;
+        executed_at?: Date;
     }[];
     policy: {
         rules: PolicyRules;

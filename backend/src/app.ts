@@ -89,19 +89,7 @@ app.use(helmet({
 }));
 
 const corsOptions = {
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-        const allowedOrigins = [
-            process.env.FRONTEND_URL?.replace(/\/$/, ''), // Normalize: remove trailing slash
-            'http://localhost:5173',
-            'http://localhost:3000'
-        ].filter(Boolean) as string[];
-
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY'],
@@ -134,9 +122,13 @@ app.use(versionMiddleware);
 const v1Router = express.Router();
 
 // Apply API Key globally to V1 except auth/public
-v1Router.use('/auth', authLimiter, authRoutes);
+if (process.env.NODE_ENV !== 'test') {
+    v1Router.use('/auth', authLimiter, authRoutes);
+    v1Router.use(apiLimiter);
+} else {
+    v1Router.use('/auth', authRoutes);
+}
 
-v1Router.use(apiLimiter);
 v1Router.use(apiKeyMiddleware); // Scoped to non-auth v1 routes
 
 v1Router.use('/user', userRoutes);

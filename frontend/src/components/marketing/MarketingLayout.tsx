@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 
-const MarketingNavbar: React.FC = () => {
+function MarketingNavbar() {
     return (
         <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-iron-900 border-dashed">
             <div className="max-w-7xl mx-auto px-6">
@@ -36,9 +36,9 @@ const MarketingNavbar: React.FC = () => {
             </div>
         </nav>
     );
-};
+}
 
-const MarketingFooter: React.FC = () => {
+function MarketingFooter() {
     return (
         <footer className="bg-black border-t border-iron-900 text-neutral-600 py-20 px-6">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
@@ -81,7 +81,7 @@ const MarketingFooter: React.FC = () => {
             </div>
         </footer>
     );
-};
+}
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -93,5 +93,5 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <MarketingFooter />
         </div>
     );
-};
+}
 

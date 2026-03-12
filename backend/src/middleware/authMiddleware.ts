@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/auth';
+import { firebaseAuth } from '../config/firebase';
 import prisma from '../db';
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any, ReqQuery = any> extends Request<P, ResBody, ReqBody, ReqQuery> {
@@ -23,34 +23,44 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     }
 
     try {
-        const payload = verifyToken(token) as any;
+        const decodedToken = await firebaseAuth.verifyIdToken(token);
 
-        if (!payload || !payload.userId) {
+        if (!decodedToken || !decodedToken.uid) {
             throw new Error('Invalid token payload');
         }
 
-        // Verify user exists and is active
-        const user = await prisma.user.findUnique({
-            where: { user_id: payload.userId },
-            select: { user_id: true }
+        // Verify user exists and is active using Firebase UID or Email fallback initially (for sync mapping)
+        const user = await (prisma as any).user.findFirst({
+            where: {
+                OR: [
+                    { firebase_uid: decodedToken.uid },
+                    { email: decodedToken.email || undefined }
+                ]
+            },
+            include: {
+                role: {
+                    include: { policy: true }
+                }
+            }
         });
 
         if (!user) {
-            console.error(`[Auth] User ${payload.userId} not found`);
+            console.error(`[Auth] User matching ${decodedToken.uid} not found`);
             return res.status(401).json({ error: 'Invalid authentication', code: 'USER_NOT_FOUND' });
         }
 
         (req as AuthRequest).user = {
-            userId: payload.userId,
-            email: (payload as any).email,
-            role: (payload as any).role
+            userId: user.user_id,
+            email: user.email,
+            role: user.role ? { name: user.role.name, policy: user.role.policy } : undefined
         };
+
         next();
     } catch (err: any) {
         console.warn(`[Auth] Token verification failed from ${req.ip}: ${err.message}`);
         return res.status(403).json({
             error: 'Invalid or expired token',
-            code: err.name === 'TokenExpiredError' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN'
+            code: err.code === 'auth/id-token-expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN'
         });
     }
 };

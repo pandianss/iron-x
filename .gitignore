@@ -30,3 +30,6 @@ frontend/dist/
 # Tests
 coverage/
 .nyc_output/
+
+# Secrets
+backend/firebase-service-account.json

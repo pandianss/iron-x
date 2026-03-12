@@ -1,30 +1,48 @@
+import { z } from 'zod';
 import { Logger } from './logger';
 
-export class ConfigError extends Error {
-    constructor(public missingVars: string[]) {
-        super(`Missing required environment variables: ${missingVars.join(', ')}`);
-        this.name = 'ConfigError';
-    }
-}
+const envSchema = z.object({
+    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+    JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+    PORT: z.coerce.number().min(1000).max(65535).default(3000),
+    FRONTEND_URL: z.string().url().optional(),
+    API_URL: z.string().url().optional(),
+    REDIS_URL: z.string().optional(),
+    STRIPE_SECRET_KEY: z.string().startsWith('sk_').optional(),
+});
 
-export const validateConfig = () => {
-    const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
+export type AppConfig = z.infer<typeof envSchema>;
 
-    // In production, we might want more strict checks
-    if (process.env.NODE_ENV === 'production') {
-        requiredEnvVars.push('FRONTEND_URL', 'API_URL');
-    }
+let _config: AppConfig | null = null;
 
-    const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+export const validateConfig = (): AppConfig => {
+    const result = envSchema.safeParse(process.env);
 
-    if (missingEnvVars.length > 0) {
-        if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'ci') {
-            Logger.warn(`[Config] Missing environment variables in ${process.env.NODE_ENV} mode: ${missingEnvVars.join(', ')}`);
-            return;
+    if (!result.success) {
+        const isTest = process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'ci';
+
+        if (isTest) {
+            Logger.warn('[Config] Validation warnings in test mode:');
+            result.error.errors.forEach(err => {
+                Logger.warn(`  - ${err.path.join('.')}: ${err.message}`);
+            });
+            return process.env as unknown as AppConfig;
         }
 
-        throw new ConfigError(missingEnvVars);
+        Logger.error('[Config] ❌ Environment configuration is invalid:');
+        result.error.errors.forEach(err => {
+            Logger.error(`  - ${err.path.join('.')}: ${err.message}`);
+        });
+        process.exit(1);
     }
 
-    Logger.info(`[Config] Configuration validated for ${process.env.NODE_ENV || 'development'} mode.`);
+    Logger.info(`[Config] ✅ Configuration validated for ${result.data.NODE_ENV} mode.`);
+    _config = result.data;
+    return result.data;
+};
+
+export const getConfig = (): AppConfig => {
+    if (!_config) throw new Error('Config not initialized. Call validateConfig() first.');
+    return _config;
 };

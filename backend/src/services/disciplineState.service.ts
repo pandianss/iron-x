@@ -4,7 +4,7 @@ import { injectable, inject } from 'tsyringe';
 
 interface DisciplineMetrics {
     score: number;
-    classification: 'STRICT' | 'STABLE' | 'DRIFTING' | 'BREACH';
+    classification: 'HIGH_RELIABILITY' | 'STABLE' | 'DRIFTING' | 'BREACH';
     compositePressure: number;
     driftVectors: Array<{
         source: string;
@@ -91,49 +91,41 @@ export class DisciplineStateService {
         userId: string,
         instances: any[]
     ): Promise<number> {
-        // Base score from user record
-        const user = await this.prisma.user.findUnique({
-            where: { user_id: userId },
-            select: { current_discipline_score: true }
-        });
-
-        let score = user?.current_discipline_score ?? 75;
-
-        // Calculate based on recent performance
-        const completedOnTime = instances.filter(
-            i => i.status === 'COMPLETED' // simplified check
-        ).length;
-
-        const completedLate = instances.filter(
-            i => i.status === 'LATE' // simplified check
-        ).length;
-
-        const missed = instances.filter(i => i.status === 'MISSED').length;
+        if (!instances || instances.length === 0) return 75; // Neutral start
 
         const total = instances.length;
+        const completedOnTime = instances.filter(i => {
+            if (i.status !== 'COMPLETED') return false;
+            if (!i.executed_at || !i.scheduled_end_time) return true;
+            return new Date(i.executed_at) <= new Date(i.scheduled_end_time);
+        }).length;
 
-        if (total > 0) {
-            const onTimeRate = completedOnTime / total;
-            const lateRate = completedLate / total;
-            const missRate = missed / total;
+        // Calculate Execution Lag (L_e) in hours
+        const totalLagMinutes = instances
+            .filter(i => i.executed_at && i.scheduled_end_time && new Date(i.executed_at) > new Date(i.scheduled_end_time))
+            .reduce((acc, i) => {
+                const diff = new Date(i.executed_at).getTime() - new Date(i.scheduled_end_time).getTime();
+                return acc + Math.round(diff / 60000);
+            }, 0);
 
-            // Weighted score calculation
-            score = (onTimeRate * 100) + (lateRate * 70) - (missRate * 30);
+        const executionLagHours = totalLagMinutes / 60;
 
-            // Clamp between 0-100
-            score = Math.max(0, Math.min(100, score));
-        }
+        // Formula: DS = (A_c / A_t) * 100 - (L_e * 0.5)
+        let score = (completedOnTime / total) * 100 - (executionLagHours * 0.5);
 
-        return Math.round(score * 10) / 10; // Round to 1 decimal
+        // Clamp between 0-100
+        score = Math.max(0, Math.min(100, score));
+
+        return Math.round(score * 10) / 10;
     }
 
     private classifyDiscipline(
         score: number,
         instances: any[]
-    ): 'STRICT' | 'STABLE' | 'DRIFTING' | 'BREACH' {
-        if (score >= 90) return 'STRICT';
-        if (score >= 70) return 'STABLE';
-        if (score >= 50) return 'DRIFTING';
+    ): 'HIGH_RELIABILITY' | 'STABLE' | 'DRIFTING' | 'BREACH' {
+        if (score >= 85) return 'HIGH_RELIABILITY';
+        if (score >= 50) return 'STABLE';
+        if (score >= 20) return 'DRIFTING';
         return 'BREACH';
     }
 
@@ -148,38 +140,45 @@ export class DisciplineStateService {
             direction: 'POSITIVE' | 'NEGATIVE';
         }> = [];
 
-        // Group by action to detect patterns
-        const actionGroups = instances.reduce((acc: any, inst) => {
-            const key = inst.action?.action_id || 'unknown';
-            if (!acc[key]) {
-                acc[key] = {
-                    title: inst.action?.title || 'Unknown Action',
-                    instances: []
-                };
-            }
-            acc[key].instances.push(inst);
-            return acc;
-        }, {});
+        if (instances.length === 0) return [];
 
-        // Calculate drift for each action
-        Object.entries(actionGroups).forEach(([actionId, group]: [string, any]) => {
-            const recent = group.instances.slice(0, 7); // Last 7 instances
-            const missed = recent.filter((i: any) => i.status === 'MISSED').length;
-            const late = recent.filter((i: any) => i.status === 'LATE').length;
+        const missed = instances.filter(i => i.status === 'MISSED');
+        if (missed.length === 0) {
+            vectors.push({ source: 'Performance Consistency', magnitude: 15, direction: 'POSITIVE' });
+            return vectors;
+        }
 
-            if (missed > 0 || late > 0) {
-                const magnitude = ((missed * 2 + late) / recent.length) * 100;
+        // Detect Day of Week pattern
+        const dayCounts: Record<number, number> = {};
+        missed.forEach(i => {
+            const day = new Date(i.scheduled_start_time).getDay();
+            dayCounts[day] = (dayCounts[day] || 0) + 1;
+        });
+
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        Object.entries(dayCounts).forEach(([day, count]) => {
+            if (count >= 2) {
                 vectors.push({
-                    source: group.title,
-                    magnitude: Math.round(magnitude * 10) / 10,
+                    source: `${days[parseInt(day)]} Pattern`,
+                    magnitude: Math.min(count * 20, 100),
                     direction: 'NEGATIVE'
                 });
-            } else if (recent.length >= 5 && missed === 0) {
-                // Positive drift for consistent performance
+            }
+        });
+
+        // Detect Time of Day pattern (Hourly bins)
+        const hourCounts: Record<number, number> = {};
+        missed.forEach(i => {
+            const hour = new Date(i.scheduled_start_time).getHours();
+            hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+        });
+
+        Object.entries(hourCounts).forEach(([hour, count]) => {
+            if (count >= 2) {
                 vectors.push({
-                    source: group.title,
-                    magnitude: 15,
-                    direction: 'POSITIVE'
+                    source: `${hour}:00 Window Pattern`,
+                    magnitude: Math.min(count * 20, 100),
+                    direction: 'NEGATIVE'
                 });
             }
         });
@@ -192,35 +191,50 @@ export class DisciplineStateService {
             .filter(v => v.direction === 'NEGATIVE')
             .reduce((sum, v) => sum + v.magnitude, 0);
 
+        // Weigh negative pressure by a factor of 0.8 and subtract positive buffer
         const positivePressure = driftVectors
             .filter(v => v.direction === 'POSITIVE')
             .reduce((sum, v) => sum + v.magnitude, 0);
 
-        return Math.round((negativePressure - positivePressure) * 10) / 10;
+        const pressure = (negativePressure * 0.8) - (positivePressure * 0.2);
+        return Math.round(Math.max(0, pressure) * 10) / 10;
     }
 
     private calculateViolationHorizon(score: number, instances: any[]): {
         daysUntilBreach: number | null;
         criticalActions: string[];
     } {
-        // Calculate trend
-        const recentScores = instances.slice(0, 14).map((inst, idx) => {
-            const dayScore = inst.status === 'COMPLETED' ? 5 :
-                inst.status === 'LATE' ? 2 : -3;
-            return dayScore;
-        });
+        if (score <= 20) return { daysUntilBreach: 0, criticalActions: [] };
 
-        const avgDailyChange = recentScores.length > 0 ? recentScores.reduce((a, b) => a + b, 0) / recentScores.length : 0;
+        // Calculate daily score delta over last 14 days
+        const fourteenDaysAgo = new Date();
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+        const recentInstances = instances.filter(i => new Date(i.scheduled_start_time) >= fourteenDaysAgo);
+        if (recentInstances.length < 5) return { daysUntilBreach: null, criticalActions: [] };
+
+        const missed = recentInstances.filter(i => i.status === 'MISSED').length;
+        const total = recentInstances.length;
+        const missRate = missed / total;
+
+        // Simplified projection: assume current performance continues
+        // If miss rate is high, calculate how many missed actions it takes to drop to 20
+        // DS = (A_c / A_t) * 100 - (L_e * 0.5)
+        // If we assume A_t increases by X per day and A_c increases by (1-missRate)*X per day
+        // And L_e increases proportionally...
+
+        // Linear decay estimate based on recent trend (dummy version for now as per prompt)
+        const avgDailyActions = total / 14;
+        const ptsLostPerAction = 100 / (total || 1); // rough scaling
+        const dailyDecay = missRate * avgDailyActions * ptsLostPerAction;
 
         let daysUntilBreach: number | null = null;
-        if (avgDailyChange < 0) {
-            const pointsToBreach = score - 50; // Breach threshold
-            daysUntilBreach = Math.max(1, Math.ceil(pointsToBreach / Math.abs(avgDailyChange)));
+        if (dailyDecay > 0) {
+            daysUntilBreach = Math.ceil((score - 20) / dailyDecay);
         }
 
-        // Find critical actions (most frequently missed)
         const actionMissCount: Record<string, number> = {};
-        instances.forEach(inst => {
+        recentInstances.forEach(inst => {
             if (inst.status === 'MISSED') {
                 const key = inst.action?.title || 'Unknown';
                 actionMissCount[key] = (actionMissCount[key] || 0) + 1;
@@ -337,6 +351,11 @@ export class DisciplineStateService {
     }
 
     async updateDisciplineScore(userId: string): Promise<number> {
+        const user = await (this.prisma.user.findUnique({
+            where: { user_id: userId },
+            select: { current_discipline_score: true, trust_tier: true }
+        }) as any);
+
         const instances = await this.prisma.actionInstance.findMany({
             where: {
                 user_id: userId,
@@ -347,6 +366,7 @@ export class DisciplineStateService {
             include: { action: true }
         });
 
+        const oldScore = user?.current_discipline_score ?? 75;
         const newScore = await this.calculateDisciplineScore(userId, instances);
         const classification = this.classifyDiscipline(newScore, instances);
 
@@ -357,6 +377,21 @@ export class DisciplineStateService {
                 discipline_classification: classification
             }
         });
+
+        // Notifications
+        const { container } = await import('tsyringe');
+        const { NotificationService } = await import('./notification.service');
+        const notifService = container.resolve(NotificationService);
+        await notifService.notifyScoreChange(userId, oldScore, newScore, classification);
+
+        // Trust Tier
+        const { TrustTierService } = await import('./trustTier.service');
+        const trustService = container.resolve(TrustTierService);
+        const newTier = await trustService.evaluateTierUpdate(userId);
+
+        if (newTier !== user?.trust_tier) {
+            await notifService.notifyTrustTierPromotion(userId, newTier);
+        }
 
         return newScore;
     }

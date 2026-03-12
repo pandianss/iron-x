@@ -32,29 +32,22 @@ VITE_API_URL="https://api.iron-x.com/api/v1"
 
 ## Deployment Steps
 
-### 1. Database Setup
-Ensure PostgreSQL is running and accessible.
-```bash
-cd backend
-npx prisma migrate deploy
+### 1. Local Setup (Recommended)
+We provide scripts to automate the local environment setup.
+```powershell
+.\scripts\setup-local.ps1
 ```
 
-### 2. Backend Deployment
-We recommend using Docker or a Node.js-ready platform.
-```bash
-cd backend
-npm install
-npm run build
-npm start
+### 2. Local Startup
+Launch both services concurrently:
+```powershell
+.\scripts\start-local.ps1
 ```
 
-### 3. Frontend Deployment
-The frontend can be deployed as a static site (Vercel, Netlify, S3).
+### 3. Alternative: Docker Setup
+If you prefer virtualization, you can still use Docker Compose:
 ```bash
-cd frontend
-npm install
-npm run build
-# Deploy 'dist' folder
+docker-compose up -d
 ```
 
 ## Production Checklist

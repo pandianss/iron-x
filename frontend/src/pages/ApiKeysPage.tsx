@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     Code2, 
     Plus, 
     Trash2, 
     Copy, 
     Check, 
-    Clock, 
     ShieldAlert, 
     Key, 
     ExternalLink, 
     Lock,
     X,
-    Loader2,
-    Shield
+    Loader2
 } from 'lucide-react';
 import { IntegrationClient } from '../domain/integration';
 import { BillingClient, Subscription } from '../domain/billing';

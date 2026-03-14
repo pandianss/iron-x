@@ -38,7 +38,7 @@ export default function OrganizationDashboardPage() {
             const [orgStats, orgWebhooks, orgKeys, logsResponse] = await Promise.all([
                 OrganizationClient.getStats(organization.org_id),
                 IntegrationClient.getWebhooks(organization.org_id),
-                IntegrationClient.getApiKeys(organization.org_id),
+                IntegrationClient.getApiKeys(),
                 AnalyticsClient.getAuditLogs({ limit: 10 })
             ]);
 
@@ -68,10 +68,10 @@ export default function OrganizationDashboardPage() {
     const handleGenerateKey = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const result = await IntegrationClient.generateApiKey(org.org_id, newKeyName);
+            const result = await IntegrationClient.generateApiKey(newKeyName);
             setGeneratedKey(result.plainKey);
             setNewKeyName('');
-            const updated = await IntegrationClient.getApiKeys(org.org_id);
+            const updated = await IntegrationClient.getApiKeys();
             setApiKeys(updated);
         } catch {
             setError('Failed to generate API key');

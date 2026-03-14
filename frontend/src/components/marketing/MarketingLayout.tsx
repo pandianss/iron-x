@@ -53,7 +53,7 @@ function MarketingFooter() {
                     <ul className="space-y-3 text-[10px] font-mono uppercase tracking-widest">
                         <li><Link to="/pricing" className="hover:text-white transition-colors">Licensing</Link></li>
                         <li><Link to="/roi-calculator" className="hover:text-white transition-colors">Projection Engine</Link></li>
-                        <li><a href="https://api.iron-x.com/api/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Architecture</a></li>
+                        <li><a href={`${import.meta.env.VITE_API_URL?.replace('/api/v1', '') ?? 'https://api.iron-x.com'}/api/docs`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Architecture</a></li>
                     </ul>
                 </div>
                 <div>

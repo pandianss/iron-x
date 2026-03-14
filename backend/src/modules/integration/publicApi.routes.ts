@@ -3,11 +3,13 @@ import { apiKeyMiddleware, ApiKeyRequest } from '../../middleware/apiKeyMiddlewa
 import { ExternalApiService } from '../../services/externalApi.service';
 import { container } from 'tsyringe';
 import prisma from '../../db';
+import { publicApiLimiter } from '../../middleware/rateLimitMiddleware';
 
 const router = Router();
 const externalApiService = container.resolve(ExternalApiService);
 
 // Secure all routes in this router with API Key
+router.use(publicApiLimiter);
 router.use(apiKeyMiddleware);
 
 // Middleware to ensure a key was actually provided and valid (since apiKeyMiddleware falls back to next() if no key)

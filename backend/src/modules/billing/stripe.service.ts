@@ -3,6 +3,8 @@ import Stripe from 'stripe';
 import prisma from '../../db';
 import { container } from 'tsyringe';
 
+import { Logger } from '../../utils/logger';
+
 export class StripeService {
     private stripe: Stripe;
 
@@ -73,30 +75,19 @@ export class StripeService {
 
     async handleWebhook(signature: string, payload: Buffer) {
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
         if (!webhookSecret) {
-            // In dev/test, if secret is missing, we might want to log warn and proceed or fail.
-            // For verification script, we might not have it set in container env unless we set it.
-            // Let's assume strict check.
-            console.warn('STRIPE_WEBHOOK_SECRET not set');
-            // throw new Error('STRIPE_WEBHOOK_SECRET not set');
+            // Fail hard and loud — missing webhook secret means no subscriptions will activate
+            Logger.error('[Stripe] STRIPE_WEBHOOK_SECRET is not set. All webhook events will be rejected.');
+            throw new Error('STRIPE_WEBHOOK_SECRET not configured. Set it in environment variables.');
         }
 
         let event: Stripe.Event;
-
         try {
-            if (webhookSecret) {
-                event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-            } else {
-                // Mock event construction if secret is missing (DANGEROUS in prod, ok for MVP dev/test if we accept anything)
-                // But verify_stripe sends a fake signature which will fail signature verification if we strictly enforce it.
-                // The verification script expects 400 if signature fails.
-                // If we want to support mock, we might need a bypass.
-                // For now, let's allow it to throw if construction fails.
-                event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret!);
-            }
+            event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
         } catch (err: any) {
-            console.error(`Webhook signature verification failed.`, err.message);
-            throw new Error(`Webhook Error: ${err.message}`);
+            Logger.error(`[Stripe] Webhook signature verification failed: ${err.message}`);
+            throw new Error(`Webhook signature invalid: ${err.message}`);
         }
 
         switch (event.type) {
@@ -110,7 +101,7 @@ export class StripeService {
                 await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
                 break;
             default:
-                console.log(`Unhandled event type ${event.type}`);
+                Logger.info(`[Stripe] Unhandled event type: ${event.type}`);
         }
     }
 
@@ -127,20 +118,45 @@ export class StripeService {
 
     private async handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         const userId = session.metadata?.userId;
-        const subscriptionId = session.subscription as string;
-
-        if (userId && subscriptionId) {
-            await (prisma as any).subscription.update({
-                where: { user_id: userId },
-                data: {
-                    stripe_subscription_id: subscriptionId,
-                    plan_tier: 'INDIVIDUAL_PRO',
-                    is_active: true,
-                    start_date: new Date(),
-                    end_date: null
-                }
-            });
+        if (!userId) {
+            Logger.error('[Stripe] checkout.session.completed missing userId in metadata');
+            return;
         }
+
+        // Determine tier from the price ID purchased
+        const lineItems = await this.stripe.checkout.sessions.listLineItems(session.id);
+        const priceId = lineItems.data[0]?.price?.id;
+
+        // Map price ID to subscription tier
+        // Update these to match your actual Stripe price IDs
+        const tierMap: Record<string, string> = {
+            'price_pro_monthly': 'INDIVIDUAL_PRO',
+            'price_enterprise_seats': 'TEAM_ENTERPRISE',
+        };
+
+        const tier = tierMap[priceId || ''];
+        if (!tier) {
+            Logger.warn(`[Stripe] Unknown price ID in checkout: ${priceId}`);
+            return;
+        }
+
+        await (prisma as any).subscription.upsert({
+            where: { user_id: userId },
+            update: {
+                plan_tier: tier as any,
+                stripe_subscription_id: session.subscription as string,
+                is_active: true,
+                updated_at: new Date()
+            },
+            create: {
+                user_id: userId,
+                plan_tier: tier as any,
+                stripe_subscription_id: session.subscription as string,
+                is_active: true
+            }
+        });
+
+        Logger.info(`[Stripe] User ${userId} upgraded to ${tier}`);
     }
 
     private async handleInvoicePaid(invoice: Stripe.Invoice) {

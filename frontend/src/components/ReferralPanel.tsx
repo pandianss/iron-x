@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../domain/api';
-import { Share2, Copy, Check, Users, Gift, Loader2 } from 'lucide-react';
+import { Copy, Check, Users, Gift, Loader2 } from 'lucide-react';
 
 export default function ReferralPanel() {
     const [stats, setStats] = useState<any>(null);

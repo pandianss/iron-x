@@ -8,6 +8,10 @@ export interface User {
         name: string;
         slug: string;
     };
+    role?: {
+        name: string;
+    };
+    plan_tier?: string;
 }
 
 export interface AuthContextType {

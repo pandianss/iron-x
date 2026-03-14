@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

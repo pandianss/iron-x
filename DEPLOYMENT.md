@@ -50,21 +50,11 @@ If you prefer virtualization, you can still use Docker Compose:
 docker-compose up -d
 ```
 
-### 3b. Seed Required System Roles
+## Deployment Sequence (run in order)
+1. `npm run migrate:prod`   — applies all pending migrations
+2. `npm run db:seed`        — seeds COACH and ADMIN roles (idempotent)
+3. `npm start`              — starts the server
 
-After running migrations, seed the system roles (required for Coach Mode and RBAC):
-
-```bash
-cd backend
-npx ts-node seed_roles.ts
-```
-
-This is idempotent — safe to run multiple times. It creates:
-- `ADMIN` role
-- `COACH` role (with `BYPASS_LOCKOUT` permission)
-- Standard user roles
-
-**This step is required.** Skipping it will cause `POST /api/v1/coach/initialize` to return a 500 error.
 
 ## Production Checklist
 - [ ] Enable SSL (HTTPS) for both API and Frontend.

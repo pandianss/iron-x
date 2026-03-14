@@ -10,6 +10,8 @@ import WeeklyReportModal from '../components/WeeklyReportModal';
 import { BookOpen, X } from 'lucide-react';
 import { BillingClient } from '../domain/billing';
 import { WitnessClient } from '../domain/witness';
+import ReferralPanel from '../components/ReferralPanel';
+import OnboardingChecklist from '../components/OnboardingChecklist';
 
 export default function DashboardPage() {
     const { token, logout, user } = useAuth();
@@ -114,6 +116,8 @@ export default function DashboardPage() {
 
                 <AttentionDensityStrip />
 
+                <OnboardingChecklist />
+
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-iron-900">
                     <div>
                         <h1 className="text-4xl font-bold font-display text-white uppercase tracking-tight">
@@ -160,6 +164,9 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
+                <div className="pt-12 border-t border-iron-900">
+                    <ReferralPanel />
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         <DisciplineDashboard />

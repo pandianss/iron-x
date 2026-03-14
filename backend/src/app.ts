@@ -25,6 +25,7 @@ import analyticsRoutes from './modules/analytics/analytics.routes';
 import securityRoutes from './modules/auth/security.routes';
 import organizationRoutes from './modules/organization/organization.routes';
 import publicProfileRoutes from './modules/user/publicProfile.routes';
+import referralRoutes from './modules/user/referral.routes';
 import witnessRoutes from './modules/witness/witness.routes';
 import driftReportRoutes from './modules/analytics/driftReport.routes';
 import coachRoutes from './modules/coach/coach.routes';
@@ -138,6 +139,7 @@ if (process.env.NODE_ENV !== 'test') {
 v1Router.use(apiKeyMiddleware); // Scoped to non-auth v1 routes
 
 v1Router.use('/user', userRoutes);
+v1Router.use('/referral', referralRoutes);
 v1Router.use('/admin', adminRoutes);
 v1Router.use('/team', teamRoutes);
 v1Router.use('/goals', goalRoutes);

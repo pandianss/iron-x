@@ -2,10 +2,10 @@ import { api } from './api';
 
 export const WitnessClient = {
   assignWitness: (actionId: string, witnessUserId: string) =>
-    api.post(`/actions/${actionId}/witness`, { witnessUserId }).then(r => r.data),
+    api.post(`/witness/actions/${actionId}/witness`, { witnessUserId }).then(r => r.data),
 
   removeWitness: (actionId: string) =>
-    api.delete(`/actions/${actionId}/witness`).then(r => r.data),
+    api.delete(`/witness/actions/${actionId}/witness`).then(r => r.data),
 
   getWatchedActions: () =>
     api.get('/witness/watching').then(r => r.data),

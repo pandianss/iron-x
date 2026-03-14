@@ -14,7 +14,7 @@ function MarketingNavbar() {
                         </Link>
                         <div className="hidden md:flex items-center gap-8">
                             <Link to="/pricing" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Licensing</Link>
-                            <Link to="/roi-calculator" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Projection Engine</Link>
+                            <Link to="/pricing" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Projection Engine</Link>
                         </div>
                     </div>
                     <div className="flex items-center gap-8">
@@ -52,8 +52,8 @@ function MarketingFooter() {
                     <h4 className="text-white font-bold font-display uppercase tracking-widest text-xs mb-6">Environment</h4>
                     <ul className="space-y-3 text-[10px] font-mono uppercase tracking-widest">
                         <li><Link to="/pricing" className="hover:text-white transition-colors">Licensing</Link></li>
-                        <li><Link to="/roi-calculator" className="hover:text-white transition-colors">Projection Engine</Link></li>
-                        <li><Link to="/docs" className="hover:text-white transition-colors">Architecture</Link></li>
+                        <li><Link to="/pricing" className="hover:text-white transition-colors">Projection Engine</Link></li>
+                        <li><a href="http://localhost:3000/api/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Architecture</a></li>
                     </ul>
                 </div>
                 <div>
@@ -67,9 +67,18 @@ function MarketingFooter() {
                 <div>
                     <h4 className="text-white font-bold font-display uppercase tracking-widest text-xs mb-6">Support</h4>
                     <ul className="space-y-3 text-[10px] font-mono uppercase tracking-widest">
-                        <li><Link to="/contact" className="hover:text-white transition-colors">Open Ticket</Link></li>
-                        <li><Link to="/status" className="hover:text-white transition-colors">System State</Link></li>
+                        <li><a href="mailto:enterprise@iron-x.com" className="hover:text-white transition-colors">Open Ticket</a></li>
+                        <li><a href="https://status.iron-x.com" target="_blank" rel="noopener" className="hover:text-white transition-colors">System State</a></li>
                     </ul>
+
+
+
+
+
+
+
+
+
                 </div>
             </div>
             <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-iron-900/30 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono uppercase tracking-widest text-iron-800">

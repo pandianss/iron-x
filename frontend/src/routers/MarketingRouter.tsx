@@ -1,6 +1,8 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
 import HomePage from '../pages/marketing/HomePage';
 import IndustryPage from '../pages/marketing/IndustryPage';
+import RoiCalculatorPage from '../pages/marketing/RoiCalculatorPage';
+import LockoutPage from '../pages/marketing/LockoutPage';
 import PricingPage from '../pages/PricingPage';
 import JoinTeamPage from '../pages/JoinTeamPage';
 import LoginPage from '../pages/LoginPage';
@@ -15,6 +17,9 @@ const MarketingRouter = () => {
             <Route path="/solutions/:industry" element={<IndustryPage />} />
             <Route path="/solutions" element={<Navigate to="/" replace />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/roi-calculator" element={<RoiCalculatorPage />} />
+            <Route path="/lockout" element={<LockoutPage />} />
+            <Route path="/docs" element={<Navigate to="/pricing" replace />} />
             <Route path="/join/:token" element={<JoinTeamPage />} />
 
             {/* Auth Routes - Public but often entry points to App */}

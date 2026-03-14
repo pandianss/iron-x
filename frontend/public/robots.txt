@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://iron-x.com/sitemap.xml

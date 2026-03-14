@@ -75,6 +75,31 @@ export class EmailService {
         await this.transporter.sendMail(mailOptions);
         return true;
     }
+
+    // Onboarding Drip Sequence (B4)
+    async sendDripDay1(to: string, userName: string) {
+        return this.sendEmail(
+            to,
+            "Iron-X Node: Systems Check & Core Protocol",
+            `Hello ${userName},\n\nYour integration with the Iron-X Protocol has begun. On Day 1, we focus on Structural Enforcement. Ensure your hard lockouts are configured for your highest entropy tasks.\n\nDiscipline is an engineering requirement.`
+        );
+    }
+
+    async sendDripDay3(to: string, userName: string) {
+        return this.sendEmail(
+            to,
+            "Operational Insight: Interpreting Your Drift Score",
+            `Hello ${userName},\n\nBy now, the system has baseline data on your behavioral drift. Access your analytics dashboard to see where your entropy is highest.\n\nSmall deviations accumulate into system failure.`
+        );
+    }
+
+    async sendDripDay7(to: string, userName: string) {
+        return this.sendEmail(
+            to,
+            "Protocol Review: Upgrade to Tier-1 Operator",
+            `Hello ${userName},\n\nInitial evaluation complete. Your discipline trajectory is now available. To enable advanced Hard Lockouts and full AI Drift Analysis, initialize an OPERATOR node.\n\n[Upgrade Link](https://iron-x.com/pricing)`
+        );
+    }
 }
 
 export const emailService = new EmailService();

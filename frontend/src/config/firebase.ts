@@ -3,16 +3,14 @@ import { getAuth } from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCX9IruooFr3yAnr6m55whAIQItE_FoCjI",
-    authDomain: "ironx-640b2.firebaseapp.com",
-    projectId: "ironx-640b2",
-    storageBucket: "ironx-640b2.firebasestorage.app",
-    messagingSenderId: "328614818720",
-    appId: "1:328614818720:web:d1dadcc2d44c44237e2ac5",
-    measurementId: "G-M48YB84C8K"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
-
-console.log('Firebase Config loaded:', firebaseConfig);
 
 export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);

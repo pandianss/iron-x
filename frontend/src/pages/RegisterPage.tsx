@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { AuthClient } from '../domain/auth';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { api } from '../domain/api';
+
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -11,6 +13,8 @@ export default function RegisterPage() {
     const [orgSlug, setOrgSlug] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const referralCode = searchParams.get('ref');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,8 +31,14 @@ export default function RegisterPage() {
                 orgSlug: orgSlug || undefined
             });
 
-            // The AuthContext onAuthStateChanged listener will also fire and sync, 
-            // but providing the extended data here ensures the org is created.
+            // 3. Apply referral if present
+            if (referralCode) {
+                try {
+                    await api.post('/referral/apply', { code: referralCode });
+                } catch (e) {
+                    console.warn('Referral apply failed:', e);
+                }
+            }
 
             navigate('/cockpit');
         } catch (err: unknown) {

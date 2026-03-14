@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { StripeService } from './stripe.service';
 import { AuthRequest } from '../../middleware/authMiddleware';
+import prisma from '../../db';
 
 const stripeService = container.resolve(StripeService);
 
@@ -10,20 +11,23 @@ export class StripeController {
     async createCheckoutSession(req: AuthRequest, res: Response) {
         try {
             const { priceId, successUrl, cancelUrl } = req.body;
-            // AuthRequest ensures user is present if authenticateToken middleware passes
-            // But strict null checks might still complain if optional
-            const user = req.user;
-            if (!user) {
+            const userId = req.user?.userId;
+            if (!userId) {
                 res.status(401).json({ error: 'Unauthorized' });
                 return;
             }
-            const userId = user.userId;
-            const email = 'test@example.com';
-            // AuthRequest definition in authMiddleware.ts only has userId.
-            // We need to fetch email or update AuthRequest.
-            // For now, let's use a dummy or fetch user?
-            // StripeService.createCheckoutSession needs email to create customer.
-            // Let's rely on fallback in service or here.
+
+            const dbUser = await prisma.user.findUnique({
+                where: { user_id: userId },
+                select: { email: true }
+            });
+
+            if (!dbUser) {
+                res.status(404).json({ error: 'User not found' });
+                return;
+            }
+
+            const email = dbUser.email;
 
             const session = await stripeService.createCheckoutSession(userId, email, priceId, successUrl, cancelUrl);
             res.json({ url: session.url });

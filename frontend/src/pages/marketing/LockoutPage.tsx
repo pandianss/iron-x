@@ -2,6 +2,20 @@ import { Lock, ShieldAlert, Twitter, Download, ArrowRight, ExternalLink } from '
 import { Link } from 'react-router-dom';
 
 export default function LockoutPage() {
+    const lockoutData = JSON.parse(sessionStorage.getItem('lockout_data') || '{}');
+    const lockedUntil = lockoutData.locked_until ? new Date(lockoutData.locked_until) : null;
+    
+    const getTimeRemaining = (until: Date) => {
+        const diff = until.getTime() - new Date().getTime();
+        if (diff <= 0) return '00:00:00';
+        const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    };
+
+    const remaining = lockedUntil ? getTimeRemaining(lockedUntil) : '—';
+
     return (
         <div className="min-h-screen bg-black text-white font-mono flex items-center justify-center p-6 selection:bg-red-600 selection:text-white">
             <div className="max-w-xl w-full space-y-12">
@@ -30,13 +44,13 @@ export default function LockoutPage() {
 
                     <div className="space-y-4">
                         <div className="text-[10px] text-red-700 uppercase tracking-widest border-b border-red-900 pb-2">Reason for Enforcement</div>
-                        <p className="text-lg font-bold uppercase">"Drift Threshold Exceeded: 3 Consecutive Missed Focus Windows"</p>
+                        <p className="text-lg font-bold uppercase">"{lockoutData.message || 'Discipline threshold exceeded'}"</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 border border-red-900 bg-red-950/10">
                             <div className="text-[8px] text-red-800 uppercase tracking-widest mb-1">Duration</div>
-                            <div className="text-2xl font-display font-black">04:00:00</div>
+                            <div className="text-2xl font-display font-black">{remaining}</div>
                         </div>
                         <div className="p-4 border border-red-900 bg-red-950/10">
                             <div className="text-[8px] text-red-800 uppercase tracking-widest mb-1">Penalty</div>

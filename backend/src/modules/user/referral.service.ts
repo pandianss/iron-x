@@ -57,7 +57,8 @@ export class ReferralService {
             data: { referred_by: referrer.user_id }
         });
 
-        return { success: true, referrerName: referrer.name };
+        const emailPrefix = referrer.email.split('@')[0];
+        return { success: true, referrerName: emailPrefix };
     }
 
     async getReferralStats(userId: string) {
@@ -66,10 +67,10 @@ export class ReferralService {
             where: { referred_by: userId }
         });
 
-        // Get referred users who reached OPERATOR+ (dummy logic for now, could be based on subscription)
+        // Get referred users who reached OPERATOR+ (dummy logic for now, could be based on subscription or role_id)
         const activeReferrals = await this.prisma.user.findMany({
-            where: { referred_by: userId, role: { name: 'OPERATOR' } },
-            select: { name: true, created_at: true }
+            where: { referred_by: userId, role_id: { not: null } },
+            select: { email: true, created_at: true }
         });
 
         return {

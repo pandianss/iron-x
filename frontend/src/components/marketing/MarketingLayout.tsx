@@ -14,7 +14,7 @@ function MarketingNavbar() {
                         </Link>
                         <div className="hidden md:flex items-center gap-8">
                             <Link to="/pricing" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Licensing</Link>
-                            <Link to="/pricing" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Projection Engine</Link>
+                            <Link to="/roi-calculator" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Projection Engine</Link>
                         </div>
                     </div>
                     <div className="flex items-center gap-8">
@@ -52,8 +52,8 @@ function MarketingFooter() {
                     <h4 className="text-white font-bold font-display uppercase tracking-widest text-xs mb-6">Environment</h4>
                     <ul className="space-y-3 text-[10px] font-mono uppercase tracking-widest">
                         <li><Link to="/pricing" className="hover:text-white transition-colors">Licensing</Link></li>
-                        <li><Link to="/pricing" className="hover:text-white transition-colors">Projection Engine</Link></li>
-                        <li><a href="http://localhost:3000/api/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Architecture</a></li>
+                        <li><Link to="/roi-calculator" className="hover:text-white transition-colors">Projection Engine</Link></li>
+                        <li><a href="https://api.iron-x.com/api/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Architecture</a></li>
                     </ul>
                 </div>
                 <div>

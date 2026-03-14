@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { auth } from '../config/firebase';
 
-const API_URL = 'http://localhost:3000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 export const api = axios.create({
     baseURL: API_URL,
@@ -43,6 +43,16 @@ api.interceptors.response.use(
         if (error.response?.status === 403) {
             const msg: string = error.response.data?.message || '';
             const code: string = error.response.data?.code || '';
+            
+            if (code === 'GOV_LOCKOUT') {
+                sessionStorage.setItem('lockout_data', JSON.stringify({
+                    locked_until: error.response.data.locked_until,
+                    message: error.response.data.message,
+                }));
+                window.location.href = '/lockout';
+                return Promise.reject(error);
+            }
+
             if (msg.includes('Plan limit reached') || msg.includes('Resource limit reached') || code === 'PLAN_LIMIT_EXCEEDED') {
                 const extractResource = (m: string) => {
                     const upper = m.toUpperCase();

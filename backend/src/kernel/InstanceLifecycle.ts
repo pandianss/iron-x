@@ -3,6 +3,8 @@ import prisma from '../db';
 import { UserId, DisciplineContext } from './domain/types';
 import { DisciplinePolicy } from './policies/DisciplinePolicy';
 import { kernelEvents, DomainEventType } from './events/bus';
+import { container } from 'tsyringe';
+import { DisciplineStateService } from '../services/disciplineState.service';
 
 export class InstanceLifecycle {
     async loadContext(userId: string): Promise<DisciplineContext> {
@@ -171,6 +173,10 @@ export class InstanceLifecycle {
                 policy: context.policy
             }, context.userId);
         }
+
+        // TRIGGER DISCIPLINE REFRESH
+        const disciplineStateService = container.resolve(DisciplineStateService);
+        await disciplineStateService.updateDisciplineScore(context.userId);
 
         return instanceIds;
     }

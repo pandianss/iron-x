@@ -5,6 +5,9 @@ import prisma from '../db';
 import { kernel } from '../kernel/DisciplineEngine';
 import { v4 as uuidv4 } from 'uuid';
 import { kernelEvents, DomainEventType } from '../kernel/events/bus';
+import { container } from 'tsyringe';
+import { DisciplineStateService } from '../services/disciplineState.service';
+import { WitnessService } from '../services/witness.service';
 
 export const getDailySchedule = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
@@ -83,6 +86,10 @@ export const logExecution = async (req: AuthRequest, res: Response) => {
         if (status === 'COMPLETED' || status === 'LATE') {
             await witnessService.handleActionCompleted(id);
         }
+
+        // TRIGGER DISCIPLINE REFRESH
+        const disciplineStateService = container.resolve(DisciplineStateService);
+        await disciplineStateService.updateDisciplineScore(userId);
 
         kernelEvents.emitEvent(DomainEventType.INSTANCE_STATUS_CHANGED, {
             instanceId: id,

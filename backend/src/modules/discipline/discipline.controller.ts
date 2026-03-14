@@ -1,3 +1,4 @@
+// backend/src/modules/discipline/discipline.controller.ts
 
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
@@ -22,9 +23,9 @@ export class DisciplineController {
             res.json(state);
         } catch (error: any) {
             console.error('[Discipline] Error fetching state:', error);
-            res.status(500).json({
+            res.status(500).json({ 
                 error: 'Failed to fetch discipline state',
-                message: error.message
+                message: error.message 
             });
         }
     }
@@ -49,9 +50,9 @@ export class DisciplineController {
             });
         } catch (error: any) {
             console.error('[Discipline] Error fetching pressure:', error);
-            res.status(500).json({
+            res.status(500).json({ 
                 error: 'Failed to fetch pressure data',
-                message: error.message
+                message: error.message 
             });
         }
     }
@@ -67,22 +68,22 @@ export class DisciplineController {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
 
-            const prisma = container.resolve('PrismaClient' as any) as any;
-
+            const prisma = container.resolve('PrismaClient' as any);
+            
             // Get action instances from last 30 days
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
             const instances = await prisma.actionInstance.findMany({
                 where: {
-                    user_id: userId,
+                    action: { user_id: userId },
                     scheduled_start_time: { gte: thirtyDaysAgo }
                 },
                 orderBy: { scheduled_start_time: 'asc' },
                 select: {
                     scheduled_start_time: true,
                     status: true,
-                    // completion_time_offset_minutes might not exist, logic handles it
+                    completion_time_offset_minutes: true
                 }
             });
 
@@ -90,19 +91,21 @@ export class DisciplineController {
             const dailyScores: Array<{ date: string; score: number }> = [];
             const dayMap = new Map<string, { completed: number; missed: number; late: number }>();
 
-            instances.forEach((inst: any) => {
+            instances.forEach(inst => {
                 const dateKey = inst.scheduled_start_time.toISOString().split('T')[0];
                 if (!dayMap.has(dateKey)) {
                     dayMap.set(dateKey, { completed: 0, missed: 0, late: 0 });
                 }
-
+                
                 const day = dayMap.get(dateKey)!;
                 if (inst.status === 'COMPLETED') {
-                    day.completed++;
+                    if (inst.completion_time_offset_minutes && inst.completion_time_offset_minutes > 0) {
+                        day.late++;
+                    } else {
+                        day.completed++;
+                    }
                 } else if (inst.status === 'MISSED') {
                     day.missed++;
-                } else if (inst.status === 'LATE') {
-                    day.late++;
                 }
             });
 
@@ -113,15 +116,15 @@ export class DisciplineController {
                 .forEach(([date, stats]) => {
                     const total = stats.completed + stats.late + stats.missed;
                     if (total > 0) {
-                        const dailyPerformance =
-                            (stats.completed / total) * 100 +
-                            (stats.late / total) * 70 -
+                        const dailyPerformance = 
+                            (stats.completed / total) * 100 + 
+                            (stats.late / total) * 70 - 
                             (stats.missed / total) * 30;
-
+                        
                         // Smooth the score changes
                         runningScore = runningScore * 0.7 + dailyPerformance * 0.3;
                     }
-
+                    
                     dailyScores.push({
                         date,
                         score: Math.round(runningScore * 10) / 10
@@ -131,9 +134,9 @@ export class DisciplineController {
             res.json({ trajectory: dailyScores });
         } catch (error: any) {
             console.error('[Discipline] Error fetching trajectory:', error);
-            res.status(500).json({
+            res.status(500).json({ 
                 error: 'Failed to fetch trajectory',
-                message: error.message
+                message: error.message 
             });
         }
     }
@@ -162,9 +165,9 @@ export class DisciplineController {
             });
         } catch (error: any) {
             console.error('[Discipline] Error fetching identity:', error);
-            res.status(500).json({
+            res.status(500).json({ 
                 error: 'Failed to fetch identity',
-                message: error.message
+                message: error.message 
             });
         }
     }
@@ -183,88 +186,16 @@ export class DisciplineController {
             const service = container.resolve(DisciplineStateService);
             const newScore = await service.updateDisciplineScore(userId);
 
-            res.json({
-                success: true,
+            res.json({ 
+                success: true, 
                 newScore,
                 message: 'Discipline score recalculated successfully'
             });
         } catch (error: any) {
             console.error('[Discipline] Error refreshing score:', error);
-            res.status(500).json({
+            res.status(500).json({ 
                 error: 'Failed to refresh score',
-                message: error.message
-            });
-        }
-    }
-
-    /**
-     * GET /api/v1/discipline/history
-     * Returns audit log / history
-     */
-    static async getHistory(req: AuthRequest, res: Response) {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-
-            const service = container.resolve(DisciplineStateService);
-            const history = await service.getAuditLog(userId);
-
-            res.json(history);
-        } catch (error: any) {
-            console.error('[Discipline] Error fetching history:', error);
-            res.status(500).json({
-                error: 'Failed to fetch history',
-                message: error.message
-            });
-        }
-    }
-
-    /**
-     * GET /api/v1/discipline/preview
-     * Returns tomorrow preview
-     */
-    static async getPreview(req: AuthRequest, res: Response) {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-
-            const service = container.resolve(DisciplineStateService);
-            const preview = await service.getTomorrowPreview(userId);
-
-            res.json(preview);
-        } catch (error: any) {
-            console.error('[Discipline] Error fetching preview:', error);
-            res.status(500).json({
-                error: 'Failed to fetch preview',
-                message: error.message
-            });
-        }
-    }
-
-    /**
-     * GET /api/v1/discipline/warnings
-     * Returns anticipatory warnings
-     */
-    static async getWarnings(req: AuthRequest, res: Response) {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-
-            const service = container.resolve(DisciplineStateService);
-            const warnings = await service.getAnticipatoryWarnings(userId);
-
-            res.json(warnings);
-        } catch (error: any) {
-            console.error('[Discipline] Error fetching warnings:', error);
-            res.status(500).json({
-                error: 'Failed to fetch warnings',
-                message: error.message
+                message: error.message 
             });
         }
     }

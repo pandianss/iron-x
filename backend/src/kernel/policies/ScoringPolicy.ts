@@ -9,20 +9,26 @@ export class ScoringPolicy {
         const total = instances.filter(i => i.status !== 'PENDING').length;
         if (total === 0) return 50;
 
-        const completed = instances.filter(i => i.status === 'COMPLETED').length;
-        const executionRate = completed / total;
-
-        const onTime = instances.filter(i => {
+        const completedOnTime = instances.filter(i => {
             if (i.status !== 'COMPLETED') return false;
-            if (!i.executed_at || !i.scheduled_end_time) return true; // Legacy/missing data, assume on time if completed
+            if (!i.executed_at || !i.scheduled_end_time) return true;
             return new Date(i.executed_at) <= new Date(i.scheduled_end_time);
         }).length;
 
-        const onTimeRate = completed > 0 ? (onTime / completed) : 0;
+        const completedLate = instances.filter(i => {
+            if (i.status !== 'COMPLETED') return false;
+            if (!i.executed_at || !i.scheduled_end_time) return false;
+            return new Date(i.executed_at) > new Date(i.scheduled_end_time);
+        }).length;
 
-        // Weight: 70% Execution, 30% On-Time
-        const combinedRate = (executionRate * 0.7) + (onTimeRate * 0.3);
+        const missed = instances.filter(i => i.status === 'MISSED').length;
 
-        return Math.round(combinedRate * 100);
+        const onTimeRate = completedOnTime / total;
+        const lateRate = completedLate / total;
+        const missRate = missed / total;
+
+        const score = (onTimeRate * 100) + (lateRate * 70) - (missRate * 30);
+        
+        return Math.max(0, Math.min(100, Math.round(score)));
     }
 }

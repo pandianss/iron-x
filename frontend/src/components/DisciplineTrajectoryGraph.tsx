@@ -1,26 +1,43 @@
-import { useState } from 'react';
-import { useTrajectoryHistory, useTrajectoryProjection } from '../hooks/useTrajectory';
-import { useDiscipline } from '../hooks/useDiscipline';
+import { useEffect, useState } from 'react';
+import { DisciplineClient, TrajectoryData } from '../domain/discipline';
 
 export default function DisciplineTrajectoryGraph() {
-    const { refreshTrigger } = useDiscipline();
+    const [data, setData] = useState<TrajectoryData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [days, setDays] = useState(30);
-    const { data, loading: historyLoading, error: historyError } = useTrajectoryHistory(days, refreshTrigger);
-    const { data: projection, loading: projectionLoading } = useTrajectoryProjection();
 
-    const loading = historyLoading || projectionLoading;
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const result = await DisciplineClient.getTrajectory();
+                setData(result);
+                setError(null);
+            } catch (err: any) {
+                console.error('Failed to fetch trajectory history:', err);
+                setError(err.response?.data?.error || 'Failed to load trajectory data');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    if (loading) return <div className="animate-pulse h-64 bg-iron-900/20 border border-iron-900"></div>;
-    if (historyError) return <div className="p-6 text-red-500 bg-red-900/10 border border-red-900 uppercase text-[10px] font-bold tracking-widest">[ Failure ] Error: {historyError}</div>;
-    if (!data || data.history.length === 0) return <div className="p-6 text-iron-700 bg-iron-950/20 border border-iron-900 uppercase text-[10px] font-bold tracking-widest">No trajectory data available.</div>;
+        fetchData();
+        const interval = setInterval(fetchData, 60000);
+        return () => clearInterval(interval);
+    }, [days]);
+
+    if (loading && !data) return <div className="animate-pulse h-64 bg-iron-900/20 border border-iron-900"></div>;
+    if (error) return <div className="p-6 text-red-500 bg-red-900/10 border border-red-900 uppercase text-[10px] font-bold tracking-widest">[ Failure ] Error: {error}</div>;
+    if (!data || data.trajectory.length === 0) return <div className="p-6 text-iron-700 bg-iron-950/20 border border-iron-900 uppercase text-[10px] font-bold tracking-widest">No trajectory data available.</div>;
 
     // SVG Configuration
     const height = 240;
     const width = 800;
     const padding = 30;
 
-    const historyPoints = data.history.length;
-    const totalPoints = historyPoints + 1;
+    const historyPoints = data.trajectory.length;
+    const totalPoints = historyPoints;
 
     const getX = (index: number) => {
         return padding + (index / (totalPoints - 1)) * (width - 2 * padding);
@@ -30,19 +47,10 @@ export default function DisciplineTrajectoryGraph() {
         return height - padding - (score / 100) * (height - 2 * padding);
     };
 
-    const historyPath = data.history.map((d, i) => `${getX(i)},${getY(d.score)}`).join(' ');
+    const historyPath = data.trajectory.map((d, i) => `${getX(i)},${getY(d.score)}`).join(' ');
 
     let projectionPath = '';
-    if (projection && data.history.length > 0) {
-        const lastPoint = data.history[data.history.length - 1];
-        const lastX = getX(data.history.length - 1);
-        const lastY = getY(lastPoint.score);
-
-        const predX = getX(totalPoints - 1);
-        const predY = getY(projection.projectedScore);
-
-        projectionPath = `${lastX},${lastY} ${predX},${predY}`;
-    }
+    // Projection logic removed as backend doesn't provide it yet in getTrajectory
 
     return (
         <div className="bg-iron-950/40 p-6 border border-iron-900 hardened-border mt-8 glass-panel">
@@ -94,7 +102,7 @@ export default function DisciplineTrajectoryGraph() {
                     )}
 
                     {/* Points */}
-                    {data.history.map((d, i) => (
+                    {data.trajectory.map((d, i) => (
                         <circle
                             key={i}
                             cx={getX(i)}
@@ -106,34 +114,6 @@ export default function DisciplineTrajectoryGraph() {
                             <title>{`${new Date(d.date).toLocaleDateString()}: ${d.score}`}</title>
                         </circle>
                     ))}
-
-                    {/* Miss Events - Signal Red */}
-                    {data.events.map((e, i) => {
-                        const eventDate = new Date(e.date).toDateString();
-                        const index = data.history.findIndex(h => new Date(h.date).toDateString() === eventDate);
-                        if (index === -1) return null;
-
-                        return (
-                            <g key={`event-${i}`}>
-                                <circle
-                                    cx={getX(index)}
-                                    cy={getY(data.history[index].score)}
-                                    r="4"
-                                    className="fill-red-500 animate-pulse opacity-50"
-                                />
-                                <circle
-                                    cx={getX(index)}
-                                    cy={getY(data.history[index].score)}
-                                    r="2"
-                                    fill="#ff3300"
-                                    stroke="#000000"
-                                    strokeWidth="1"
-                                >
-                                    <title>{`VIOLATION: ${e.cause}`}</title>
-                                </circle>
-                            </g>
-                        );
-                    })}
                 </svg>
             </div>
             <div className="flex justify-between items-center text-[9px] text-iron-700 uppercase font-mono tracking-widest mt-4">

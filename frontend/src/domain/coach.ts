@@ -29,4 +29,5 @@ export interface CoachDashboardData {
     unreliable_count: number;
     stable_count: number;
   };
+  invite_link: string | null;
 }

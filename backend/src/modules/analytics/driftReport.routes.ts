@@ -6,6 +6,6 @@ const router = Router();
 const controller = new DriftReportController();
 
 router.use(authenticateToken);
-router.post('/analytics/drift-report', (req, res) => controller.generateDriftReport(req, res));
+router.post('/drift-report', (req, res) => controller.generateDriftReport(req, res));
 
 export default router;

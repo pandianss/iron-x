@@ -9,13 +9,11 @@ import {
     Copy, 
     CheckCircle2,
     Lock,
-    Unlock,
     TrendingUp,
     ExternalLink,
-    AlertTriangle,
-    Activity
+    AlertTriangle
 } from 'lucide-react';
-import { CoachClient, CoachDashboardData, ClientProfile } from '../domain/coach';
+import { CoachClient, CoachDashboardData } from '../domain/coach';
 import { useNavigate } from 'react-router-dom';
 
 const CoachDashboardPage: React.FC = () => {
@@ -50,13 +48,11 @@ const CoachDashboardPage: React.FC = () => {
     };
 
     const copyInviteLink = () => {
-        // In a real app, we'd get this from the backend or have it stored
-        // For now, if we don't have it, we might need an endpoint to fetch ongoing links
-        // But for Prompt 05, we'll assume we can regenerate or it's in the data
-        // For simplicity, let's say we just show a message or use a placeholder if not in data
-        // Actually, initializeCoach returns it. We should probably return it in dashboard too.
-        // Let's assume dashboard returns a generic one for the first team.
-        const link = "https://iron-x.com/join/active-coach-token"; 
+        const link = data?.invite_link;
+        if (!link) {
+            alert('No active invite link. Re-initialize your coach node to generate one.');
+            return;
+        }
         navigator.clipboard.writeText(link);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -87,14 +83,20 @@ const CoachDashboardPage: React.FC = () => {
         }
     };
 
-    if (loading) return (
-        <div className="min-h-screen bg-black flex items-center justify-center font-mono">
-            <div className="space-y-4 text-center">
-                <Activity size={32} className="mx-auto text-blue-500 animate-pulse" />
-                <div className="text-xs text-iron-500 uppercase tracking-widest animate-pulse">Scanning_Client_Nodes...</div>
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+                <div className="text-center font-mono">
+                    <div className="text-iron-500 text-xs tracking-[0.3em] uppercase mb-4 animate-pulse">
+                        // SCANNING_CLIENT_ROSTER...
+                    </div>
+                    <div className="w-64 h-px bg-iron-900 mx-auto overflow-hidden">
+                        <div className="h-full bg-white animate-pulse" style={{ width: '40%' }} />
+                    </div>
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
 
     if (error) return (
         <div className="min-h-screen bg-black flex items-center justify-center font-mono p-6">

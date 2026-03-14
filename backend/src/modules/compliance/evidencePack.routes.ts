@@ -6,6 +6,6 @@ const router = Router();
 const controller = new EvidencePackController();
 
 router.use(authenticateToken);
-router.post('/compliance/evidence-pack', (req, res) => controller.generateEvidencePack(req, res));
+router.post('/evidence-pack', (req, res) => controller.generateEvidencePack(req, res));
 
 export default router;

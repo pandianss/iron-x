@@ -14,8 +14,8 @@ router.use(checkSubscriptionTier([SubscriptionTier.INDIVIDUAL_PRO, SubscriptionT
 
 router.post('/actions/:actionId/witness', (req, res) => controller.assignWitness(req, res));
 router.delete('/actions/:actionId/witness', (req, res) => controller.removeWitness(req, res));
-router.get('/witness/watching', (req, res) => controller.getMyWitnessedActions(req, res));
-router.get('/witness/notifications', (req, res) => controller.getWitnessNotifications(req, res));
-router.get('/witness/eligible', (req, res) => controller.getTeamMembersForWitness(req, res));
+router.get('/watching', (req, res) => controller.getMyWitnessedActions(req, res));
+router.get('/notifications', (req, res) => controller.getWitnessNotifications(req, res));
+router.get('/eligible', (req, res) => controller.getTeamMembersForWitness(req, res));
 
 export default router;

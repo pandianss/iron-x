@@ -157,16 +157,16 @@ v1Router.use('/audit', auditRoutes); // /api/v1/audit
 v1Router.use('/analytics', analyticsRoutes); // /api/v1/analytics
 v1Router.use('/security', securityRoutes); // /api/v1/security
 v1Router.use('/organizations', organizationRoutes); // /api/v1/organizations
-// v1Router.use('/integration', integrationRoutes); // /api/v1/integration
-// v1Router.use('/ops', opsRoutes); // /api/v1/ops
+
+// Monetization routes — rate-limited via v1Router
+v1Router.use('/witness', witnessRoutes);
+v1Router.use('/analytics', driftReportRoutes);
+v1Router.use('/coach', coachRoutes);
+v1Router.use('/compliance', complianceRoutes);
+v1Router.use('/api-keys', apiKeyRoutes);
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', publicProfileRoutes);
-app.use('/api', witnessRoutes);
-app.use('/api', driftReportRoutes);
-app.use('/api', coachRoutes);
-app.use('/api', complianceRoutes);
-app.use('/api', apiKeyRoutes);
 app.use('/api/v1', publicApiRoutes);
 app.use('/api/v1', v1Router);
 

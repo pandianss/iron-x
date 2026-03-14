@@ -10,7 +10,7 @@ router.use(authenticateToken);
 const service = new ApiKeyService();
 
 // Create a new key
-router.post('/api-keys', async (req: AuthRequest, res) => {
+router.post('/', async (req: AuthRequest, res) => {
   try {
     const userId = req.user!.userId;
     const subscriptionService = container.resolve(SubscriptionService);
@@ -60,7 +60,7 @@ router.post('/api-keys', async (req: AuthRequest, res) => {
 });
 
 // List keys
-router.get('/api-keys', async (req: AuthRequest, res) => {
+router.get('/', async (req: AuthRequest, res) => {
   try {
     const keys = await service.listKeys(req.user!.userId);
     return res.json(keys);
@@ -70,7 +70,7 @@ router.get('/api-keys', async (req: AuthRequest, res) => {
 });
 
 // Revoke key
-router.delete('/api-keys/:keyId', async (req: AuthRequest, res) => {
+router.delete('/:keyId', async (req: AuthRequest, res) => {
   try {
     await service.revokeKey(req.params.keyId, req.user!.userId);
     return res.json({ success: true });

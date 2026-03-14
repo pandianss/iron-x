@@ -78,15 +78,20 @@ export class EvidencePackController {
         pdfBase64 = pdfBuffer.toString('base64');
       }
 
-      // 6. Log the event
-      await prisma.auditLog.create({
-        data: {
-          actor_id: userId,
-          action: 'EVIDENCE_PACK_GENERATED',
-          details: JSON.stringify({ packId: pack.packId, period, scope, format }),
-          timestamp: new Date()
-        }
-      });
+      // 6. Log the event — non-fatal if this fails
+      try {
+        await prisma.auditLog.create({
+          data: {
+            actor_id: userId,
+            target_user_id: userId, // Self-audit
+            action: 'EVIDENCE_PACK_GENERATED',
+            details: JSON.stringify({ packId: pack.packId, period, scope, format }),
+            timestamp: new Date()
+          }
+        });
+      } catch (auditErr) {
+        console.error('[EvidencePack] Audit log write failed (non-fatal):', auditErr);
+      }
 
       return res.json({
         packId: pack.packId,

@@ -40,10 +40,17 @@ export class CoachController {
                 data: { name: "My Clients", owner_id: userId, org_id: org.org_id, max_seats: 50 }
             });
 
-            // 4. Assign coach role
+            // 4. Assign coach role — look up actual role_id from DB
+            const coachRole = await prisma.role.findFirst({ where: { name: 'COACH' } });
+            if (!coachRole) {
+                return res.status(500).json({ 
+                    error: 'COACH role not found in database. Run: npx ts-node seed_roles.ts' 
+                });
+            }
+
             await prisma.user.update({
                 where: { user_id: userId },
-                data: { org_id: org.org_id, role_id: 'role_coach' }
+                data: { org_id: org.org_id, role_id: coachRole.role_id }
             });
 
             // 5. Generate invite token
@@ -124,10 +131,29 @@ export class CoachController {
                 stable_count: clients.filter(c => c?.discipline_classification === 'STABLE' || c?.discipline_classification === 'HIGH_RELIABILITY').length,
             };
 
+            // Get active invite link for first owned team
+            const firstTeam = user.teams_owned[0];
+            let inviteLink: string | null = null;
+
+            if (firstTeam) {
+                const invite = await prisma.teamInvitation.findFirst({
+                    where: { 
+                        team_id: firstTeam.team_id,
+                        expires_at: { gt: new Date() }
+                    },
+                    orderBy: { expires_at: 'desc' }
+                });
+                
+                if (invite) {
+                    inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/join/${invite.token}`;
+                }
+            }
+
             return res.json({
                 total_clients: clients.length,
                 clients,
-                summary
+                summary,
+                invite_link: inviteLink
             });
 
         } catch (error: any) {

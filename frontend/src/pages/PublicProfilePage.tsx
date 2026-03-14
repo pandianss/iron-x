@@ -78,8 +78,14 @@ const PublicProfilePage: React.FC = () => {
     const htmlSnippet = `<img src="${badgeUrl}" alt="Iron-X Discipline Badge" />`;
 
     return (
-        <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black p-8 md:p-12 infrastructure-bg">
-            <div className="max-w-4xl mx-auto space-y-12">
+        <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black infrastructure-bg">
+            <div className="border-b border-neutral-900 px-6 py-4 flex items-center justify-between">
+                <Link to="/" className="text-xs font-mono text-neutral-500 hover:text-white transition-colors tracking-widest uppercase">
+                    ← Iron-X
+                </Link>
+                <span className="text-xs font-mono text-neutral-700 tracking-widest">// PUBLIC_PROFILE_RECORD</span>
+            </div>
+            <div className="max-w-4xl mx-auto space-y-12 p-8 md:p-12">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-iron-900 pb-8 gap-6">
                     <div>

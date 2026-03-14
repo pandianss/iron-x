@@ -117,15 +117,20 @@ model Webhook {
 }
 
 model ApiKey {
-  key_id     String    @id @default(uuid())
-  org_id     String
-  name       String
-  key_hash   String    @unique
-  last_used  DateTime?
-  expires_at DateTime?
-  created_at DateTime  @default(now())
+  key_id        String    @id @default(uuid())
+  org_id        String?
+  user_id       String?
+  name          String
+  key_hash      String    @unique
+  key_preview   String
+  is_active     Boolean   @default(true)
+  call_count    Int       @default(0)
+  monthly_limit Int       @default(10000)
+  last_used_at  DateTime?
+  expires_at    DateTime?
+  created_at    DateTime  @default(now())
 
-  organization Organization @relation(fields: [org_id], references: [org_id])
+  organization Organization? @relation(fields: [org_id], references: [org_id])
 
   @@map("api_keys")
 }
@@ -216,6 +221,7 @@ model Action {
   window_start_time       DateTime
   window_duration_minutes Int
   is_strict               Boolean  @default(true)
+  is_active               Boolean  @default(true)
   witness_user_id         String?
   created_at              DateTime @default(now())
 
@@ -445,6 +451,7 @@ model Role {
   role_id     String  @id @default(uuid())
   name        String  @unique // e.g., 'Analyst', 'Manager', 'Executive'
   description String?
+  permissions String? // JSON string of permission keys
   policy_id   String?
 
   policy Policy? @relation(fields: [policy_id], references: [policy_id])

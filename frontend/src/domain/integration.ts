@@ -11,13 +11,12 @@ export const IntegrationClient = {
         return response.data;
     },
 
-    generateApiKey: async (orgId: string, name: string) => {
-        const response = await api.post(`/integration/${orgId}/keys`, { name });
-        return response.data;
-    },
+    generateApiKey: (name: string, expiresAt?: string) =>
+        api.post('/api-keys', { name, expiresAt }).then(r => r.data),
 
-    getApiKeys: async (orgId: string) => {
-        const response = await api.get(`/integration/${orgId}/keys`);
-        return response.data;
-    }
+    getApiKeys: () =>
+        api.get('/api-keys').then(r => r.data),
+
+    revokeApiKey: (keyId: string) =>
+        api.delete(`/api-keys/${keyId}`).then(r => r.data),
 };

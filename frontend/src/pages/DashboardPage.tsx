@@ -7,7 +7,9 @@ import DisciplineDashboard from '../components/DisciplineDashboard';
 import ExecutionFeedbackPanel from '../components/ExecutionFeedbackPanel';
 import AttentionDensityStrip from '../components/AttentionDensityStrip';
 import WeeklyReportModal from '../components/WeeklyReportModal';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, X } from 'lucide-react';
+import { BillingClient } from '../domain/billing';
+import { WitnessClient } from '../domain/witness';
 
 export default function DashboardPage() {
     const { token, logout, user } = useAuth();
@@ -15,6 +17,9 @@ export default function DashboardPage() {
     const [instances, setInstances] = useState<ScheduledItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isReportOpen, setIsReportOpen] = useState(false);
+    const [subscription, setSubscription] = useState<any>(null);
+    const [unreadWitnessNotifs, setUnreadWitnessNotifs] = useState(0);
+    const [showQuotaBanner, setShowQuotaBanner] = useState(() => !sessionStorage.getItem('iron-x:quota-banner-dismissed'));
 
     const fetchSchedule = async () => {
         try {
@@ -27,9 +32,38 @@ export default function DashboardPage() {
         }
     };
 
+    const fetchSubscription = async () => {
+        try {
+            const res = await BillingClient.getSubscription();
+            setSubscription(res);
+        } catch (err) {
+            console.error('Error fetching sub', err);
+        }
+    };
+
+    const fetchWitnessNotifs = async () => {
+        try {
+            const notifs = await WitnessClient.getNotifications();
+            const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            const count = notifs.filter((n: any) => new Date(n.sent_at) > last24h).length;
+            setUnreadWitnessNotifs(count);
+        } catch (err) {
+            console.error('Error fetching witness notifs', err);
+        }
+    };
+
     useEffect(() => {
-        if (token) fetchSchedule();
+        if (token) {
+            fetchSchedule();
+            fetchSubscription();
+            fetchWitnessNotifs();
+        }
     }, [token]);
+
+    const handleDismissBanner = () => {
+        setShowQuotaBanner(false);
+        sessionStorage.setItem('iron-x:quota-banner-dismissed', 'true');
+    };
 
     const [lastExecutionStatus, setLastExecutionStatus] = useState<'COMPLETED' | 'LATE' | null>(null);
 
@@ -53,6 +87,31 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-iron-950 text-iron-300 font-mono infrastructure-bg p-8 pt-32">
             <div className="max-w-5xl mx-auto space-y-12">
+                {showQuotaBanner && subscription?.plan_tier === 'FREE' && (
+                    <div className="bg-iron-950 border border-yellow-900/50 p-3 flex justify-between items-center transition-all animate-in fade-in slide-in-from-top-4">
+                        <div className="flex items-center gap-3">
+                            <span className="text-yellow-600 font-bold">⚠</span>
+                            <span className="text-yellow-500 text-[10px] uppercase tracking-widest">
+                                EVAL NODE ACTIVE — 3 Actions / 3 Goals maximum. HARD enforcement disabled.
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <Link 
+                                to="/billing" 
+                                className="text-white text-[10px] font-bold uppercase tracking-widest hover:underline"
+                            >
+                                [ Initialize OPERATOR → ]
+                            </Link>
+                            <button 
+                                onClick={handleDismissBanner}
+                                className="text-iron-700 hover:text-white transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <AttentionDensityStrip />
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-iron-900">
@@ -73,12 +132,20 @@ export default function DashboardPage() {
                             <BookOpen className="w-3 h-3 mr-2" /> Weekly Report
                         </button>
 
-                        <nav className="flex gap-4 text-[10px] uppercase tracking-widest font-bold">
+                        <nav className="flex gap-4 text-[10px] uppercase tracking-widest font-bold items-center">
                             <Link to="/billing" className="text-iron-600 hover:text-white transition-colors">
                                 [ Billing ]
                             </Link>
                             <Link to="/security" className="text-iron-600 hover:text-white transition-colors">
                                 [ Security ]
+                            </Link>
+                            <Link to="/witness" className="text-iron-600 hover:text-white transition-colors flex items-center gap-2">
+                                [ Witness ]
+                                {unreadWitnessNotifs > 0 && (
+                                    <span className="bg-red-600 text-white px-1.5 py-0.5 rounded-full text-[8px] animate-pulse">
+                                        {unreadWitnessNotifs}
+                                    </span>
+                                )}
                             </Link>
                             {user?.organization && (
                                 <Link to={`/org/${user.organization.slug}`} className="text-red-500 hover:text-red-400 transition-colors">

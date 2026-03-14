@@ -24,7 +24,13 @@ import auditRoutes from './modules/audit/audit.routes';
 import analyticsRoutes from './modules/analytics/analytics.routes';
 import securityRoutes from './modules/auth/security.routes';
 import organizationRoutes from './modules/organization/organization.routes';
-// import integrationRoutes from './modules/integration/integration.routes';
+import publicProfileRoutes from './modules/user/publicProfile.routes';
+import witnessRoutes from './modules/witness/witness.routes';
+import driftReportRoutes from './modules/analytics/driftReport.routes';
+import coachRoutes from './modules/coach/coach.routes';
+import complianceRoutes from './modules/compliance/evidencePack.routes';
+import apiKeyRoutes from './modules/integration/apiKey.routes';
+import publicApiRoutes from './modules/integration/publicApi.routes';
 // import opsRoutes from './modules/ops/ops.routes';
 
 import { apiLimiter, authLimiter } from './middleware/rateLimitMiddleware';
@@ -155,6 +161,13 @@ v1Router.use('/organizations', organizationRoutes); // /api/v1/organizations
 // v1Router.use('/ops', opsRoutes); // /api/v1/ops
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api', publicProfileRoutes);
+app.use('/api', witnessRoutes);
+app.use('/api', driftReportRoutes);
+app.use('/api', coachRoutes);
+app.use('/api', complianceRoutes);
+app.use('/api', apiKeyRoutes);
+app.use('/api/v1', publicApiRoutes);
 app.use('/api/v1', v1Router);
 
 // Stripe routes (can be outside v1Router if they have a different base path or specific middleware needs)

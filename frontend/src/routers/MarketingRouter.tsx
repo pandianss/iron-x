@@ -5,11 +5,13 @@ import PricingPage from '../pages/PricingPage';
 import JoinTeamPage from '../pages/JoinTeamPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
+import PublicProfilePage from '../pages/PublicProfilePage';
 
 const MarketingRouter = () => {
     return (
         <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/u/:username" element={<PublicProfilePage />} />
             <Route path="/solutions/:industry" element={<IndustryPage />} />
             <Route path="/solutions" element={<Navigate to="/" replace />} />
             <Route path="/pricing" element={<PricingPage />} />

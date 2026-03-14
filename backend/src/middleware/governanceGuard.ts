@@ -37,7 +37,7 @@ export const governanceGuard = async (req: AuthRequest, res: Response, next: Nex
             select: {
                 locked_until: true,
                 enforcement_mode: true,
-                role: { select: { name: true } }
+                role: { select: { name: true, permissions: true } }
             }
         });
 
@@ -45,7 +45,16 @@ export const governanceGuard = async (req: AuthRequest, res: Response, next: Nex
             return res.status(401).json({ error: 'User entity not found', code: 'GOV_NO_ENTITY' });
         }
 
-        // 3. Lockout Enforcement (Hard Mode)
+        // 3. Role-Based Bypass (e.g., COACH)
+        const permissions = userState.role?.permissions ? JSON.parse(userState.role.permissions as string) : [];
+        const hasBypass = permissions.includes('BYPASS_LOCKOUT');
+
+        if (hasBypass) {
+            console.log(`[GOVERNANCE] Lockout BYPASS active for user ${userId} (Role: ${userState.role?.name})`);
+            return next();
+        }
+
+        // 4. Lockout Enforcement (Hard Mode)
         // If locked_until is in the future, we reject ALL modification requests
         // Read-only requests (GET) might be allowed depending on strictness, 
         // but for now, we block everything significant or follow strict rules.

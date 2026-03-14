@@ -149,4 +149,16 @@ export class SubscriptionService {
 
         return { status: 'OK' };
     }
+
+    async getUsage(userId: string) {
+        const actions = await prisma.action.count({ where: { user_id: userId } });
+        const goals = await prisma.goal.count({ where: { user_id: userId } });
+        const teams = await prisma.team.count({ where: { owner_id: userId } });
+
+        return {
+            actions,
+            goals,
+            teams
+        };
+    }
 }

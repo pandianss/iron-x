@@ -3,7 +3,9 @@ import { autoInjectable, inject } from 'tsyringe';
 import { PolicyService } from '../policies/policy.service';
 import prisma from '../../db';
 import { AuthRequest } from '../../middleware/authMiddleware';
-import { BadRequestError, NotFoundError } from '../../utils/AppError';
+import { BadRequestError, ForbiddenError, NotFoundError } from '../../utils/AppError';
+import { SubscriptionService } from '../subscription/subscription.service';
+import { container } from 'tsyringe';
 
 @autoInjectable()
 export class UserController {
@@ -50,6 +52,31 @@ export class UserController {
 
             const { password_hash, ...profile } = user;
             res.json(profile);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    togglePublicScore = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user!.userId;
+            
+            const subscriptionService = container.resolve(SubscriptionService);
+            const sub = await subscriptionService.getSubscription(userId);
+            
+            if (!sub || sub.plan_tier === 'FREE') {
+                throw new ForbiddenError('Public Badge requires OPERATOR tier.');
+            }
+
+            const user = await prisma.user.findUnique({ where: { user_id: userId } });
+            if (!user) throw new NotFoundError('User not found');
+
+            const updated = await prisma.user.update({
+                where: { user_id: userId },
+                data: { public_score_enabled: !user.public_score_enabled }
+            });
+
+            res.json({ public_score_enabled: updated.public_score_enabled });
         } catch (error) {
             next(error);
         }

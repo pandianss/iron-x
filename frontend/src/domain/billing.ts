@@ -9,6 +9,11 @@ export interface Subscription {
     is_locked: boolean;
     end_date?: string;
     grace_period_until?: string;
+    usage?: {
+        actions: number;
+        goals: number;
+        teams: number;
+    };
 }
 
 export const BillingClient = {

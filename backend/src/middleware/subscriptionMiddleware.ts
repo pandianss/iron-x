@@ -76,3 +76,27 @@ export const checkStrictModeAccess = async (req: AuthRequest, res: Response, nex
         res.status(500).json({ message: 'Server error during plan check' });
     }
 };
+
+export const checkSubscriptionTier = (allowedTiers: SubscriptionTier[]) => {
+    return async (req: AuthRequest, res: Response, next: NextFunction) => {
+        const userId = req.user?.userId;
+        if (!userId) return res.sendStatus(401);
+
+        try {
+            const subscriptionService = container.resolve(SubscriptionService);
+            const sub = await subscriptionService.getSubscription(userId);
+            const tier = sub?.plan_tier || SubscriptionTier.FREE;
+
+            if (!allowedTiers.includes(tier)) {
+                return res.status(403).json({
+                    message: `PLAN_LIMIT_EXCEEDED: This feature requires ${allowedTiers.join(' or ')} license.`,
+                    code: 'PLAN_LIMIT_EXCEEDED_FEATURE'
+                });
+            }
+            next();
+        } catch (error) {
+            console.error('Subscription tier check error', error);
+            res.status(500).json({ message: 'Server error during plan check' });
+        }
+    };
+};

@@ -144,6 +144,39 @@ async function seedRoles() {
         console.error('Error ensuring Auditor role:', e);
     }
 
+    // COACH
+    try {
+        await (prisma as any).role.upsert({
+            where: { name: 'COACH' },
+            create: {
+                name: 'COACH',
+                description: 'Professional coach with client management capabilities',
+                permissions: JSON.stringify([
+                    'VIEW_CLIENT_SCORES',
+                    'VIEW_CLIENT_AUDIT_LOGS',
+                    'SET_CLIENT_ENFORCEMENT_POLICY',
+                    'MANAGE_TEAM_ROSTER',
+                    'EXPORT_CLIENT_REPORTS',
+                    'BYPASS_LOCKOUT'
+                ]),
+                policy_id: null // Coaches are exempt from discipline protocol
+            },
+            update: {
+                permissions: JSON.stringify([
+                    'VIEW_CLIENT_SCORES',
+                    'VIEW_CLIENT_AUDIT_LOGS',
+                    'SET_CLIENT_ENFORCEMENT_POLICY',
+                    'MANAGE_TEAM_ROSTER',
+                    'EXPORT_CLIENT_REPORTS',
+                    'BYPASS_LOCKOUT'
+                ])
+            }
+        });
+        console.log('Role "COACH" ensured.');
+    } catch (e) {
+        console.error('Error ensuring COACH role:', e);
+    }
+
 }
 
 seedRoles().catch(console.error);

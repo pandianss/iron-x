@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { SecurityClient } from '../domain/security';
 import { AuthClient } from '../domain/auth';
+import { BillingClient } from '../domain/billing';
+import { ExternalLink, Copy, Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function SecuritySettingsPage() {
     const [mfaEnabled, setMfaEnabled] = useState(false);
@@ -14,6 +17,10 @@ export default function SecuritySettingsPage() {
     const [success, setSuccess] = useState('');
     const [showSetup, setShowSetup] = useState(false);
     const [showDisable, setShowDisable] = useState(false);
+    const [publicScoreEnabled, setPublicScoreEnabled] = useState(false);
+    const [subscription, setSubscription] = useState<any>(null);
+    const [userProfile, setUserProfile] = useState<any>(null);
+    const [copiedLink, setCopiedLink] = useState(false);
 
     useEffect(() => {
         fetchProfile();
@@ -22,7 +29,12 @@ export default function SecuritySettingsPage() {
     const fetchProfile = async () => {
         try {
             const profile = await AuthClient.getProfile();
+            setUserProfile(profile);
             setMfaEnabled(profile.mfa_enabled);
+            setPublicScoreEnabled(profile.public_score_enabled);
+            
+            const sub = await BillingClient.getSubscription();
+            setSubscription(sub);
         } catch {
             setError('CRITICAL: SEC_PARAM_FETCH_FAILURE');
         } finally {
@@ -75,6 +87,19 @@ export default function SecuritySettingsPage() {
             setError(errorMessage);
         }
     };
+
+    const handleTogglePublicScore = async () => {
+        try {
+            const response = await AuthClient.togglePublicScore();
+            setPublicScoreEnabled(response.public_score_enabled);
+            setSuccess('PROTOCOL_STATE_UPDATED: PUBLIC_SCORE_TOGGLED');
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'STATE_TRANSITION_FAILURE');
+        }
+    };
+
+    const username = userProfile?.email?.split('@')[0] || 'operator';
+    const profileUrl = `${window.location.origin}/u/${username}`;
 
     if (loading) return (
         <div className="min-h-screen bg-iron-950 flex items-center justify-center font-mono text-iron-500 uppercase tracking-widest animate-pulse">
@@ -264,6 +289,77 @@ export default function SecuritySettingsPage() {
                                 )}
                             </>
                         )}
+                    </div>
+                </div>
+
+                {/* Public Badge Section */}
+                <div className="bg-black/40 border border-iron-900 glass-panel hardened-border p-8 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[80px] font-black -mr-4 -mt-4 selection:bg-transparent pointer-events-none tracking-tighter">
+                        BADGE
+                    </div>
+
+                    <div className="relative z-10 space-y-8">
+                        <div className="flex items-center justify-between border-b border-iron-900 pb-6">
+                            <div className="space-y-1">
+                                <h2 className="text-xl font-display font-bold text-white uppercase tracking-tight">Public Discipline Badge</h2>
+                                <p className="text-xs text-iron-500 font-mono uppercase tracking-widest italic">External Accountability Protocol Integration</p>
+                            </div>
+                            <div className={`px-4 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] border ${publicScoreEnabled ? 'bg-blue-950/50 text-blue-400 border-blue-800' : 'bg-iron-950/50 text-iron-500 border-iron-800'}`}>
+                                {publicScoreEnabled ? 'STATUS: BROADCASTING' : 'STATUS: OFFLINE'}
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <p className="text-sm text-iron-400 leading-relaxed font-mono max-w-xl">
+                                Enabling the public profile exposes your discipline score, trust tier, and 30-day trajectory to the public web. 
+                                <span className="block mt-2 text-white/50 text-[10px] italic">// REQUIRES ACTIVE OPERATOR LICENSE.</span>
+                            </p>
+
+                            {subscription?.plan_tier === 'FREE' ? (
+                                <Link 
+                                    to="/pricing"
+                                    className="inline-block px-8 py-3 bg-iron-900 border border-iron-800 text-iron-400 font-display font-black uppercase tracking-widest text-xs hover:text-white hover:border-white transition-all duration-300"
+                                >
+                                    Upgrade to OPERATOR to enable
+                                </Link>
+                            ) : (
+                                <div className="space-y-6">
+                                    <button
+                                        onClick={handleTogglePublicScore}
+                                        className={`px-8 py-3 font-display font-black uppercase tracking-widest text-xs transition-all duration-300 active:scale-95 border
+                                            ${publicScoreEnabled 
+                                                ? 'bg-red-950/20 text-red-500 border-red-900/50 hover:bg-black' 
+                                                : 'bg-white text-black hover:bg-blue-600 hover:text-white'}`}
+                                    >
+                                        {publicScoreEnabled ? 'Terminate_Broadcast' : 'Initialize_Broadcast'}
+                                    </button>
+
+                                    {publicScoreEnabled && (
+                                        <div className="flex flex-wrap gap-4 pt-4 animate-in fade-in slide-in-from-left-4 duration-500">
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(profileUrl);
+                                                    setCopiedLink(true);
+                                                    setTimeout(() => setCopiedLink(false), 2000);
+                                                }}
+                                                className="flex items-center gap-2 px-4 py-2 bg-iron-900/50 border border-iron-800 text-iron-400 font-mono text-[10px] uppercase tracking-widest hover:text-white transition-colors"
+                                            >
+                                                {copiedLink ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+                                                Copy Profile Link
+                                            </button>
+                                            <a
+                                                href={profileUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-2 px-4 py-2 border border-iron-800 text-iron-600 font-mono text-[10px] uppercase tracking-widest hover:text-white hover:border-white transition-colors"
+                                            >
+                                                <ExternalLink size={12} /> View Profile
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 

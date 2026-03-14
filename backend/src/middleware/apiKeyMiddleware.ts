@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
+import { ApiKeyService } from '../modules/integration/apiKey.service';
 
-import crypto from 'crypto';
-import prisma from '../db';
+const apiKeyService = new ApiKeyService();
+
+export interface ApiKeyRequest extends Request {
+    apiKeyUserId?: string;
+    apiKeyOrgId?: string;
+    apiKeyId?: string;
+}
 
 export const apiKeyMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     // Check if the request is from a public route
@@ -14,36 +20,19 @@ export const apiKeyMiddleware = async (req: Request, res: Response, next: NextFu
     if (!apiKey) {
         // Fallback to JWT Check if there's no api key
         return next();
-        // Note: For Iron-X standard endpoints expect JWT (passed to auth middleware). 
-        // This middleware handles X-API-KEY primarily for integration/machine routes.
-        // It's acting alongside normal auth, so missing it just means we move on.
     }
 
     try {
-        const keyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
+        const result = await apiKeyService.validateKey(apiKey);
 
-        const validKey = await prisma.apiKey.findUnique({
-            where: {
-                key_hash: keyHash
-            }
-        });
-
-        if (!validKey) {
-            return res.status(401).json({ message: 'Invalid API Key' });
+        if (!result.valid) {
+            return res.status(401).json({ message: 'Invalid or Expired API Key' });
         }
 
-        if (validKey.expires_at && validKey.expires_at < new Date()) {
-            return res.status(401).json({ message: 'API Key Expired' });
-        }
-
-        // Update last used asynchronously
-        prisma.apiKey.update({
-            where: { key_id: validKey.key_id },
-            data: { last_used: new Date() }
-        }).catch(err => console.error('Failed to update API key last_used', err));
-
-        // Attach org to request for downstream handlers
-        (req as any).orgId = validKey.org_id;
+        // Attach user/org to request for downstream handlers
+        (req as ApiKeyRequest).apiKeyUserId = result.userId;
+        (req as ApiKeyRequest).apiKeyOrgId = result.orgId;
+        (req as ApiKeyRequest).apiKeyId = result.key_id;
 
         return next();
     } catch (e) {

@@ -10,6 +10,7 @@ export interface AuthRequest<P = any, ResBody = any, ReqBody = any, ReqQuery = a
             name: string;
             policy?: any;
         };
+        orgId?: string;
     };
 }
 
@@ -52,7 +53,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         (req as AuthRequest).user = {
             userId: user.user_id,
             email: user.email,
-            role: user.role ? { name: user.role.name, policy: user.role.policy } : undefined
+            role: user.role ? { name: user.role.name, policy: user.role.policy } : undefined,
+            orgId: user.org_id || undefined
         };
 
         next();

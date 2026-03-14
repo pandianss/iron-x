@@ -7,6 +7,12 @@ import ActionsPage from '../pages/ActionsPage';
 import SecuritySettingsPage from '../pages/SecuritySettingsPage';
 import OrganizationDashboardPage from '../pages/OrganizationDashboardPage';
 import BillingPortalPage from '../pages/BillingPortalPage';
+import WitnessPage from '../pages/WitnessPage';
+import DriftReportPage from '../pages/DriftReportPage';
+import CoachDashboardPage from '../pages/CoachDashboardPage';
+import CoachSetupPage from '../pages/CoachSetupPage';
+import CompliancePage from '../pages/CompliancePage';
+import ApiKeysPage from '../pages/ApiKeysPage';
 
 export const ProtectedRoute = () => {
     const { isAuthenticated } = useAuth();
@@ -22,4 +28,10 @@ export {
     SecuritySettingsPage,
     OrganizationDashboardPage,
     BillingPortalPage,
+    WitnessPage,
+    DriftReportPage,
+    CoachDashboardPage,
+    CoachSetupPage,
+    CompliancePage,
+    ApiKeysPage,
 };

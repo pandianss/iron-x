@@ -13,5 +13,10 @@ export const AuthClient = {
             }
         });
         return response.data;
+    },
+
+    togglePublicScore: async () => {
+        const response = await api.patch('/user/public-score');
+        return response.data;
     }
 };

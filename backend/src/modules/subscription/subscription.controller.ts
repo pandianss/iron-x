@@ -32,7 +32,11 @@ export class SubscriptionController {
             if (!userId) throw new UnauthorizedError();
 
             const subscription = await this.subscriptionService.getSubscription(userId);
-            res.json(subscription || { plan_tier: SubscriptionTier.FREE });
+            const usage = await this.subscriptionService.getUsage(userId);
+            res.json({
+                ...(subscription || { plan_tier: SubscriptionTier.FREE }),
+                usage
+            });
         } catch (error) {
             next(error);
         }

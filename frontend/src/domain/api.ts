@@ -36,3 +36,25 @@ api.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 403) {
+            const msg: string = error.response.data?.message || '';
+            const code: string = error.response.data?.code || '';
+            if (msg.includes('Plan limit reached') || msg.includes('Resource limit reached') || code === 'PLAN_LIMIT_EXCEEDED') {
+                const extractResource = (m: string) => {
+                    const upper = m.toUpperCase();
+                    if (upper.includes('ACTION')) return 'ACTIONS';
+                    if (upper.includes('GOAL')) return 'GOALS';
+                    if (upper.includes('TEAM')) return 'TEAMS';
+                    return 'ACTIONS';
+                };
+                const resource = extractResource(msg);
+                window.dispatchEvent(new CustomEvent('iron-x:quota-exceeded', { detail: { resource } }));
+            }
+        }
+        return Promise.reject(error);
+    }
+);

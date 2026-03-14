@@ -10,6 +10,7 @@ const router = Router();
 const userController = container.resolve(UserController);
 
 router.put('/enforcement-mode', authenticateToken, validate(UpdateProfileSchema), userController.updateEnforcementMode);
+router.patch('/public-score', authenticateToken, userController.togglePublicScore);
 router.get('/profile', authenticateToken, userController.getProfile);
 
 export default router;

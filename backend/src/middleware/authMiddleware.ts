@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { firebaseAuth } from '../config/firebase';
 import prisma from '../db';
+import { Logger } from '../utils/logger';
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any, ReqQuery = any> extends Request<P, ResBody, ReqBody, ReqQuery> {
     user?: {
@@ -19,7 +20,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        console.warn(`[Auth] Missing token from ${req.ip} for ${req.path}`);
+        Logger.warn(`[Auth] Missing token from ${req.ip} for ${req.path}`);
         return res.status(401).json({ error: 'Authentication required', code: 'NO_TOKEN' });
     }
 
@@ -30,14 +31,19 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
             throw new Error('Invalid token payload');
         }
 
-        // Verify user exists and is active using Firebase UID or Email fallback initially (for sync mapping)
-        const user = await (prisma as any).user.findFirst({
-            where: {
-                OR: [
-                    { firebase_uid: decodedToken.uid },
-                    { email: decodedToken.email || undefined }
-                ]
-            },
+        // Security Hardening: Enforce email verification for production-grade security
+        // In some dev scenarios, you might want to disable this via env var.
+        if (process.env.NODE_ENV === 'production' && !decodedToken.email_verified) {
+            Logger.warn(`[Auth] Attempted login with unverified email: ${decodedToken.email}`);
+            return res.status(403).json({ 
+                error: 'Email verification required', 
+                code: 'EMAIL_NOT_VERIFIED' 
+            });
+        }
+
+        // Verify user exists using Firebase UID ONLY to prevent account hijacking via email spoofing
+        const user = await prisma.user.findUnique({
+            where: { firebase_uid: decodedToken.uid },
             include: {
                 role: {
                     include: { policy: true }
@@ -46,20 +52,23 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         });
 
         if (!user) {
-            console.error(`[Auth] User matching ${decodedToken.uid} not found`);
+            Logger.error(`[Auth] User matching Firebase UID ${decodedToken.uid} not found in database.`);
             return res.status(401).json({ error: 'Invalid authentication', code: 'USER_NOT_FOUND' });
         }
 
         (req as AuthRequest).user = {
             userId: user.user_id,
             email: user.email,
-            role: user.role ? { name: user.role.name, policy: user.role.policy } : undefined,
+            role: user.role ? { 
+                name: user.role.name, 
+                policy: user.role.policy 
+            } : undefined,
             orgId: user.org_id || undefined
         };
 
         next();
     } catch (err: any) {
-        console.warn(`[Auth] Token verification failed from ${req.ip}: ${err.message}`);
+        Logger.warn(`[Auth] Token verification failed from ${req.ip}: ${err.message}`);
         return res.status(403).json({
             error: 'Invalid or expired token',
             code: err.code === 'auth/id-token-expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN'

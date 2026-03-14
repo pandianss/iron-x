@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 import { auth } from '../config/firebase';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
@@ -12,59 +11,68 @@ export const api = axios.create({
     },
 });
 
+// Optimized token injection: Only fetch if needed, and rely on Firebase's internal caching
 api.interceptors.request.use(
     async (config) => {
-        // Respect explicitly set authorization headers (e.g., from AuthClient.sync)
         if (config.headers.Authorization) {
             return config;
         }
 
-        // Otherwise, fetch the current active Firebase token
-        if (auth.currentUser) {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
             try {
-                const token = await auth.currentUser.getIdToken();
+                // forceRefresh: false allows Firebase to use its internal cached token if it hasn't expired
+                const token = await currentUser.getIdToken(false);
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
                 }
             } catch (err) {
-                // Ignore token fetch errors here
+                // Silently fail, backend will return 401 if token is required
             }
         }
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 403) {
-            const msg: string = error.response.data?.message || '';
-            const code: string = error.response.data?.code || '';
-            
+        const status = error.response?.status;
+        const data = error.response?.data;
+        const code = data?.code;
+        const message = data?.message || '';
+
+        // Handle System-Level States via Events instead of hard redirects
+        if (status === 403) {
+            // 1. Governance Lockout
             if (code === 'GOV_LOCKOUT') {
-                sessionStorage.setItem('lockout_data', JSON.stringify({
-                    locked_until: error.response.data.locked_until,
-                    message: error.response.data.message,
+                window.dispatchEvent(new CustomEvent('iron-x:system-lockout', { 
+                    detail: { 
+                        lockedUntil: data.locked_until,
+                        message: data.message 
+                    } 
                 }));
-                window.location.href = '/lockout';
                 return Promise.reject(error);
             }
 
-            if (msg.includes('Plan limit reached') || msg.includes('Resource limit reached') || code === 'PLAN_LIMIT_EXCEEDED') {
-                const extractResource = (m: string) => {
-                    const upper = m.toUpperCase();
-                    if (upper.includes('ACTION')) return 'ACTIONS';
-                    if (upper.includes('GOAL')) return 'GOALS';
-                    if (upper.includes('TEAM')) return 'TEAMS';
-                    return 'ACTIONS';
-                };
-                const resource = extractResource(msg);
-                window.dispatchEvent(new CustomEvent('iron-x:quota-exceeded', { detail: { resource } }));
+            // 2. Plan Quota Exceeded
+            if (code === 'PLAN_LIMIT_EXCEEDED' || message.includes('limit reached')) {
+                const resource = message.toUpperCase().includes('GOAL') ? 'GOALS' : 
+                                 message.toUpperCase().includes('TEAM') ? 'TEAMS' : 'ACTIONS';
+                
+                window.dispatchEvent(new CustomEvent('iron-x:quota-exceeded', { 
+                    detail: { resource } 
+                }));
+                return Promise.reject(error);
             }
         }
+        
+        // 3. Auth Failures (Optional: trigger unified logout or re-auth)
+        if (status === 401 && code === 'USER_NOT_FOUND') {
+             window.dispatchEvent(new CustomEvent('iron-x:auth-failure', { detail: { code } }));
+        }
+
         return Promise.reject(error);
     }
 );

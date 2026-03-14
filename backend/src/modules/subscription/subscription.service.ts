@@ -1,6 +1,7 @@
 import { singleton } from 'tsyringe';
 import prisma from '../../db';
-import { SubscriptionTier } from '@prisma/client';
+import { SubscriptionTier, Prisma } from '@prisma/client';
+import { Logger } from '../../utils/logger';
 
 export const SUBSCRIPTION_LIMITS = {
     [SubscriptionTier.FREE]: {
@@ -37,15 +38,85 @@ export class SubscriptionService {
         });
     }
 
-    async assignTier(userId: string, tier: SubscriptionTier) {
-        // Upsert subscription
+    async activateSubscription(params: {
+        userId: string;
+        tier: SubscriptionTier;
+        subscriptionId: string;
+        customerId: string;
+        provider: 'stripe' | 'razorpay';
+    }) {
+        const { userId, tier, subscriptionId, customerId, provider } = params;
+
+        const updateData: Prisma.SubscriptionUpdateInput = {
+            plan_tier: tier,
+            is_active: true,
+            is_locked: false,
+            grace_period_until: null,
+            updated_at: new Date()
+        };
+
+        if (provider === 'stripe') {
+            updateData.stripe_subscription_id = subscriptionId;
+            updateData.stripe_customer_id = customerId;
+        } else {
+            updateData.razorpay_subscription_id = subscriptionId;
+            updateData.razorpay_customer_id = customerId;
+        }
+
+        Logger.info(`[Subscription] Activating ${tier} plan for user ${userId} via ${provider}`);
+        
         return prisma.subscription.upsert({
             where: { user_id: userId },
-            update: { plan_tier: tier, updated_at: new Date() },
+            update: updateData,
             create: {
                 user_id: userId,
                 plan_tier: tier,
-                start_date: new Date()
+                is_active: true,
+                ...(provider === 'stripe' ? {
+                    stripe_subscription_id: subscriptionId,
+                    stripe_customer_id: customerId
+                } : {
+                    razorpay_subscription_id: subscriptionId,
+                    razorpay_customer_id: customerId
+                })
+            }
+        });
+    }
+
+    async deactivateSubscription(userId: string) {
+        Logger.info(`[Subscription] Deactivating subscription for user ${userId}`);
+        return prisma.subscription.update({
+            where: { user_id: userId },
+            data: {
+                is_active: false,
+                plan_tier: SubscriptionTier.FREE,
+                updated_at: new Date()
+            }
+        });
+    }
+
+    async lockAccount(userId: string, gracePeriodDays: number = 7) {
+        const graceUntil = new Date();
+        graceUntil.setDate(graceUntil.getDate() + gracePeriodDays);
+        
+        Logger.warn(`[Subscription] Locking account for user ${userId}. Grace until: ${graceUntil.toISOString()}`);
+
+        return prisma.subscription.update({
+            where: { user_id: userId },
+            data: {
+                is_locked: true,
+                grace_period_until: graceUntil
+            }
+        });
+    }
+
+    async unlockAccount(userId: string) {
+        Logger.info(`[Subscription] Unlocking account for user ${userId}`);
+        return prisma.subscription.update({
+            where: { user_id: userId },
+            data: {
+                is_locked: false,
+                grace_period_until: null
             }
         });
     }
@@ -112,39 +183,17 @@ export class SubscriptionService {
 
         return { allowed: true };
     }
-    async lockAccount(userId: string, gracePeriodDays: number = 7) {
-        const graceUntil = new Date();
-        graceUntil.setDate(graceUntil.getDate() + gracePeriodDays);
-
-        return (prisma as any).subscription.update({
-            where: { user_id: userId },
-            data: {
-                is_locked: true,
-                grace_period_until: graceUntil
-            }
-        });
-    }
-
-    async unlockAccount(userId: string) {
-        return (prisma as any).subscription.update({
-            where: { user_id: userId },
-            data: {
-                is_locked: false,
-                grace_period_until: null
-            }
-        });
-    }
 
     async getAccountStatus(userId: string) {
         const sub = await this.getSubscription(userId);
         if (!sub) return { status: 'OK' };
 
-        if ((sub as any).is_locked) {
+        if (sub.is_locked) {
             const now = new Date();
-            if ((sub as any).grace_period_until && now > (sub as any).grace_period_until) {
+            if (sub.grace_period_until && now > sub.grace_period_until) {
                 return { status: 'HARD_LOCKED', message: 'Account hard-locked due to non-payment.' };
             }
-            return { status: 'GRACE_PERIOD', message: 'Account in grace period. Please update payment method.', until: (sub as any).grace_period_until };
+            return { status: 'GRACE_PERIOD', message: 'Account in grace period. Please update payment method.', until: sub.grace_period_until };
         }
 
         return { status: 'OK' };

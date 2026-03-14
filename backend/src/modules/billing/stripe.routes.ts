@@ -8,17 +8,12 @@ const router = Router();
 const controller = new StripeController();
 
 // Checkout (Protected)
-router.post('/checkout', authenticateToken, controller.createCheckoutSession);
+router.post('/checkout', authenticateToken, (req, res) => controller.createCheckoutSession(req, res));
 
 // Portal (Protected)
-router.post('/portal', authenticateToken, controller.createPortalSession);
+router.post('/portal', authenticateToken, (req, res) => controller.createPortalSession(req, res));
 
 // Webhook (Public, Raw Body)
-// Note: Webhook needs raw body. We might need to handle this in app.ts specifically for this route
-// or use express.raw({ type: 'application/json' }) here?
-// Webhook (Public, Raw Body)
-// Note: Webhook needs raw body. We might need to handle this in app.ts specifically for this route
-// or use express.raw({ type: 'application/json' }) here?
-router.post('/webhook', express.raw({ type: 'application/json' }), controller.handleWebhook as any);
+router.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => controller.handleWebhook(req, res));
 
 export default router;

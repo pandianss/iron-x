@@ -1,9 +1,21 @@
 import cron from 'node-cron';
 import prisma from './db';
-import { kernelQueue } from './infrastructure/queue';
-import { v4 as uuidv4 } from 'uuid';
-
+import { kernelQueue, redisConnection } from './infrastructure/queue';
 import { Logger } from './utils/logger';
+
+const LEADER_KEY = 'ironx:cron:leader';
+const LEADER_TTL = 3600; // 1 hour
+
+/**
+ * Basic Redis-based leader election.
+ * Returns true if this instance successfully claimed the lead for this hour.
+ */
+async function isLeader(): Promise<boolean> {
+    const instanceId = process.env.HOSTNAME || 'local-instance';
+    // NX = Only set if not exists, EX = TTL in seconds
+    const result = await redisConnection.set(LEADER_KEY, instanceId, 'EX', LEADER_TTL, 'NX');
+    return result === 'OK';
+}
 
 export const startCronJobs = () => {
     if (process.env.CRON_ENABLED === 'false') {
@@ -11,21 +23,19 @@ export const startCronJobs = () => {
         return;
     }
 
-    // Leader-election hook: In a multi-instance env, only one should run cron.
-    // Future: Add Redis-based lock check here.
-
     Logger.info('[Cron] Initializing scheduler...');
 
     // Run every hour to check for missed actions and violations
     cron.schedule('0 * * * *', async () => {
+        if (!(await isLeader())) {
+            Logger.debug('[Cron] Not the leader for this cycle. Skipping.');
+            return;
+        }
+
         Logger.info('[Cron] Triggering hourly discipline score recalculation cycle...');
 
         try {
-            const { container } = await import('tsyringe');
-            const { DisciplineStateService } = await import('./services/disciplineState.service');
-            const disciplineService = container.resolve(DisciplineStateService);
-
-            // Find users active in the last 7 days
+            // Find users active in the last 7 days or with non-zero scores
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -36,59 +46,33 @@ export const startCronJobs = () => {
                         { current_discipline_score: { gt: 0 } }
                     ]
                 },
-                select: { user_id: true, current_discipline_score: true }
+                select: { user_id: true }
             });
 
-            Logger.info(`[Cron] Processing ${activeUsers.length} users for score update.`);
+            Logger.info(`[Cron] Enqueuing ${activeUsers.length} users for score update.`);
 
-            for (const user of activeUsers) {
-                try {
-                    const oldScore = user.current_discipline_score;
-                    const newScore = await disciplineService.updateDisciplineScore(user.user_id);
-                    const delta = Math.round((newScore - oldScore) * 10) / 10;
+            // Parallelize by pushing individual jobs to BullMQ
+            const jobs = activeUsers.map(user => ({
+                name: 'KERNEL_CYCLE_JOB',
+                data: { userId: user.user_id, timestamp: new Date().toISOString() },
+                opts: { removeOnComplete: true, removeOnFail: 1000 }
+            }));
 
-                    Logger.info(`[Cron] User ${user.user_id}: ${oldScore} -> ${newScore} (delta: ${delta})`);
-
-                    // Task 04: Evaluate Trust Tier
-                    const { TrustTierService } = await import('./services/trustTier.service');
-                    const trustService = container.resolve(TrustTierService);
-                    await trustService.evaluateTierUpdate(user.user_id);
-
-                    // Task 05: Anticipatory Notifications
-                    const { NotificationService } = await import('./services/notification.service');
-                    const notifService = container.resolve(NotificationService);
-                    await notifService.checkAndNotify(user.user_id);
-
-                    // Check for lockout triggers
-                    // If DS hits breach threshold (< 20 as per item 01)
-                    if (newScore < 20) {
-                        const lockoutHours = 24; // Default
-                        const lockedUntil = new Date();
-                        lockedUntil.setHours(lockedUntil.getHours() + lockoutHours);
-
-                        await prisma.user.update({
-                            where: { user_id: user.user_id },
-                            data: {
-                                locked_until: lockedUntil,
-                                enforcement_mode: 'HARD'
-                            }
-                        });
-                        Logger.warn(`[Cron] User ${user.user_id} BREACHED. HARD Lockout applied until ${lockedUntil.toISOString()}`);
-                    }
-                } catch (userError) {
-                    Logger.error(`[Cron] Failed to update score for user ${user.user_id}:`, userError);
-                }
+            if (jobs.length > 0) {
+                await kernelQueue.addBulk(jobs);
+                Logger.info(`[Cron] Successfully enqueued ${jobs.length} jobs.`);
             }
         } catch (error) {
-            Logger.error('[Cron] Hourly discipline cycle failed:', error);
+            Logger.error('[Cron] Hourly discipline cycle trigger failed:', error);
         }
     });
 
     // Run every day at 3 AM to cleanup old audit logs
     cron.schedule('0 3 * * *', async () => {
+        if (!(await isLeader())) return;
+
         Logger.info('[Cron] Triggering audit log cleanup...');
         try {
-            // Default to 90 days retention if not specified
             const retentionDays = parseInt(process.env.AUDIT_RETENTION_DAYS || '90');
             await kernelQueue.add('CLEANUP_LOGS_JOB', { retentionDays });
         } catch (error) {
@@ -97,14 +81,11 @@ export const startCronJobs = () => {
     });
 
     // Run every Sunday at 2 AM for database maintenance
-    // Run every Sunday at 2 AM for database maintenance
     cron.schedule('0 2 * * 0', async () => {
+        if (!(await isLeader())) return;
+
         Logger.info('[Cron] Triggering weekly database maintenance...');
         try {
-            // const { container } = await import('tsyringe');
-            // const { OpsService } = await import('./modules/_experimental/ops/ops.service');
-            // const opsService = container.resolve(OpsService);
-            // await opsService.runDatabaseMaintenance();
             Logger.info('[Cron] Database maintenance skipped (Ops module inactive)');
         } catch (error) {
             Logger.error('[Cron] Weekly maintenance failed:', error);

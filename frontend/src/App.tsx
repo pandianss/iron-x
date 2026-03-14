@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { AuthProvider } from './context/AuthContext';
 import { DisciplineProvider } from './context/DisciplineContext';
@@ -26,13 +26,25 @@ const basename = import.meta.env.VITE_APP_BASENAME || '/';
 
 function App() {
     const [upgradeResource, setUpgradeResource] = useState<any>(null);
+    const [lockoutData, setLockoutData] = useState<any>(null);
 
     useEffect(() => {
-        const handler = (e: any) => {
-            setUpgradeResource(e.detail.resource);
+        const handleQuota = (e: any) => setUpgradeResource(e.detail.resource);
+        const handleLockout = (e: any) => setLockoutData(e.detail);
+        const handleAuthFail = () => {
+            // Potential unified logout trigger
+            console.warn('Authentication failure detected. Session may be invalid.');
         };
-        window.addEventListener('iron-x:quota-exceeded', handler as EventListener);
-        return () => window.removeEventListener('iron-x:quota-exceeded', handler as EventListener);
+
+        window.addEventListener('iron-x:quota-exceeded', handleQuota as EventListener);
+        window.addEventListener('iron-x:system-lockout', handleLockout as EventListener);
+        window.addEventListener('iron-x:auth-failure', handleAuthFail as EventListener);
+
+        return () => {
+            window.removeEventListener('iron-x:quota-exceeded', handleQuota as EventListener);
+            window.removeEventListener('iron-x:system-lockout', handleLockout as EventListener);
+            window.removeEventListener('iron-x:auth-failure', handleAuthFail as EventListener);
+        };
     }, []);
 
     return (
@@ -41,7 +53,12 @@ function App() {
                 <DisciplineProvider>
                     <Router basename={basename}>
                         <Routes>
-                            {/* Protected app routes — flat, no delegation */}
+                            {/* Governance Lockout Override */}
+                            {lockoutData && (
+                                <Route path="*" element={<Navigate to="/lockout" replace />} />
+                            )}
+
+                            {/* Protected app routes */}
                             <Route element={<ProtectedRoute />}>
                                 <Route path="/dashboard" element={<DashboardPage />} />
                                 <Route path="/cockpit" element={<CockpitPage />} />
@@ -56,6 +73,17 @@ function App() {
                                 <Route path="/coach/setup" element={<CoachSetupPage />} />
                                 <Route path="/compliance" element={<CompliancePage />} />
                                 <Route path="/developer" element={<ApiKeysPage />} />
+                                <Route path="/lockout" element={
+                                    <div className="min-h-screen flex items-center justify-center bg-black text-white p-8">
+                                        <div className="max-w-md text-center border border-red-900 bg-red-950/20 p-8 rounded-2xl">
+                                            <h1 className="text-3xl font-bold text-red-500 mb-4">SYSTEM LOCKOUT</h1>
+                                            <p className="text-red-200/70 mb-6">{lockoutData?.message || 'Access restricted due to governance breach.'}</p>
+                                            {lockoutData?.lockedUntil && (
+                                                <p className="text-sm font-mono text-red-500/50">LOCKED UNTIL: {new Date(lockoutData.lockedUntil).toLocaleString()}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                } />
                             </Route>
 
                             {/* Marketing / public routes */}

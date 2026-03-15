@@ -4,7 +4,7 @@ import { api } from './api';
 
 export interface DisciplineState {
     score: number;
-    classification: 'STRICT' | 'STABLE' | 'DRIFTING' | 'BREACH';
+    classification: 'HIGH_RELIABILITY' | 'STABLE' | 'RECOVERING' | 'ONBOARDING';
     compositePressure: number;
     driftVectors: Array<{
         source: string;

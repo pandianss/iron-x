@@ -12,20 +12,6 @@ export function registerObservers() {
     // Enforcement
     domainEvents.on(DomainEventType.VIOLATION_DETECTED, (e) => { enforcementObserver.handle(e); });
 
-    // Bind to new EventBus as well
-    kernelEvents.on(NewDomainEventType.VIOLATION_DETECTED, (e) => {
-        // Adapt event shape if necessary, or just pass if compatible
-        // The old observer expects userId to be present.
-        if (e.userId) {
-            enforcementObserver.handle({
-                type: DomainEventType.VIOLATION_DETECTED,
-                timestamp: e.timestamp,
-                userId: e.userId,
-                payload: e.payload
-            });
-        }
-    });
-
     // Audit (New)
     // Invoking the singleton to ensure subscriptions are active
     console.log('[Bootstrap] auditSubscriber initialized status:', !!auditSubscriber);

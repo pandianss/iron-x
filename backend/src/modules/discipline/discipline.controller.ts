@@ -74,6 +74,13 @@ export class DisciplineController {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+            // Start from the user's most recent persisted discipline score, or 50 (neutral) if none exists.
+            const latestScore = await prisma.disciplineScore.findFirst({
+                where: { user_id: userId },
+                orderBy: { date: 'desc' },
+                select: { score: true }
+            });
+
             const instances = await prisma.actionInstance.findMany({
                 where: {
                     action: { user_id: userId },
@@ -82,8 +89,9 @@ export class DisciplineController {
                 orderBy: { scheduled_start_time: 'asc' },
                 select: {
                     scheduled_start_time: true,
+                    scheduled_end_time: true,
                     status: true,
-                    completion_time_offset_minutes: true
+                    executed_at: true
                 }
             });
 
@@ -91,7 +99,7 @@ export class DisciplineController {
             const dailyScores: Array<{ date: string; score: number }> = [];
             const dayMap = new Map<string, { completed: number; missed: number; late: number }>();
 
-            instances.forEach(inst => {
+            instances.forEach((inst: any) => {
                 const dateKey = inst.scheduled_start_time.toISOString().split('T')[0];
                 if (!dayMap.has(dateKey)) {
                     dayMap.set(dateKey, { completed: 0, missed: 0, late: 0 });
@@ -99,7 +107,12 @@ export class DisciplineController {
                 
                 const day = dayMap.get(dateKey)!;
                 if (inst.status === 'COMPLETED') {
-                    if (inst.completion_time_offset_minutes && inst.completion_time_offset_minutes > 0) {
+                    const isLate = 
+                        inst.executed_at && 
+                        inst.scheduled_end_time && 
+                        new Date(inst.executed_at) > new Date(inst.scheduled_end_time);
+                    
+                    if (isLate) {
                         day.late++;
                     } else {
                         day.completed++;
@@ -110,7 +123,7 @@ export class DisciplineController {
             });
 
             // Convert to array and calculate scores
-            let runningScore = 75; // Starting baseline
+            let runningScore = latestScore?.score ?? 50;
             Array.from(dayMap.entries())
                 .sort(([a], [b]) => a.localeCompare(b))
                 .forEach(([date, stats]) => {

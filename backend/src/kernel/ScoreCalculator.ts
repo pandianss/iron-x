@@ -37,9 +37,14 @@ export class ScoreCalculator {
             if (total > 0) {
                 const completed = instances.filter(i => i.status === 'COMPLETED').length;
                 executionRate = completed / total;
-                // Currently no explicit difference between COMPLETED and ON_TIME mapped in status here, 
-                // but setting base fallback properties
-                onTimeRate = executionRate;
+
+                // Compute on-time rate: COMPLETED before or at scheduled_end_time
+                const completedOnTime = instances.filter(i => {
+                    if (i.status !== 'COMPLETED') return false;
+                    if (!i.executed_at || !i.scheduled_end_time) return true; // no timing data → assume on time
+                    return new Date(i.executed_at) <= new Date(i.scheduled_end_time);
+                }).length;
+                onTimeRate = completedOnTime / total;
             }
         }
 

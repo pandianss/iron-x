@@ -30,7 +30,7 @@
 3.  **Design Project:** Create a municipal regulation that requires *zero* human enforcement agents (fully automated compliance).
 
 ## Assessment Rubrics
-**Pass/Fail Condition:**
-*   Did the student rely on "trust" or "hope"? -> **FAIL**
-*   Did the student expect users to "remember"? -> **FAIL**
-*   Did the student build a mechanism that acts when the human sleeps? -> **PASS**
+**Reliability Benchmark:**
+*   Does the design provide systemic support for the operator? -> **PASS**
+*   Does the mechanism maintain continuity during human variability? -> **PASS**
+*   Does the design rely on unassisted memory or high-stress vigilance? -> **RECALIBRATE**

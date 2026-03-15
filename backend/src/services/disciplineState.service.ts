@@ -5,7 +5,7 @@ import { injectable, inject } from 'tsyringe';
 
 interface DisciplineMetrics {
     score: number;
-    classification: 'STRICT' | 'STABLE' | 'DRIFTING' | 'BREACH';
+    classification: 'HIGH_RELIABILITY' | 'STABLE' | 'RECOVERING' | 'ONBOARDING';
     compositePressure: number;
     driftVectors: Array<{
         source: string;
@@ -130,11 +130,11 @@ export class DisciplineStateService {
     private classifyDiscipline(
         score: number,
         instances: any[]
-    ): 'STRICT' | 'STABLE' | 'DRIFTING' | 'BREACH' {
-        if (score >= 90) return 'STRICT';
+    ): 'HIGH_RELIABILITY' | 'STABLE' | 'RECOVERING' | 'ONBOARDING' {
+        if (instances.length < 10) return 'ONBOARDING';
+        if (score >= 90) return 'HIGH_RELIABILITY';
         if (score >= 70) return 'STABLE';
-        if (score >= 50) return 'DRIFTING';
-        return 'BREACH';
+        return 'RECOVERING';
     }
 
     private calculateDriftVectors(instances: any[]): Array<{

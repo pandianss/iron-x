@@ -9,21 +9,21 @@ This kit contains distribution assets for the Iron-X Monetization & Growth Sprin
 **Objective:** Incentivize high-reliability operators to invite their sub-network.
 
 ### Social Scripts
-- **Twitter/X:** "I just initialized a Hard Lockout on Iron-X. My behavioral entropy was 4.2x above baseline. If I fail, my DS drops. Join the protocol: iron-x.com/register?ref={YOUR_CODE}"
+- **Twitter/X:** "I just completed my 10th consecutive cycle on Iron-X. My behavioral reliability is 2x above baseline. Join the protocol: iron-x.com/register?ref={YOUR_CODE}"
 - **Professional:** "Engineering discipline into my daily workflow with Iron-X. It's the only infrastructure that enforces adherence without negotiation. Link in bio."
 
 ---
 
-## 02 // Asset Cluster: Failure/Lockout Cards
-The `/lockout` route generates intimidating, high-consequence visuals when a breach is detected. 
-- **Usage:** Share these manually or via automated social integrations to demonstrate "The Cost of Failure".
-- **Visual:** High-contrast red/black, mono-typography, cryptographic status strings.
+## 02 // Asset Cluster: Achievement Cards
+The `/share/achievement` route generates high-performance metrics cards for users who maintain HIGH_RELIABILITY for 7+ days.
+- **Usage:** Share these manually to celebrate consistent progress and "The Value of Reliability".
+- **Visual:** Sleek dark mode, cyan accents, mono-typography, cryptographic verification strings.
 
 ---
 
 ## 03 // Distribution Hooks
-- **Newsletter:** "Behavioral Drift is a System Failure. Your hourly rate is ₹X, but your effective output is Y. Calculate your ROI: iron-x.com/roi-calculator"
-- **ProductHunt Launch Caption:** "Iron-X isn't a task manager. It's an enforcement layer for your discipline. Hard lockouts, AI drift analysis, and zero negotiations."
+- **Newsletter:** "Behavioral Reliability is a Competitive Edge. Your consistency is your ROI. Analyze your performance: iron-x.com/reliability-report"
+- **ProductHunt Launch Caption:** "Iron-X isn't a task manager. It's a reliability layer for your output. AI drift analysis, systemic support, and zero negotiations."
 
 ---
 

@@ -28,7 +28,7 @@ export class ExecutionPipeline {
                 payload: {
                     instanceId: instance.instance_id,
                     reason: 'LATE_EXECUTION',
-                    policyId: mode // 'HARD' or 'SOFT' acting as pseudo-policy ID for now
+                    enforcementMode: mode // 'HARD' | 'SOFT' — not a policy ID
                 }
             });
         }
@@ -50,7 +50,7 @@ export class ExecutionPipeline {
                 payload: {
                     instanceId,
                     reason: 'MISSED_ACTION',
-                    policyId: mode // 'HARD' or 'SOFT' acting as pseudo-policy ID for now
+                    enforcementMode: mode // 'HARD' | 'SOFT' — not a policy ID
                 }
             });
         }

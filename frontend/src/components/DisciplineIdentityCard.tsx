@@ -58,10 +58,10 @@ const DisciplineIdentityCard: React.FC = () => {
 
     const getClassificationColor = (classification: string) => {
         switch (classification) {
-            case 'STRICT': return 'text-green-600 bg-green-50 border-green-200';
+            case 'HIGH_RELIABILITY': return 'text-green-600 bg-green-50 border-green-200';
             case 'STABLE': return 'text-blue-600 bg-blue-50 border-blue-200';
-            case 'DRIFTING': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-            case 'BREACH': return 'text-red-600 bg-red-50 border-red-200';
+            case 'RECOVERING': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+            case 'ONBOARDING': return 'text-blue-500 bg-blue-50 border-blue-100';
             default: return 'text-iron-600 bg-iron-50 border-iron-200';
         }
     };

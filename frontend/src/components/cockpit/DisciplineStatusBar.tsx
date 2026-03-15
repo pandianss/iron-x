@@ -41,10 +41,10 @@ export function DisciplineStatusBar() {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'STRICT': return 'text-iron-200'; // Neutral/White
-            case 'STABLE': return 'text-iron-400';
-            case 'DRIFTING': return 'text-amber-500';
-            case 'BREACH': return 'text-red-600 animate-pulse';
+            case 'HIGH_RELIABILITY': return 'text-green-400';
+            case 'STABLE': return 'text-iron-200';
+            case 'RECOVERING': return 'text-amber-500';
+            case 'ONBOARDING': return 'text-blue-400';
             default: return 'text-iron-500';
         }
     };

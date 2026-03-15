@@ -31,7 +31,7 @@ model User {
   acknowledgment_required Boolean   @default(false)
 
   // Phase 3.5: Experience Hardening
-  discipline_classification   String   @default("UNRELIABLE") // 'UNRELIABLE', 'RECOVERING', 'STABLE', 'HIGH_RELIABILITY'
+  discipline_classification   String   @default("ONBOARDING") // 'ONBOARDING', 'RECOVERING', 'STABLE', 'HIGH_RELIABILITY'
   classification_last_updated DateTime @default(now())
   trust_tier                  String   @default("PROVISIONAL") // 'PROVISIONAL', 'STANDARD', 'TRUSTED', 'AUTONOMOUS'
   public_score_enabled        Boolean  @default(false)

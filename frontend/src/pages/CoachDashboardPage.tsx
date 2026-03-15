@@ -75,7 +75,7 @@ const CoachDashboardPage: React.FC = () => {
 
     const getClassificationColor = (cls: string) => {
         switch (cls) {
-            case 'UNRELIABLE': return 'border-red-600 text-red-500';
+            case 'ONBOARDING': return 'border-blue-400 text-blue-500';
             case 'RECOVERING': return 'border-orange-500 text-orange-400';
             case 'STABLE': return 'border-blue-600 text-blue-500';
             case 'HIGH_RELIABILITY': return 'border-green-500 text-green-400';

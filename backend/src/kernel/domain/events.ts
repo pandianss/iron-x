@@ -25,7 +25,7 @@ export interface ViolationDetectedEvent extends DomainEvent {
         instanceId: InstanceId;
         reason: string;
         enforcementMode?: string; // 'HARD' | 'SOFT'
-        policyId?: PolicyId;        // real Policy UUID, optional
+        policyId?: PolicyId;        // real Policy UUID — reserved for future use
     };
 }
 

@@ -100,13 +100,19 @@ const DisciplineIdentityCard: React.FC = () => {
                 {/* Score Display */}
                 <div className="flex items-end gap-4 mb-6">
                     <div>
-                        <div className={`text-5xl font-bold ${getScoreColor(data.score)}`}>
-                            {data.score.toFixed(1)}
-                        </div>
+                        {data.classification === 'ONBOARDING' ? (
+                            <div className="text-3xl font-bold text-iron-500 italic">
+                                INITIALIZING
+                            </div>
+                        ) : (
+                            <div className={`text-5xl font-bold ${getScoreColor(data.score)}`}>
+                                {data.score.toFixed(1)}
+                            </div>
+                        )}
                         <div className="text-xs text-iron-400 mt-1">Discipline Score</div>
                     </div>
                     <div className={`px-3 py-1 rounded-md border ${getClassificationColor(data.classification)} text-sm font-bold mb-2`}>
-                        {data.classification}
+                        {data.classification === 'ONBOARDING' ? 'Building track record' : data.classification}
                     </div>
                 </div>
 

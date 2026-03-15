@@ -2,7 +2,7 @@ import { api } from './api';
 
 export interface TrajectoryIdentity {
     score: number;
-    classification: 'UNRELIABLE' | 'RECOVERING' | 'STABLE' | 'HIGH_RELIABILITY';
+    classification: 'ONBOARDING' | 'RECOVERING' | 'STABLE' | 'HIGH_RELIABILITY';
     daysAtCurrent: number;
     nextThreshold: number;
     supervisionMode: string;

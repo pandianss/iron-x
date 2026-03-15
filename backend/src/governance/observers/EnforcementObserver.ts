@@ -13,11 +13,11 @@ export class EnforcementObserver {
 
     private async handleViolation(event: ViolationDetectedEvent) {
         const { userId, payload } = event;
-        const { policyId } = payload;
+        const { enforcementMode } = payload;
 
         console.log(`[Governance] Violation observed for ${userId}: ${payload.reason}`);
 
-        if (policyId === 'HARD') {
+        if (enforcementMode === 'HARD') {
             try {
                 // Check if this is the user's first violation ever
                 const violationCount = await prisma.auditLog.count({
@@ -28,14 +28,12 @@ export class EnforcementObserver {
                 });
 
                 if (violationCount <= 1) { // 1 because the current one might already be logged or is about to be
-                    console.log(`[Governance] First-time violation for ${userId}. Applying Coaching Pause (2h) instead of Hard Lockout.`);
-                    const twoHoursLater = new Date();
-                    twoHoursLater.setHours(twoHoursLater.getHours() + 2);
-
+                    console.log(`[Governance] First-time violation for ${userId}. Applying Coaching Pause (Option A) instead of Hard Lockout.`);
+                    
                     await prisma.user.update({
                         where: { user_id: userId },
                         data: {
-                            locked_until: twoHoursLater,
+                            locked_until: null, // Option A: No lockout for first failure
                             acknowledgment_required: true,
                             enforcement_mode: 'SOFT' // temporarily downgrade to SOFT/COACHING mode
                         }

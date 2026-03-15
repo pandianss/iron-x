@@ -2,6 +2,7 @@
 import Stripe from 'stripe';
 import { singleton, container } from 'tsyringe';
 import { IBillingProvider, CheckoutSessionParams, BillingEvent, BillingWebhookEvent } from './billing.provider';
+import prisma from '../../db';
 import { Logger } from '../../utils/logger';
 
 @singleton()
@@ -51,28 +52,102 @@ export class StripeService implements IBillingProvider {
         });
     }
 
-    async constructEvent(payload: Buffer, signature: string): Promise<BillingWebhookEvent> {
+    async handleWebhook(signature: string, payload: Buffer) {
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-        if (!webhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET not configured');
 
-        const event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-        
-        const result: BillingWebhookEvent = {
-            type: this.mapEventType(event.type),
-            raw: event
-        };
-
-        const data = event.data.object as any;
-        result.customerId = data.customer;
-        result.subscriptionId = data.subscription || data.id;
-        result.userId = data.metadata?.userId;
-
-        if (event.type === 'checkout.session.completed') {
-            const lineItems = await this.stripe.checkout.sessions.listLineItems(data.id);
-            result.priceId = lineItems.data[0]?.price?.id;
+        if (!webhookSecret) {
+            Logger.error('[Stripe] STRIPE_WEBHOOK_SECRET is not set. All webhook events will be rejected.');
+            throw new Error('STRIPE_WEBHOOK_SECRET not configured. Set it in environment variables.');
         }
 
-        return result;
+        let event: Stripe.Event;
+        try {
+            event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+        } catch (err: any) {
+            Logger.error(`[Stripe] Webhook signature verification failed: ${err.message}`);
+            throw new Error(`Webhook signature invalid: ${err.message}`);
+        }
+
+        switch (event.type) {
+            case 'checkout.session.completed':
+                await this.handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
+                break;
+            case 'invoice.payment_failed':
+                await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+                break;
+            case 'customer.subscription.deleted':
+                await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
+                break;
+            default:
+                Logger.info(`[Stripe] Unhandled event type: ${event.type}`);
+        }
+    }
+
+    private async handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+        const userId = session.metadata?.userId;
+        if (!userId) {
+            Logger.error('[Stripe] checkout.session.completed missing userId in metadata');
+            return;
+        }
+
+        // Determine tier from the price ID purchased
+        const lineItems = await this.stripe.checkout.sessions.listLineItems(session.id);
+        const priceId = lineItems.data[0]?.price?.id;
+
+        // Map price ID to subscription tier
+        const tierMap: Record<string, string> = {
+            'price_pro_monthly': 'INDIVIDUAL_PRO',
+            'price_enterprise_seats': 'TEAM_ENTERPRISE',
+        };
+
+        const tier = tierMap[priceId || ''];
+        if (!tier) {
+            Logger.warn(`[Stripe] Unknown price ID in checkout: ${priceId}`);
+            return;
+        }
+
+        await prisma.subscription.upsert({
+            where: { user_id: userId },
+            update: {
+                plan_tier: tier as any,
+                stripe_subscription_id: session.subscription as string,
+                is_active: true,
+                updated_at: new Date()
+            },
+            create: {
+                user_id: userId,
+                plan_tier: tier as any,
+                stripe_subscription_id: session.subscription as string,
+                is_active: true
+            }
+        });
+
+        Logger.info(`[Stripe] User ${userId} upgraded to ${tier}`);
+    }
+
+    private async handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+        // Logic for failed payment (e.g., alert user, lock account)
+        const customerId = invoice.customer as string;
+        const sub = await prisma.subscription.findFirst({ where: { stripe_customer_id: customerId } });
+        if (sub) {
+            await prisma.subscription.update({
+                where: { subscription_id: sub.subscription_id },
+                data: { is_active: false }
+            });
+            Logger.warn(`[Stripe] Payment failed for customer ${customerId}, subscription deactivated`);
+        }
+    }
+
+    private async handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+        const customerId = subscription.customer as string;
+        const sub = await prisma.subscription.findFirst({ where: { stripe_customer_id: customerId } });
+        if (sub) {
+            await prisma.subscription.update({
+                where: { subscription_id: sub.subscription_id },
+                data: { is_active: false, plan_tier: 'FREE' }
+            });
+            Logger.info(`[Stripe] Subscription deleted for customer ${customerId}`);
+        }
     }
 
     private mapEventType(stripeType: string): BillingEvent {

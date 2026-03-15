@@ -74,38 +74,7 @@ export class StripeController {
         const signature = req.headers['stripe-signature'] as string;
 
         try {
-            const event = await this.stripeService.constructEvent(req.body as Buffer, signature);
-            
-            if (!event.type) {
-                return res.json({ ignored: true });
-            }
-
-            switch (event.type) {
-                case BillingEvent.CHECKOUT_COMPLETED:
-                case BillingEvent.INVOICE_PAID:
-                    if (event.userId && event.priceId && event.subscriptionId && event.customerId) {
-                        const tier = this.mapPriceToTier(event.priceId);
-                        await this.subService.activateSubscription({
-                            userId: event.userId,
-                            tier,
-                            subscriptionId: event.subscriptionId,
-                            customerId: event.customerId,
-                            provider: 'stripe'
-                        });
-                    }
-                    break;
-                case BillingEvent.PAYMENT_FAILED:
-                    if (event.userId) {
-                        await this.subService.lockAccount(event.userId);
-                    }
-                    break;
-                case BillingEvent.SUBSCRIPTION_DELETED:
-                    if (event.userId) {
-                        await this.subService.deactivateSubscription(event.userId);
-                    }
-                    break;
-            }
-
+            await this.stripeService.handleWebhook(signature, req.body as Buffer);
             res.json({ received: true });
         } catch (error: any) {
             Logger.error('[Stripe] Webhook Error:', error);

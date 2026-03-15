@@ -3,74 +3,41 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('Seeding Controls...');
+    console.log('--- SEEDING PRODUCTION CONTROLS ---');
 
-    // ISO 27001 Controls
     const controls = [
-        {
-            framework: 'ISO 27001',
-            control_code: 'A.9.2.1',
-            description: 'User registration and de-registration',
-        },
-        {
-            framework: 'ISO 27001',
-            control_code: 'A.9.4.1',
-            description: 'Information access restriction',
-        },
-        {
-            framework: 'ISO 27001',
-            control_code: 'A.12.4.1',
-            description: 'Event logging',
-        }
+        { framework: 'ISO 27001', control_code: 'A.12.6.1', description: 'Management of technical vulnerabilities' },
+        { framework: 'ISO 27001', control_code: 'A.9.2.3', description: 'Management of privileged access rights' },
+        { framework: 'ISO 27001', control_code: 'A.7.2.2', description: 'Information security awareness, education and training' },
+        { framework: 'SOC 2', control_code: 'CC6.1', description: 'Logical access security' },
+        { framework: 'SOC 2', control_code: 'CC7.1', description: 'System monitoring and incident response' }
     ];
 
     for (const c of controls) {
         await prisma.control.upsert({
-            where: {
-                framework_control_code: {
-                    framework: c.framework,
-                    control_code: c.control_code
-                }
-            },
+            where: { framework_control_code: { framework: c.framework, control_code: c.control_code } },
             create: c,
             update: c
         });
+        console.log(`[+] Seeded: ${c.control_code}`);
     }
 
-    console.log('Controls seeded.');
-
-    // Map A.12.4.1 (Logging) to Audit Logs (Conceptual mapping)
-    const logControl = await prisma.control.findFirst({
-        where: { control_code: 'A.12.4.1' }
-    });
-
-    if (logControl) {
-        // Check if mapping exists
-        const mappingExists = await prisma.controlMapping.findFirst({
-            where: {
-                control_id: logControl.control_id,
-                evidence_source: 'LOG:audit_logs'
+    console.log('--- MAPPING EVIDENCE SOURCES ---');
+    const vulnControl = await prisma.control.findFirst({ where: { control_code: 'A.12.6.1' } });
+    if (vulnControl) {
+        await prisma.controlMapping.upsert({
+            where: { mapping_id: 'vuln-map-prod' },
+            update: {},
+            create: {
+                mapping_id: 'vuln-map-prod',
+                control_id: vulnControl.control_id,
+                enforcement_mechanism: 'IMMUTABLE_LOG',
+                evidence_source: 'SYSTEM:vulnerability_scan'
             }
         });
-
-        if (!mappingExists) {
-            await prisma.controlMapping.create({
-                data: {
-                    control_id: logControl.control_id,
-                    enforcement_mechanism: 'IMMUTABLE_LOG',
-                    evidence_source: 'LOG:audit_logs'
-                }
-            });
-            console.log('Mapped A.12.4.1 to Audit Logs');
-        }
     }
+
+    console.log('Seeding Complete.');
 }
 
-main()
-    .catch(e => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+main().catch(e => { console.error(e); process.exit(1); }).finally(async () => { await prisma.$disconnect(); });

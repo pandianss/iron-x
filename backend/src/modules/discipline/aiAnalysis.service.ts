@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { injectable, inject } from 'tsyringe';
 import axios from 'axios';
-import { Logger } from '../utils/logger';
+import { Logger } from '../../core/logger';
 
 @injectable()
 export class AiAnalysisService {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { ExternalApiService } from '../services/externalApi.service';
+import { ExternalApiService } from '../modules/integration/externalApi.service';
 
 export const ExternalController = {
     async getMetrics(req: Request, res: Response) {

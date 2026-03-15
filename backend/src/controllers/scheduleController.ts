@@ -1,13 +1,13 @@
 
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
-import prisma from '../db';
+import prisma from '../infrastructure/db';
 import { kernel } from '../kernel/DisciplineEngine';
 import { v4 as uuidv4 } from 'uuid';
 import { kernelEvents, DomainEventType } from '../kernel/events/bus';
 import { container } from 'tsyringe';
-import { DisciplineStateService } from '../services/disciplineState.service';
-import { WitnessService } from '../services/witness.service';
+import { DisciplineStateService } from '../modules/discipline/disciplineState.service';
+import { WitnessService } from '../modules/witness/witness.service';
 
 export const getDailySchedule = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
@@ -80,7 +80,7 @@ export const logExecution = async (req: AuthRequest, res: Response) => {
 
         // EMIT EVENT
         const { container } = await import('tsyringe');
-        const { WitnessService } = await import('../services/witness.service');
+        const { WitnessService } = await import('../modules/witness/witness.service');
         const witnessService = container.resolve(WitnessService);
 
         if (status === 'COMPLETED' || status === 'LATE') {

@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { autoInjectable } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { AuthRequest } from '../../middleware/authMiddleware';
 import { NotFoundError } from '../../utils/AppError';
 import { kernelEvents, DomainEventType } from '../../kernel/events/bus';

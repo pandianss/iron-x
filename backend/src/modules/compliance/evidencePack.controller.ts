@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { container } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { EvidencePackService } from './evidencePack.service';
 import { generateEvidencePackPdf } from './evidencePack.pdf';
 import { AuthRequest } from '../../middleware/authMiddleware';

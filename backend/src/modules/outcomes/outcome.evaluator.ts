@@ -1,6 +1,6 @@
 import { singleton, inject } from 'tsyringe';
-import prisma from '../../db';
-import { Logger } from '../../utils/logger';
+import prisma from '../../infrastructure/db';
+import { Logger } from '../../core/logger';
 import { OutcomeRepository } from './outcome.repository';
 import { IndisciplineCalculator } from './indiscipline.calculator';
 

@@ -3,7 +3,7 @@ import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware'
 import { ApiKeyService } from './apiKey.service';
 import { container } from 'tsyringe';
 import { SubscriptionService } from '../subscription/subscription.service';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 
 const router = Router();
 router.use(authenticateToken);

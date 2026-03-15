@@ -1,8 +1,9 @@
-import { container } from 'tsyringe';
-import prisma from '../../db';
+import { Logger } from '../../core/logger';
+import prisma from '../../infrastructure/db';
 import { DomainEvent, ViolationDetectedEvent } from '../../kernel/domain/events';
 import { DomainEventType } from '../../kernel/domain/types';
-import { PolicyService } from '../../services/policy.service';
+import { PolicyService } from '../../modules/policies/policy.service';
+import { container } from 'tsyringe';
 
 export class EnforcementObserver {
     async handle(event: DomainEvent) {

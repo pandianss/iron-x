@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { EvidenceService } from '../services/evidence.service';
+import { EvidenceService } from '../modules/compliance/evidence.service';
 import { AuditService } from '../modules/audit/audit.service';
 
 export const generateEvidence = async (req: Request, res: Response) => {

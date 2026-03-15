@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthRequest } from '../../middleware/authMiddleware';

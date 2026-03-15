@@ -1,7 +1,7 @@
 import { UserId, InstanceId, DisciplineContext } from './domain/types';
 import { PolicyEvaluator } from './PolicyEvaluator';
 import { domainEvents, DomainEventType } from './domain/events';
-import { Logger } from '../utils/logger';
+import { Logger } from '../core/logger';
 
 export class ExecutionPipeline {
     constructor(private policyEvaluator: PolicyEvaluator) { }

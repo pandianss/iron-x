@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 
 export class ApiKeyService {
   // Generate a new API key — returns the plaintext key ONCE (never stored)

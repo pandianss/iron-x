@@ -2,7 +2,7 @@
 
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { DisciplineStateService } from '../../services/disciplineState.service';
+import { DisciplineStateService } from './disciplineState.service';
 import { AuthRequest } from '../../middleware/authMiddleware';
 
 export class DisciplineController {
@@ -68,83 +68,10 @@ export class DisciplineController {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
 
-            const prisma = container.resolve('PrismaClient' as any) as any;
-            
-            // Get action instances from last 30 days
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const service = container.resolve(DisciplineStateService);
+            const trajectory = await service.getUserTrajectory(userId);
 
-            // Start from the user's most recent persisted discipline score, or 50 (neutral) if none exists.
-            const latestScore = await prisma.disciplineScore.findFirst({
-                where: { user_id: userId },
-                orderBy: { date: 'desc' },
-                select: { score: true }
-            });
-
-            const instances = await prisma.actionInstance.findMany({
-                where: {
-                    action: { user_id: userId },
-                    scheduled_start_time: { gte: thirtyDaysAgo }
-                },
-                orderBy: { scheduled_start_time: 'asc' },
-                select: {
-                    scheduled_start_time: true,
-                    scheduled_end_time: true,
-                    status: true,
-                    executed_at: true
-                }
-            });
-
-            // Calculate daily scores
-            const dailyScores: Array<{ date: string; score: number }> = [];
-            const dayMap = new Map<string, { completed: number; missed: number; late: number }>();
-
-            instances.forEach((inst: any) => {
-                const dateKey = inst.scheduled_start_time.toISOString().split('T')[0];
-                if (!dayMap.has(dateKey)) {
-                    dayMap.set(dateKey, { completed: 0, missed: 0, late: 0 });
-                }
-                
-                const day = dayMap.get(dateKey)!;
-                if (inst.status === 'COMPLETED') {
-                    const isLate = 
-                        inst.executed_at && 
-                        inst.scheduled_end_time && 
-                        new Date(inst.executed_at) > new Date(inst.scheduled_end_time);
-                    
-                    if (isLate) {
-                        day.late++;
-                    } else {
-                        day.completed++;
-                    }
-                } else if (inst.status === 'MISSED') {
-                    day.missed++;
-                }
-            });
-
-            // Convert to array and calculate scores
-            let runningScore = latestScore?.score ?? 50;
-            Array.from(dayMap.entries())
-                .sort(([a], [b]) => a.localeCompare(b))
-                .forEach(([date, stats]) => {
-                    const total = stats.completed + stats.late + stats.missed;
-                    if (total > 0) {
-                        const dailyPerformance = 
-                            (stats.completed / total) * 100 + 
-                            (stats.late / total) * 70 - 
-                            (stats.missed / total) * 30;
-                        
-                        // Smooth the score changes
-                        runningScore = runningScore * 0.7 + dailyPerformance * 0.3;
-                    }
-                    
-                    dailyScores.push({
-                        date,
-                        score: Math.round(runningScore * 10) / 10
-                    });
-                });
-
-            res.json({ trajectory: dailyScores });
+            res.json({ trajectory });
         } catch (error: any) {
             console.error('[Discipline] Error fetching trajectory:', error);
             res.status(500).json({ 
@@ -199,7 +126,7 @@ export class DisciplineController {
             const prisma = container.resolve('PrismaClient' as any) as any;
             const history = await prisma.auditLog.findMany({
                 where: { target_user_id: userId },
-                orderBy: { created_at: 'desc' },
+                orderBy: { timestamp: 'desc' },
                 take: 50
             });
 

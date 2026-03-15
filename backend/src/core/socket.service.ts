@@ -1,23 +1,24 @@
-
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import { injectable, singleton } from 'tsyringe';
+import { createAdapter } from '@socket.io/redis-adapter';
+import Redis from 'ioredis';
 
+@injectable()
+@singleton()
 export class SocketService {
-    private static instance: SocketService;
     private io: Server | null = null;
 
-    private constructor() { }
-
-    static getInstance(): SocketService {
-        if (!SocketService.instance) {
-            SocketService.instance = new SocketService();
-        }
-        return SocketService.instance;
-    }
+    constructor() { }
 
     initialize(httpServer: HttpServer) {
+        const REDIS_URL = process.env.REDIS_URL || 'redis://iron_redis:6379';
+        const pubClient = new Redis(REDIS_URL, { maxRetriesPerRequest: null });
+        const subClient = pubClient.duplicate();
+
         this.io = new Server(httpServer, {
+            adapter: createAdapter(pubClient as any, subClient as any),
             cors: {
                 origin: [process.env.FRONTEND_URL || 'http://localhost:5173', 'http://localhost:3000'],
                 methods: ['GET', 'POST'],

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import prisma from '../db';
-import { Logger } from '../utils/logger';
+import prisma from '../infrastructure/db';
+import { Logger } from '../core/logger';
 
 export const requireRole = (allowedRoles: string[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {

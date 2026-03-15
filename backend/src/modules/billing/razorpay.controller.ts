@@ -1,16 +1,18 @@
-
 import { Request, Response } from 'express';
-import { container } from 'tsyringe';
+import { injectable } from 'tsyringe';
 import { RazorpayService } from './razorpay.service';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { AuthRequest } from '../../middleware/authMiddleware';
-import { Logger } from '../../utils/logger';
+import { Logger } from '../../core/logger';
 import { BillingEvent } from './billing.provider';
 import { SubscriptionTier } from '@prisma/client';
 
+@injectable()
 export class RazorpayController {
-    private razorpayService = container.resolve(RazorpayService);
-    private subService = container.resolve(SubscriptionService);
+    constructor(
+        private razorpayService: RazorpayService,
+        private subService: SubscriptionService
+    ) {}
 
     async createSubscription(req: AuthRequest, res: Response) {
         try {
@@ -40,37 +42,7 @@ export class RazorpayController {
     async webhook(req: Request, res: Response) {
         try {
             const signature = req.headers['x-razorpay-signature'] as string;
-            const event = await this.razorpayService.constructEvent(req.body, signature);
-
-            if (!event.type) {
-                return res.json({ ignored: true });
-            }
-
-            switch (event.type) {
-                case BillingEvent.CHECKOUT_COMPLETED:
-                case BillingEvent.INVOICE_PAID:
-                    if (event.userId && event.subscriptionId && event.customerId) {
-                        await this.subService.activateSubscription({
-                            userId: event.userId,
-                            tier: SubscriptionTier.INDIVIDUAL_PRO,
-                            subscriptionId: event.subscriptionId,
-                            customerId: event.customerId,
-                            provider: 'razorpay'
-                        });
-                    }
-                    break;
-                case BillingEvent.PAYMENT_FAILED:
-                    if (event.userId) {
-                        await this.subService.lockAccount(event.userId);
-                    }
-                    break;
-                case BillingEvent.SUBSCRIPTION_DELETED:
-                    if (event.userId) {
-                        await this.subService.deactivateSubscription(event.userId);
-                    }
-                    break;
-            }
-
+            await this.razorpayService.handleWebhook(req.body, signature);
             res.status(200).send('OK');
         } catch (error: any) {
             Logger.error('[Razorpay] Webhook Error:', error);

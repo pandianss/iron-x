@@ -1,7 +1,7 @@
 import cron from 'node-cron';
-import prisma from './db';
+import prisma from './infrastructure/db';
 import { kernelQueue, redisConnection } from './infrastructure/queue';
-import { Logger } from './utils/logger';
+import { Logger } from './core/logger';
 
 const LEADER_KEY = 'ironx:cron:leader';
 const LEADER_TTL = 3600; // 1 hour

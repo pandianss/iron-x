@@ -1,17 +1,20 @@
-
 import { Request, Response } from 'express';
-import { container } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import { StripeService } from './stripe.service';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { AuthRequest } from '../../middleware/authMiddleware';
-import prisma from '../../db';
-import { Logger } from '../../utils/logger';
+import { PrismaClient } from '@prisma/client';
+import { Logger } from '../../core/logger';
 import { BillingEvent } from './billing.provider';
 import { SubscriptionTier } from '@prisma/client';
 
+@injectable()
 export class StripeController {
-    private stripeService = container.resolve(StripeService);
-    private subService = container.resolve(SubscriptionService);
+    constructor(
+        private stripeService: StripeService,
+        private subService: SubscriptionService,
+        @inject('PrismaClient') private prisma: PrismaClient
+    ) {}
 
     async createCheckoutSession(req: AuthRequest, res: Response) {
         try {
@@ -22,7 +25,7 @@ export class StripeController {
                 return;
             }
 
-            const dbUser = await prisma.user.findUnique({
+            const dbUser = await this.prisma.user.findUnique({
                 where: { user_id: userId },
                 select: { email: true }
             });

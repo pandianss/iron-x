@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { autoInjectable } from 'tsyringe';
-import { PublicBadgeService } from '../services/publicBadge.service';
-import { OrgDashboardService } from '../services/orgDashboard.service';
+import { PublicBadgeService } from '../modules/gamification/publicBadge.service';
+import { OrgDashboardService } from '../modules/organization/orgDashboard.service';
 import { container } from 'tsyringe';
 
 @autoInjectable()

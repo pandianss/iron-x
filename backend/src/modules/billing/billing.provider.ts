@@ -23,6 +23,7 @@ export enum BillingEvent {
 }
 
 export interface BillingWebhookEvent {
+    id?: string;
     type: BillingEvent;
     userId?: string;
     customerId?: string;

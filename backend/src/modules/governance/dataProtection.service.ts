@@ -1,7 +1,7 @@
 import { singleton, inject } from 'tsyringe';
-import prisma from '../db';
-import { Logger } from '../utils/logger';
-import { AuditService } from '../modules/audit/audit.service';
+import prisma from '../../infrastructure/db';
+import { Logger } from '../../core/logger';
+import { AuditService } from '../audit/audit.service';
 
 export enum DataClassification {
     PUBLIC = 'PUBLIC',

@@ -1,5 +1,5 @@
 
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 
 export class SSOService {
     // Mock SAML Request Generation

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { singleton, inject } from 'tsyringe';
 import { SecurityService } from './security.service';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { AuthRequest } from '../../middleware/authMiddleware';
 import { AppError } from '../../utils/AppError';
 import { comparePassword } from '../../utils/auth';

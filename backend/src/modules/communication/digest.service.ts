@@ -1,6 +1,6 @@
 
 import { singleton, inject } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { EmailService } from './email.service';
 
 @singleton()

@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Logger } from '../utils/logger';
+import { Logger } from '../core/logger';
 
 // Mock Logger to avoid cluttering test output
 jest.mock('../utils/logger', () => ({

@@ -1,4 +1,3 @@
-
 import { z } from 'zod';
 
 export const CreateTeamSchema = z.object({
@@ -15,5 +14,19 @@ export const InviteMemberSchema = z.object({
     body: z.object({
         email: z.string().email("Invalid email format"),
         role: z.enum(['ADMIN', 'MEMBER', 'OBSERVER'])
+    })
+});
+
+export const AddMemberSchema = z.object({
+    body: z.object({
+        email: z.string().email("Invalid email format"),
+        teamId: z.string().uuid("Invalid team ID format"),
+        role: z.enum(['ADMIN', 'MEMBER', 'OBSERVER']).optional()
+    })
+});
+
+export const AcceptInviteSchema = z.object({
+    params: z.object({
+        token: z.string().min(1, "Token required")
     })
 });

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { autoInjectable } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { UnauthorizedError } from '../../utils/AppError';
 
 @autoInjectable()

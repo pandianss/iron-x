@@ -1,13 +1,24 @@
-
-import prisma from '../db';
+import { singleton } from 'tsyringe';
+import prisma from '../infrastructure/db';
 import { UserId, DisciplineContext } from './domain/types';
 import { DisciplinePolicy } from './policies/DisciplinePolicy';
 import { kernelEvents, DomainEventType } from './events/bus';
 import { container } from 'tsyringe';
-import { DisciplineStateService } from '../services/disciplineState.service';
+import { DisciplineStateService } from '../modules/discipline/disciplineState.service';
+import { CacheService } from '../infrastructure/cache.service';
 
+@singleton()
 export class InstanceLifecycle {
     async loadContext(userId: string): Promise<DisciplineContext> {
+        const cache = container.resolve(CacheService);
+        const cacheKey = `ctx:${userId}`;
+
+        const cached = await cache.get<DisciplineContext>(cacheKey);
+        if (cached) {
+            // Need to convert date strings back to Date objects if coming from Redis
+            return this.hydrateContext(cached);
+        }
+
         // 1. Fetch User & Policy
         const user = await prisma.user.findUnique({
             where: { user_id: userId },
@@ -50,7 +61,7 @@ export class InstanceLifecycle {
             }
         });
 
-        return {
+        const context: DisciplineContext = {
             userId,
             traceId: 'pending',
             timestamp: new Date(),
@@ -72,6 +83,25 @@ export class InstanceLifecycle {
             },
             violations: []
         };
+
+        await cache.set(cacheKey, context, { ttlSeconds: 300 });
+        return context;
+    }
+
+    private hydrateContext(ctx: DisciplineContext): DisciplineContext {
+        ctx.timestamp = new Date(ctx.timestamp);
+        ctx.instances.forEach(i => {
+            i.scheduled_date = new Date(i.scheduled_date);
+            i.scheduled_start_time = new Date(i.scheduled_start_time);
+            i.scheduled_end_time = new Date(i.scheduled_end_time);
+            if (i.executed_at) i.executed_at = new Date(i.executed_at);
+        });
+        return ctx;
+    }
+
+    private async invalidateCache(userId: string) {
+        const cache = container.resolve(CacheService);
+        await cache.invalidate(`ctx:${userId}`);
     }
 
     async materialize(context: DisciplineContext) {
@@ -125,6 +155,18 @@ export class InstanceLifecycle {
             await prisma.actionInstance.createMany({
                 data: newInstances,
             });
+
+            // Update context in-memory to avoid reload
+            context.instances.push(...newInstances.map(i => ({
+                instance_id: 'temp-' + i.action_id, // IDs will be fresh on next full reload, but temp is fine for scoring logic if only counts/statuses matter
+                action_id: i.action_id,
+                status: i.status as string,
+                scheduled_date: i.scheduled_date,
+                scheduled_start_time: i.scheduled_start_time,
+                scheduled_end_time: i.scheduled_end_time
+            })));
+            
+            await this.invalidateCache(userId);
         }
     }
 
@@ -159,9 +201,17 @@ export class InstanceLifecycle {
             }
         });
 
+        // Update context in-memory
+        context.instances.forEach(i => {
+            if (instanceIds.includes(i.instance_id)) {
+                i.status = 'MISSED';
+            }
+        });
+
+        await this.invalidateCache(context.userId);
+
         // Emit events for each missed instance
-        const { container } = await import('tsyringe');
-        const { WitnessService } = await import('../services/witness.service');
+        const { WitnessService } = await import('../modules/witness/witness.service');
         const witnessService = container.resolve(WitnessService);
 
         for (const id of instanceIds) {

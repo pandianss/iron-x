@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { WitnessService } from '../../services/witness.service';
-import prisma from '../../db';
+import { WitnessService } from './witness.service';
+import prisma from '../../infrastructure/db';
 import { AuthRequest } from '../../middleware/authMiddleware';
 
 export class WitnessController {

@@ -1,4 +1,4 @@
-import { Logger } from './utils/logger';
+import { Logger } from './core/logger';
 import { registerObservers } from './bootstrap/registerObservers';
 import dotenv from 'dotenv';
 import { Worker, Job } from 'bullmq';
@@ -16,13 +16,14 @@ registerObservers();
 const worker = new Worker('kernel-operations', async (job: Job) => {
     // Logger.info(`[Worker] Processing Cycle: ${job.name} for user ${job.data.userId}`);
 
-    // Instantiate Kernel per job for isolation (or use Singleton if stateless enough)
-    const engine = new DisciplineEngine();
+    // Resolve Kernel per job to benefit from DI and scoping
+    const { container } = await import('tsyringe');
+    const engine = container.resolve(DisciplineEngine);
     const result = await engine.runCycle(job.data.userId);
 
     return result;
 }, {
-    connection: redisConnection
+    connection: redisConnection as any
 });
 
 worker.on('ready', () => {

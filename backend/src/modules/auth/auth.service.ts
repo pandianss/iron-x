@@ -1,7 +1,7 @@
 import { singleton } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { AppError } from '../../utils/AppError';
-import { Logger } from '../../utils/logger';
+import { Logger } from '../../core/logger';
 
 @singleton()
 export class AuthService {

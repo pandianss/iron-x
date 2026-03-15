@@ -1,5 +1,5 @@
 
-import prisma from '../db';
+import prisma from '../../infrastructure/db';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';

@@ -269,6 +269,9 @@ model ActionInstance {
   linked_outcomes OutcomeActionLink[]
   witness_notifs  WitnessNotification[]
 
+  @@index([user_id, status, scheduled_start_time])
+  @@index([user_id, status, scheduled_date])
+  @@index([scheduled_end_time, status])
   @@map("action_instances")
 }
 
@@ -324,6 +327,7 @@ model AuditLog {
   actor  User? @relation("AuditLogActor", fields: [actor_id], references: [user_id])
   target User? @relation("AuditLogTarget", fields: [target_user_id], references: [user_id])
 
+  @@index([target_user_id, timestamp])
   @@map("audit_logs")
 }
 
@@ -536,4 +540,12 @@ model DriftAnalysis {
   user User @relation(fields: [user_id], references: [user_id])
 
   @@map("drift_analyses")
+}
+model ProcessedEvent {
+  event_id   String   @id
+  provider   String // 'stripe', 'razorpay'
+  type       String
+  processed_at DateTime @default(now())
+
+  @@map("processed_events")
 }

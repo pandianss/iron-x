@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { AiAnalysisService } from '../../services/aiAnalysis.service';
+import { AiAnalysisService } from '../discipline/aiAnalysis.service';
 import { SubscriptionService } from '../subscription/subscription.service';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { generateDriftReportPdf } from './driftReport.pdf';
 import { AuthRequest } from '../../middleware/authMiddleware';
 

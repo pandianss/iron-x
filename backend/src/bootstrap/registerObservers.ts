@@ -3,7 +3,7 @@ import { DomainEventType } from '../kernel/domain/types';
 import { enforcementObserver } from '../governance/observers/EnforcementObserver';
 import { auditObserver } from '../governance/observers/AuditObserver';
 import { auditSubscriber } from '../modules/audit/AuditSubscriber';
-import { Logger } from '../utils/logger';
+import { Logger } from '../core/logger';
 import { kernelEvents, DomainEventType as NewDomainEventType } from '../kernel/events/bus';
 
 export function registerObservers() {

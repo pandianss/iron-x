@@ -1,6 +1,6 @@
 import { singleton } from 'tsyringe';
-import prisma from '../../db';
-import { Logger } from '../../utils/logger';
+import prisma from '../../infrastructure/db';
+import { Logger } from '../../core/logger';
 
 @singleton()
 export class IndisciplineCalculator {

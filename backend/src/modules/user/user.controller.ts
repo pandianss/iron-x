@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { autoInjectable, inject } from 'tsyringe';
 import { PolicyService } from '../policies/policy.service';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { AuthRequest } from '../../middleware/authMiddleware';
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../utils/AppError';
 import { SubscriptionService } from '../subscription/subscription.service';

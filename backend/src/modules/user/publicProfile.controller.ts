@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 
 export async function getPublicProfile(req: Request, res: Response) {
   const { username } = req.params;

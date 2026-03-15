@@ -1,8 +1,8 @@
 
 import { container } from 'tsyringe';
 import { kernelEvents, DomainEventType, DomainEvent } from '../../kernel/events/bus';
-import { DisciplineStateService } from '../../services/disciplineState.service';
-import { SocketService } from '../../services/socket.service';
+import { DisciplineStateService } from './disciplineState.service';
+import { SocketService } from '../../core/socket.service';
 
 export class DisciplineSubscriber {
     private static isInitialized = false;
@@ -14,7 +14,7 @@ export class DisciplineSubscriber {
         }
 
         const service = container.resolve(DisciplineStateService);
-        const socketService = SocketService.getInstance();
+        const socketService = container.resolve(SocketService);
 
         kernelEvents.subscribe(DomainEventType.INSTANCE_STATUS_CHANGED, async (event: DomainEvent) => {
             if (!event.userId) return;

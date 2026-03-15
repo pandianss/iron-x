@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import prisma from '../db';
+import prisma from '../infrastructure/db';
 import { AuditService } from '../modules/audit/audit.service';
 
 export const getAuditLogs = async (req: Request, res: Response) => {

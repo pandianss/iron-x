@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { container, autoInjectable } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { AuditService } from '../audit/audit.service';
 import { sanitizeMemberProfile } from '../../utils/privacy';
 import { NotFoundError, ForbiddenError } from '../../utils/AppError';
@@ -133,7 +133,7 @@ export class TeamController {
 
     exportComplianceReport = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { ReportService } = await import('../../services/report.service');
+            const { ReportService } = await import('../reporting/report.service');
             const reportService = container.resolve(ReportService);
             const { teamId } = req.params as { teamId: string };
             const requesterId = (req as any).user!.userId;

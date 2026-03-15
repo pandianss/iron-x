@@ -35,7 +35,7 @@ export class SSOController {
             // Find or create user? 
             // Phase 1: Fail if user doesn't exist.
             // Assumption: User must be provisioned first.
-            const user = await import('../../db').then(m => m.default.user.findUnique({ where: { email } }));
+            const user = await import('../../infrastructure/db').then(m => m.default.user.findUnique({ where: { email } }));
 
             if (!user) {
                 return res.status(401).json({ message: 'User not found in system' });

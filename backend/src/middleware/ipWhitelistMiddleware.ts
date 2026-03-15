@@ -1,6 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
-import { Logger } from '../utils/logger';
+import { Logger } from '../core/logger';
 
 /**
  * Enterprise IP Whitelisting Middleware (Placeholder/Logic)

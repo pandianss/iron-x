@@ -1,6 +1,6 @@
 
 import { singleton } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 
 @singleton()
 export class OrganizationService {

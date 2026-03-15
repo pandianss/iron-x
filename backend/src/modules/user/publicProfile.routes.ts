@@ -1,8 +1,8 @@
 
 import { Router } from 'express';
 import { getPublicProfile } from './publicProfile.controller';
-import { PublicBadgeService } from '../../services/publicBadge.service';
-import prisma from '../../db';
+import { PublicBadgeService } from '../gamification/publicBadge.service';
+import prisma from '../../infrastructure/db';
 
 const router = Router();
 const badgeService = new PublicBadgeService(prisma);

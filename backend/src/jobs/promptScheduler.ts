@@ -1,6 +1,6 @@
 
-import prisma from '../db';
-import { Logger } from '../utils/logger';
+import prisma from '../infrastructure/db';
+import { Logger } from '../core/logger';
 
 export const schedulePrompts = async () => {
     // Run every minute

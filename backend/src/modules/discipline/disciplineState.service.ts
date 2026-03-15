@@ -2,6 +2,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { injectable, inject } from 'tsyringe';
+import { ScoringEngine } from '../../domain/discipline/ScoringEngine';
 
 interface DisciplineMetrics {
     score: number;
@@ -69,7 +70,7 @@ export class DisciplineStateService {
 
         // Calculate metrics
         const score = await this.calculateDisciplineScore(userId, instances);
-        const classification = this.classifyDiscipline(score, instances);
+        const classification = ScoringEngine.classifyDiscipline(score, instances.length) as any;
         const driftVectors = this.calculateDriftVectors(instances);
         const compositePressure = this.calculateCompositePressure(driftVectors);
         const violationHorizon = this.calculateViolationHorizon(score, instances);
@@ -91,51 +92,9 @@ export class DisciplineStateService {
         userId: string,
         instances: any[]
     ): Promise<number> {
-        // Base score from user record
-        const user = await this.prisma.user.findUnique({
-            where: { user_id: userId },
-            select: { current_discipline_score: true }
-        });
-
-        let score = user?.current_discipline_score ?? 75;
-
-        // Calculate based on recent performance
-        const completedOnTime = instances.filter(
-            i => i.status === 'COMPLETED' && !i.completion_time_offset_minutes
-        ).length;
-        
-        const completedLate = instances.filter(
-            i => i.status === 'COMPLETED' && i.completion_time_offset_minutes
-        ).length;
-        
-        const missed = instances.filter(i => i.status === 'MISSED').length;
-        
-        const total = instances.length;
-
-        if (total > 0) {
-            const onTimeRate = completedOnTime / total;
-            const lateRate = completedLate / total;
-            const missRate = missed / total;
-
-            // Weighted score calculation
-            score = (onTimeRate * 100) + (lateRate * 70) - (missRate * 30);
-            
-            // Clamp between 0-100
-            score = Math.max(0, Math.min(100, score));
-        }
-
-        return Math.round(score * 10) / 10; // Round to 1 decimal
+        return ScoringEngine.calculateScore(instances);
     }
 
-    private classifyDiscipline(
-        score: number,
-        instances: any[]
-    ): 'HIGH_RELIABILITY' | 'STABLE' | 'RECOVERING' | 'ONBOARDING' {
-        if (instances.length < 10) return 'ONBOARDING';
-        if (score >= 90) return 'HIGH_RELIABILITY';
-        if (score >= 70) return 'STABLE';
-        return 'RECOVERING';
-    }
 
     private calculateDriftVectors(instances: any[]): Array<{
         source: string;
@@ -333,7 +292,7 @@ export class DisciplineStateService {
         });
 
         const newScore = await this.calculateDisciplineScore(userId, instances);
-        const classification = this.classifyDiscipline(newScore, instances);
+        const classification = ScoringEngine.classifyDiscipline(newScore, instances.length) as any;
 
         await this.prisma.user.update({
             where: { user_id: userId },
@@ -344,5 +303,76 @@ export class DisciplineStateService {
         });
 
         return newScore;
+    }
+
+    /**
+     * Calculates the discipline score trajectory for the last 30 days.
+     * Ported from and consolidated from the controller.
+     */
+    async getUserTrajectory(userId: string): Promise<Array<{ date: string; score: number }>> {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        // Get starting score
+        const latestScoreRecord = await this.prisma.disciplineScore.findFirst({
+            where: { user_id: userId },
+            orderBy: { date: 'desc' },
+            select: { score: true }
+        });
+
+        const instances = await this.prisma.actionInstance.findMany({
+            where: {
+                action: { user_id: userId },
+                scheduled_start_time: { gte: thirtyDaysAgo }
+            },
+            orderBy: { scheduled_start_time: 'asc' },
+            select: {
+                scheduled_start_time: true,
+                scheduled_end_time: true,
+                status: true,
+                executed_at: true
+            }
+        });
+
+        const dailyScores: Array<{ date: string; score: number }> = [];
+        const dayMap = new Map<string, { completed: number; missed: number; late: number }>();
+
+        instances.forEach((inst: any) => {
+            const dateKey = inst.scheduled_start_time.toISOString().split('T')[0];
+            if (!dayMap.has(dateKey)) {
+                dayMap.set(dateKey, { completed: 0, missed: 0, late: 0 });
+            }
+            
+            const day = dayMap.get(dateKey)!;
+            if (inst.status === 'COMPLETED') {
+                const isLate = 
+                    inst.executed_at && 
+                    inst.scheduled_end_time && 
+                    new Date(inst.executed_at) > new Date(inst.scheduled_end_time);
+                
+                if (isLate) {
+                    day.late++;
+                } else {
+                    day.completed++;
+                }
+            } else if (inst.status === 'MISSED') {
+                day.missed++;
+            }
+        });
+
+        let runningScore = latestScoreRecord?.score ?? 50;
+        Array.from(dayMap.entries())
+            .sort(([a], [b]) => a.localeCompare(b))
+            .forEach(([date, stats]) => {
+                const dailyPerformance = ScoringEngine.calculateDailyPerformance(stats);
+                runningScore = runningScore * 0.7 + dailyPerformance * 0.3;
+                
+                dailyScores.push({
+                    date,
+                    score: Math.round(runningScore * 10) / 10
+                });
+            });
+
+        return dailyScores;
     }
 }

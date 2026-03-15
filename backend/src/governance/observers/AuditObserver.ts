@@ -1,5 +1,6 @@
-import prisma from '../../db';
+import { Logger } from '../../core/logger';
 import { DomainEvent } from '../../kernel/domain/events';
+import prisma from '../../infrastructure/db';
 
 export class AuditObserver {
     async handle(event: DomainEvent) {

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { apiKeyMiddleware, ApiKeyRequest } from '../../middleware/apiKeyMiddleware';
-import { ExternalApiService } from '../../services/externalApi.service';
+import { ExternalApiService } from './externalApi.service';
 import { container } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { publicApiLimiter } from '../../middleware/rateLimitMiddleware';
 
 const router = Router();

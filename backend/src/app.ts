@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { container } from 'tsyringe';
-import prisma from './db';
+import prisma from './infrastructure/db';
 import authRoutes from './modules/auth/auth.routes';
 import stripeRoutes from './modules/billing/stripe.routes';
 import razorpayRoutes from './modules/billing/razorpay.routes';
@@ -35,7 +35,7 @@ import apiKeyRoutes from './modules/integration/apiKey.routes';
 import publicApiRoutes from './modules/integration/publicApi.routes';
 // import opsRoutes from './modules/ops/ops.routes';
 
-import { apiLimiter, authLimiter } from './middleware/rateLimitMiddleware';
+import { apiLimiter, authLimiter, adminLimiter, billingWebhookLimiter } from './middleware/rateLimitMiddleware';
 import { policyEnforcementMiddleware } from './middleware/policyEnforcementMiddleware';
 import { ipWhitelistMiddleware } from './middleware/ipWhitelistMiddleware';
 import { apiKeyMiddleware } from './middleware/apiKeyMiddleware';
@@ -141,7 +141,7 @@ v1Router.use(apiKeyMiddleware); // Scoped to non-auth v1 routes
 
 v1Router.use('/user', userRoutes);
 v1Router.use('/referral', referralRoutes);
-v1Router.use('/admin', adminRoutes);
+v1Router.use('/admin', adminLimiter, adminRoutes);
 v1Router.use('/team', teamRoutes);
 v1Router.use('/goals', goalRoutes);
 
@@ -174,17 +174,21 @@ app.use('/api/v1', publicApiRoutes);
 app.use('/api/v1', v1Router);
 
 // Stripe routes (can be outside v1Router if they have a different base path or specific middleware needs)
-app.use('/api/v1/billing', stripeRoutes);
-app.use('/api/v1/razorpay', razorpayRoutes);
+app.use('/api/v1/billing', billingWebhookLimiter, stripeRoutes);
+app.use('/api/v1/razorpay', billingWebhookLimiter, razorpayRoutes);
+
+// Prometheus Metrics
+app.get('/metrics', (req, res) => container.resolve(MetricsService).getMetrics(req, res));
 
 // Create HTTP server
 import { createServer } from 'http';
-import { SocketService } from './services/socket.service';
+import { SocketService } from './core/socket.service';
+import { MetricsService } from './core/metrics.service';
 
 const httpServer = createServer(app);
 
 // Initialize Socket Service
-SocketService.getInstance().initialize(httpServer);
+container.resolve(SocketService).initialize(httpServer);
 
 app.use(errorHandler);
 

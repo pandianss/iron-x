@@ -1,7 +1,6 @@
-import { singleton } from 'tsyringe';
-import prisma from '../../db';
-import { Prisma } from '@prisma/client';
-import { Logger } from '../../utils/logger';
+import { injectable, inject, singleton } from 'tsyringe';
+import { PrismaClient, Prisma } from '@prisma/client';
+import { Logger } from '../../core/logger';
 
 export interface AuditFilter {
     userId?: string;
@@ -12,8 +11,12 @@ export interface AuditFilter {
     offset?: number;
 }
 
+@injectable()
 @singleton()
 export class AuditService {
+    constructor(
+        @inject('PrismaClient') private prisma: PrismaClient
+    ) {}
     private buildWhere(filter: AuditFilter): Prisma.AuditLogWhereInput {
         const where: Prisma.AuditLogWhereInput = {};
 
@@ -44,7 +47,7 @@ export class AuditService {
         try {
             const detailsStr = typeof details === 'string' ? details : JSON.stringify(details);
 
-            await prisma.auditLog.create({
+            await this.prisma.auditLog.create({
                 data: {
                     action,
                     details: detailsStr,
@@ -63,7 +66,7 @@ export class AuditService {
         const offset = filter.offset || 0;
 
         const [logs, total] = await Promise.all([
-            prisma.auditLog.findMany({
+            this.prisma.auditLog.findMany({
                 where,
                 orderBy: { timestamp: 'desc' },
                 take: limit,
@@ -73,7 +76,7 @@ export class AuditService {
                     target: { select: { email: true } }
                 }
             }),
-            prisma.auditLog.count({ where })
+            this.prisma.auditLog.count({ where })
         ]);
 
         return {
@@ -89,7 +92,7 @@ export class AuditService {
     async exportLogs(filter: AuditFilter): Promise<string> {
         const where = this.buildWhere(filter);
 
-        const logs = await prisma.auditLog.findMany({
+        const logs = await this.prisma.auditLog.findMany({
             where,
             orderBy: { timestamp: 'desc' },
             take: 5000
@@ -108,7 +111,7 @@ export class AuditService {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
 
-        const result = await prisma.auditLog.deleteMany({
+        const result = await this.prisma.auditLog.deleteMany({
             where: {
                 timestamp: {
                     lt: cutoffDate

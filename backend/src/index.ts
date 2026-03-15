@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import { validateConfig, getConfig } from './utils/config.validator';
-import { Logger } from './utils/logger';
-import prisma from './db';
+import { Logger } from './core/logger';
+import prisma from './infrastructure/db';
 
 // Load environment variables immediately
 dotenv.config();

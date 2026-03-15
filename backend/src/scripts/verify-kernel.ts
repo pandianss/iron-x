@@ -1,5 +1,5 @@
 import { kernel } from '../kernel/DisciplineEngine';
-import prisma from '../db';
+import prisma from '../infrastructure/db';
 import { v4 as uuidv4 } from 'uuid';
 import { domainEvents } from '../kernel/domain/events';
 

@@ -4,7 +4,7 @@ import { AuthRequest } from '../../middleware/authMiddleware';
 import { AnalyticsService } from './analytics.service';
 import { OutcomeService } from './outcome.service';
 import { SimulationService } from './simulation.service';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 
 @autoInjectable()
 export class AnalyticsController {

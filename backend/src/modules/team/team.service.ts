@@ -1,6 +1,6 @@
 
 import { injectable } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { emailService } from '../communication/email.service';
 import { v4 as uuidv4 } from 'uuid';
 import { AppError, NotFoundError, ForbiddenError, BadRequestError } from '../../utils/AppError';

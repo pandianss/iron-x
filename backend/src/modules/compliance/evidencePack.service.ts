@@ -1,5 +1,5 @@
 import { container, singleton } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 

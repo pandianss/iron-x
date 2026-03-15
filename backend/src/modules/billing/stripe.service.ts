@@ -1,9 +1,10 @@
 
 import Stripe from 'stripe';
 import { singleton, container } from 'tsyringe';
+import { MetricsService } from '../../core/metrics.service';
 import { IBillingProvider, CheckoutSessionParams, BillingEvent, BillingWebhookEvent } from './billing.provider';
-import prisma from '../../db';
-import { Logger } from '../../utils/logger';
+import prisma from '../../infrastructure/db';
+import { Logger } from '../../core/logger';
 
 @singleton()
 export class StripeService implements IBillingProvider {
@@ -54,9 +55,11 @@ export class StripeService implements IBillingProvider {
 
     async handleWebhook(signature: string, payload: Buffer) {
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+        const metrics = container.resolve(MetricsService);
 
         if (!webhookSecret) {
             Logger.error('[Stripe] STRIPE_WEBHOOK_SECRET is not set. All webhook events will be rejected.');
+            metrics.paymentOpsTotal.inc({ provider: 'STRIPE', status: 'CONFIG_ERROR' });
             throw new Error('STRIPE_WEBHOOK_SECRET not configured. Set it in environment variables.');
         }
 
@@ -65,22 +68,51 @@ export class StripeService implements IBillingProvider {
             event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
         } catch (err: any) {
             Logger.error(`[Stripe] Webhook signature verification failed: ${err.message}`);
+            metrics.paymentOpsTotal.inc({ provider: 'STRIPE', status: 'SIGNATURE_FAILED' });
             throw new Error(`Webhook signature invalid: ${err.message}`);
         }
 
-        switch (event.type) {
-            case 'checkout.session.completed':
-                await this.handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
-                break;
-            case 'invoice.payment_failed':
-                await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
-                break;
-            case 'customer.subscription.deleted':
-                await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-                break;
-            default:
-                Logger.info(`[Stripe] Unhandled event type: ${event.type}`);
+        // Idempotency check
+        const processed = await prisma.processedEvent.findUnique({
+            where: { event_id: event.id }
+        });
+
+        if (processed) {
+            Logger.info(`[Stripe] Event ${event.id} already processed. Skipping.`);
+            metrics.paymentOpsTotal.inc({ provider: 'STRIPE', status: 'DUPLICATE' });
+            return;
         }
+
+        try {
+            switch (event.type) {
+                case 'checkout.session.completed':
+                    await this.handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
+                    break;
+                case 'invoice.payment_failed':
+                    await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+                    break;
+                case 'customer.subscription.deleted':
+                    await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
+                    break;
+                default:
+                    Logger.info(`[Stripe] Unhandled event type: ${event.type}`);
+            }
+            Logger.info(`[Stripe] Successfully processed event ${event.id}`);
+            metrics.paymentOpsTotal.inc({ provider: 'STRIPE', status: 'SUCCESS' });
+        } catch (err: any) {
+            Logger.error(`[Stripe] Error processing event ${event.id}: ${err.message}`);
+            metrics.paymentOpsTotal.inc({ provider: 'STRIPE', status: 'FAILED' });
+            throw err; // Re-throw the error after logging and metrics
+        }
+
+        // Mark as processed
+        await prisma.processedEvent.create({
+            data: {
+                event_id: event.id,
+                provider: 'stripe',
+                type: event.type
+            }
+        });
     }
 
     private async handleCheckoutCompleted(session: Stripe.Checkout.Session) {

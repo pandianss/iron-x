@@ -1,7 +1,7 @@
 import { singleton } from 'tsyringe';
-import prisma from '../db';
-import { CanonicalTransformer } from '../domain/canonical/transformer';
-import { DisciplineScoreV1, PolicyV1 } from '../domain/canonical/models.v1';
+import prisma from '../../infrastructure/db';
+import { CanonicalTransformer } from '../../domain/canonical/transformer';
+import { DisciplineScoreV1, PolicyV1 } from '../../domain/canonical/models.v1';
 
 @singleton()
 export class ExternalApiService {

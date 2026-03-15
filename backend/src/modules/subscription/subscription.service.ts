@@ -1,7 +1,7 @@
 import { singleton } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 import { SubscriptionTier, Prisma } from '@prisma/client';
-import { Logger } from '../../utils/logger';
+import { Logger } from '../../core/logger';
 
 export const SUBSCRIPTION_LIMITS = {
     [SubscriptionTier.FREE]: {
@@ -209,5 +209,14 @@ export class SubscriptionService {
             goals,
             teams
         };
+    }
+
+    async assignTier(userId: string, tier: SubscriptionTier) {
+        Logger.info(`[Subscription] Manually assigning ${tier} plan to user ${userId}`);
+        return prisma.subscription.upsert({
+            where: { user_id: userId },
+            update: { plan_tier: tier, is_active: true, updated_at: new Date() },
+            create: { user_id: userId, plan_tier: tier, is_active: true }
+        });
     }
 }

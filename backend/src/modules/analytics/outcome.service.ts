@@ -1,6 +1,6 @@
 
 import { autoInjectable } from 'tsyringe';
-import prisma from '../../db';
+import prisma from '../../infrastructure/db';
 
 @autoInjectable()
 export class OutcomeService {

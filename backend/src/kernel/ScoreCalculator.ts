@@ -1,14 +1,14 @@
 import { DisciplineContext } from './domain/types';
 import { domainEvents, DomainEventType } from './domain/events';
-import { ScoringPolicy } from './policies/ScoringPolicy';
-import prisma from '../db';
+import { ScoringEngine } from '../domain/discipline/ScoringEngine';
+import prisma from '../infrastructure/db';
 
 export class ScoreCalculator {
     async compute(context: DisciplineContext): Promise<number> {
         const { userId, instances, user } = context;
 
         // Pure calculation
-        const score = ScoringPolicy.calculateScore(instances);
+        const score = ScoringEngine.calculateScore(instances as any);
 
         const oldScore = user?.current_discipline_score || 50;
 

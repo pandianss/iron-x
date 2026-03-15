@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { firebaseAuth } from '../config/firebase';
-import prisma from '../db';
-import { Logger } from '../utils/logger';
+import { container } from 'tsyringe';
+import { Logger } from '../core/logger';
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any, ReqQuery = any> extends Request<P, ResBody, ReqBody, ReqQuery> {
     user?: {
@@ -42,6 +42,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         }
 
         // Verify user exists using Firebase UID ONLY to prevent account hijacking via email spoofing
+        const prisma = container.resolve('PrismaClient' as any) as any;
         const user = await prisma.user.findUnique({
             where: { firebase_uid: decodedToken.uid },
             include: {

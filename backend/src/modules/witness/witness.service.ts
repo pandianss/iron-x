@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { injectable, inject } from 'tsyringe';
-import { Logger } from '../utils/logger';
-import { EmailService } from '../modules/communication/email.service';
+import { Logger } from '../../core/logger';
+import { EmailService } from '../communication/email.service';
 
 @injectable()
 export class WitnessService {

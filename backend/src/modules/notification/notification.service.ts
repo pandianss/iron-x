@@ -1,8 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { injectable, inject } from 'tsyringe';
-import { Logger } from '../utils/logger';
-import { EmailService } from '../modules/communication/email.service';
-import { domainEvents, DomainEventType } from '../kernel/domain/events';
+import { Logger } from '../../core/logger';
+import { EmailService } from '../communication/email.service';
+import { MetricsService } from '../../core/metrics.service';
+import { container } from 'tsyringe';
+import { domainEvents, DomainEventType } from '../../kernel/domain/events';
 
 @injectable()
 export class NotificationService {
@@ -79,12 +81,18 @@ export class NotificationService {
 
     async notifyScoreChange(userId: string, oldScore: number, newScore: number, classification: string) {
         if (oldScore >= 50 && newScore < 50) {
+            const metrics = container.resolve(MetricsService);
+            metrics.scoreTransitionsTotal.inc({ from: 'STABLE', to: 'DRIFTING' });
+            
             await this.sendNotification(userId, {
                 title: 'Classification Change',
                 message: `Classification: DRIFTING. Breach horizon detected.`,
                 type: 'SCORE_DROP'
             });
         } else if (oldScore < 50 && newScore >= 50) {
+            const metrics = container.resolve(MetricsService);
+            metrics.scoreTransitionsTotal.inc({ from: 'DRIFTING', to: 'STABLE' });
+
             await this.sendNotification(userId, {
                 title: 'Classification Restored',
                 message: 'Classification restored: STABLE.',

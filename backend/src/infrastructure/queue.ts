@@ -12,7 +12,18 @@ export const redisConnection = new Redis(REDIS_URL, {
 export const QUEUE_NAME = 'kernel-operations';
 
 // Producer
-export const kernelQueue = new Queue(QUEUE_NAME, { connection: redisConnection });
+export const kernelQueue = new Queue(QUEUE_NAME, { 
+    connection: redisConnection as any,
+    defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 1000,
+        },
+        removeOnComplete: true,
+        removeOnFail: false,
+    }
+});
 
 // Consumer (Worker)
 export const createKernelWorker = () => {
@@ -42,27 +53,13 @@ export const createKernelWorker = () => {
 
         if (job.name === 'WEBHOOK_JOB') {
             const { url, payload, secret } = job.data;
-            const axios = (await import('axios')).default;
-            const crypto = await import('crypto');
+            const { WebhookService } = await import('./webhook.service');
+            const { container } = await import('tsyringe');
+            const webhookService = container.resolve(WebhookService);
 
             console.log(`[Worker] Delivering Webhook to: ${url}`);
-
-            const headers: any = { 'Content-Type': 'application/json' };
-            if (secret) {
-                const signature = crypto
-                    .createHmac('sha256', secret)
-                    .update(JSON.stringify(payload))
-                    .digest('hex');
-                headers['X-Iron-X-Signature'] = signature;
-            }
-
-            try {
-                await axios.post(url, payload, { headers, timeout: 5000 });
-                console.log(`[Worker] Webhook delivered successfully to ${url}`);
-            } catch (error: any) {
-                console.error(`[Worker] Webhook delivery failed to ${url}:`, error.message);
-                throw error; // Let BullMQ handle retries
-            }
+            await webhookService.sendWebhook(url, payload, secret);
+            console.log(`[Worker] Webhook delivered successfully to ${url}`);
         }
-    }, { connection: redisConnection });
+    }, { connection: redisConnection as any });
 };

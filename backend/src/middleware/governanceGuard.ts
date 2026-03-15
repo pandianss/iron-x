@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import prisma from '../db';
+import prisma from '../infrastructure/db';
 import { AuthRequest } from './authMiddleware';
 import { DisciplinePolicy } from '../kernel/policies/DisciplinePolicy';
 import { kernelEvents, DomainEventType } from '../kernel/events/bus';

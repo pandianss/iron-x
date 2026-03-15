@@ -1,5 +1,10 @@
-import { singleton } from 'tsyringe';
-import prisma from '../../db';
+import { singleton, container, inject } from 'tsyringe';
+import prisma from '../../infrastructure/db';
+import { PrismaClient, SubscriptionTier } from '@prisma/client';
+import { Logger } from '../../core/logger';
+import { MetricsService } from '../../core/metrics.service';
+import { DisciplinePolicy } from '../../kernel/policies/DisciplinePolicy';
+import { EnforcementMode } from '../../kernel/domain/types';
 
 @singleton()
 export class PolicyService {
@@ -189,5 +194,93 @@ export class PolicyService {
             where: { user_id: userId },
             data: { enforcement_mode: mode }
         });
+    }
+
+    /**
+     * Evaluates and applies enforcement actions (lockouts) based on the current discipline score.
+     */
+    async applyEnforcement(userId: string, currentScore: number): Promise<{
+        lockedUntil: Date | null;
+        enforcementApplied: boolean;
+    }> {
+        Logger.info(`[PolicyService] Evaluating enforcement for User ${userId} (Score: ${currentScore})`);
+
+        // 1. Fetch User and effective Policy
+        const user = await prisma.user.findUnique({
+            where: { user_id: userId },
+            include: {
+                role: {
+                    include: { policy: true }
+                }
+            }
+        });
+
+        if (!user) throw new Error('User not found');
+
+        // Resolve Policy and Rules
+        const policy = user.role?.policy;
+        const rules = DisciplinePolicy.resolveRules(policy?.rules);
+        
+        // Map Prisma EnforcementMode to our kernel expectation if necessary
+        // In our schema, it's an enum. 
+        const mode = DisciplinePolicy.resolveEnforcementMode(
+            policy?.enforcement_mode as any,
+            user.enforcement_mode as any
+        );
+
+        // 2. Determine if Score triggers Lockout
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const recentMisses = await prisma.actionInstance.count({
+            where: {
+                user_id: userId,
+                status: 'MISSED',
+                scheduled_start_time: { gte: sevenDaysAgo }
+            }
+        });
+
+        const isScoreBreach = currentScore < rules.score_threshold;
+        const isMissBreach = recentMisses >= rules.max_misses;
+
+        if (mode === 'HARD' && (isScoreBreach || isMissBreach)) {
+            const now = new Date();
+            const lockedUntil = new Date(now.getTime() + rules.lockout_hours * 60 * 60 * 1000);
+
+            const reason = isScoreBreach ? `Score ${currentScore} < Threshold ${rules.score_threshold}` : `Recent misses ${recentMisses} >= Max allowed ${rules.max_misses}`;
+            Logger.warn(`[PolicyService] HARD Lockout Triggered for User ${userId}. ${reason}. Locked until ${lockedUntil.toISOString()}`);
+            
+            const metrics = container.resolve(MetricsService);
+            metrics.lockoutsTotal.inc({ mode: 'HARD_LOCKOUT', reason: isScoreBreach ? 'SCORE_BREACH' : 'MISS_BREACH' });
+
+            await prisma.user.update({
+                where: { user_id: userId },
+                data: {
+                    locked_until: lockedUntil,
+                    discipline_classification: 'BREACH'
+                }
+            });
+
+            // Create an audit log entry for the lockout
+            await prisma.auditLog.create({
+                data: {
+                    actor_id: 'SYSTEM',
+                    target_user_id: userId,
+                    action: 'SYSTEM_LOCKOUT',
+                    details: JSON.stringify({
+                        score: currentScore,
+                        threshold: rules.score_threshold,
+                        recent_misses: recentMisses,
+                        max_misses: rules.max_misses,
+                        lockout_hours: rules.lockout_hours,
+                        locked_until: lockedUntil
+                    })
+                }
+            });
+
+            return { lockedUntil, enforcementApplied: true };
+        }
+
+        return { lockedUntil: user.locked_until, enforcementApplied: false };
     }
 }

@@ -1,8 +1,8 @@
 
 import { PrismaClient } from '@prisma/client';
 import { container } from 'tsyringe';
-import { EmailService } from '../modules/communication/email.service';
-import { Logger } from '../utils/logger';
+import { EmailService } from '../communication/email.service';
+import { Logger } from '../../core/logger';
 
 export class OnboardingDripService {
     private prisma: PrismaClient;

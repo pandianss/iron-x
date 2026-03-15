@@ -1,6 +1,6 @@
 import { singleton, inject } from 'tsyringe';
-import prisma from '../db';
-import { AuditService } from '../modules/audit/audit.service';
+import prisma from '../../infrastructure/db';
+import { AuditService } from '../audit/audit.service';
 
 @singleton()
 export class ExceptionService {

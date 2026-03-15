@@ -1,38 +1,34 @@
-import { ActionStatus, EnforcementMode } from '@prisma/client';
-// Note: Imports will need adjustment based on final backend structure
-// This serves as the baseline Enforcement Integrity Check
+// tests/enforcement/enforcement.test.ts
 
 describe('Enforcement Integrity', () => {
-    it('should trigger hard lockout on 3 consecutive misses', () => {
-        const history = [
-            { status: ActionStatus.MISSED },
-            { status: ActionStatus.MISSED },
-            { status: ActionStatus.MISSED }
-        ];
 
-        // Deterministic check: Lockout logic MUST return LOCKED
-        expect(evaluateEnforcementState(history)).toBe(EnforcementMode.HARD_LOCKOUT);
-    });
+  // Helper mirrors EnforcementObserver logic
+  function evaluateEnforcementResponse(
+    violationCount: number,
+    enforcementMode: string
+  ): 'COACHING_PAUSE' | 'HARD_LOCKOUT' | 'NO_ACTION' {
+    if (enforcementMode !== 'HARD') return 'NO_ACTION';
+    if (violationCount <= 1) return 'COACHING_PAUSE';
+    return 'HARD_LOCKOUT';
+  }
 
-    it('should not allow motivational language in UI strings (Enforcement Check)', () => {
-        const uiStrings = [
-            "Action required",
-            "System locked",
-            "Compliance low"
-        ];
+  it('should return NO_ACTION for SOFT enforcement mode', () => {
+    expect(evaluateEnforcementResponse(5, 'SOFT')).toBe('NO_ACTION');
+  });
 
-        const motivationalTerms = ["good job", "keep it up", "streak", "badge", "congrats"];
+  it('should return COACHING_PAUSE for first HARD violation (count = 0)', () => {
+    expect(evaluateEnforcementResponse(0, 'HARD')).toBe('COACHING_PAUSE');
+  });
 
-        uiStrings.forEach(str => {
-            motivationalTerms.forEach(term => {
-                expect(str.toLowerCase()).not.toContain(term);
-            });
-        });
-    });
+  it('should return COACHING_PAUSE for first HARD violation (count = 1, current may be logged)', () => {
+    expect(evaluateEnforcementResponse(1, 'HARD')).toBe('COACHING_PAUSE');
+  });
+
+  it('should return HARD_LOCKOUT for repeat violations (count = 2)', () => {
+    expect(evaluateEnforcementResponse(2, 'HARD')).toBe('HARD_LOCKOUT');
+  });
+
+  it('should return HARD_LOCKOUT for chronic violations (count = 10)', () => {
+    expect(evaluateEnforcementResponse(10, 'HARD')).toBe('HARD_LOCKOUT');
+  });
 });
-
-function evaluateEnforcementState(history: any[]): EnforcementMode {
-    const missedCount = history.filter(h => h.status === ActionStatus.MISSED).length;
-    if (missedCount >= 3) return EnforcementMode.HARD_LOCKOUT;
-    return EnforcementMode.STANDARD;
-}

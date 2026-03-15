@@ -38,7 +38,7 @@ export class DisciplineStateService {
             where: { user_id: userId },
             include: {
                 role: { include: { policy: true } },
-                disciplineExceptions: {
+                exceptions: {
                     where: {
                         OR: [
                             { valid_until: null },

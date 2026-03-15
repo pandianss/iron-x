@@ -1,5 +1,4 @@
 import { singleton, inject } from 'tsyringe';
-import prisma from '../../db';
 import { SubscriptionTier } from '@prisma/client';
 import { SUBSCRIPTION_LIMITS, SubscriptionService } from './subscription.service';
 
@@ -8,6 +7,7 @@ export type ResourceType = 'ACTIONS' | 'GOALS' | 'TEAMS' | 'WEBHOOKS' | 'API_KEY
 @singleton()
 export class QuotaService {
     constructor(
+        @inject('PrismaClient') private prisma: any,
         @inject(SubscriptionService) private subscriptionService: SubscriptionService
     ) { }
 
@@ -27,30 +27,30 @@ export class QuotaService {
 
         switch (resource) {
             case 'ACTIONS':
-                count = await prisma.action.count({ where: { user_id: userId } });
+                count = await this.prisma.action.count({ where: { user_id: userId } });
                 limit = limits.max_actions;
                 break;
             case 'GOALS':
-                count = await prisma.goal.count({ where: { user_id: userId } });
+                count = await this.prisma.goal.count({ where: { user_id: userId } });
                 limit = limits.max_goals;
                 break;
             case 'TEAMS':
-                count = await prisma.team.count({ where: { owner_id: userId } });
+                count = await this.prisma.team.count({ where: { owner_id: userId } });
                 limit = limits.max_teams;
                 break;
             case 'WEBHOOKS': {
                 // Check Org level if user tied to org
-                const user = await (prisma as any).user.findUnique({ where: { user_id: userId } });
+                const user = await (this.prisma as any).user.findUnique({ where: { user_id: userId } });
                 if (user?.org_id) {
-                    count = await (prisma as any).webhook.count({ where: { org_id: user.org_id } });
+                    count = await (this.prisma as any).webhook.count({ where: { org_id: user.org_id } });
                 }
                 limit = limits.max_webhooks || 5; // Default for webhooks if not in limits
                 break;
             }
             case 'API_KEYS': {
-                const userKey = await (prisma as any).user.findUnique({ where: { user_id: userId } });
+                const userKey = await (this.prisma as any).user.findUnique({ where: { user_id: userId } });
                 if (userKey?.org_id) {
-                    count = await (prisma as any).apiKey.count({ where: { org_id: userKey.org_id } });
+                    count = await (this.prisma as any).apiKey.count({ where: { org_id: userKey.org_id } });
                 }
                 limit = limits.max_api_keys || 3;
                 break;

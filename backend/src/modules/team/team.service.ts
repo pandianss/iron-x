@@ -1,11 +1,11 @@
 
-import { autoInjectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 import prisma from '../../db';
 import { emailService } from '../communication/email.service';
 import { v4 as uuidv4 } from 'uuid';
 import { AppError, NotFoundError, ForbiddenError, BadRequestError } from '../../utils/AppError';
 
-@autoInjectable()
+@injectable()
 export class TeamService {
     async createInvitation(teamId: string, email: string, role: string, requesterId: string) {
         // 1. Check permissions (assuming requester is manager/owner - verified by controller or here)

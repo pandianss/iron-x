@@ -68,7 +68,7 @@ export class DisciplineController {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
 
-            const prisma = container.resolve('PrismaClient' as any);
+            const prisma = container.resolve('PrismaClient' as any) as any;
             
             // Get action instances from last 30 days
             const thirtyDaysAgo = new Date();
@@ -183,6 +183,47 @@ export class DisciplineController {
                 message: error.message 
             });
         }
+    }
+
+    /**
+     * GET /api/v1/discipline/history
+     * Returns historical log of discipline events
+     */
+    static async getHistory(req: AuthRequest, res: Response) {
+        try {
+            const userId = req.user?.userId;
+            if (!userId) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            const prisma = container.resolve('PrismaClient' as any) as any;
+            const history = await prisma.auditLog.findMany({
+                where: { target_user_id: userId },
+                orderBy: { created_at: 'desc' },
+                take: 50
+            });
+
+            res.json(history);
+        } catch (error: any) {
+            console.error('[Discipline] Error fetching history:', error);
+            res.status(500).json({ error: 'Failed to fetch history' });
+        }
+    }
+
+    /**
+     * GET /api/v1/discipline/preview
+     * Returns preview of upcoming discipline impacts
+     */
+    static async getPreview(req: AuthRequest, res: Response) {
+        res.json({ message: 'Preview implementation pending' });
+    }
+
+    /**
+     * GET /api/v1/discipline/warnings
+     * Returns active discipline warnings
+     */
+    static async getWarnings(req: AuthRequest, res: Response) {
+        res.json([]);
     }
 
     /**

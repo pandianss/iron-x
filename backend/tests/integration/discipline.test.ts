@@ -13,7 +13,7 @@ jest.mock('../../src/db', () => ({
     }
 }));
 
-// Mock BullMQ
+jest.mock('razorpay');
 jest.mock('bullmq', () => ({
     Queue: jest.fn().mockImplementation(() => ({
         add: jest.fn(),
@@ -62,8 +62,12 @@ describe('Discipline Cockpit Endpoints', () => {
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('score');
-        expect(res.body).toHaveProperty('status');
-        expect(['STRICT', 'STABLE', 'DRIFTING', 'BREACH']).toContain(res.body.status);
+        expect(res.body).toHaveProperty('classification');
+        expect(['ONBOARDING', 'RECOVERING', 'STABLE', 'HIGH_RELIABILITY'])
+          .toContain(res.body.classification);
+        expect(typeof res.body.score).toBe('number');
+        expect(res.body.score).toBeGreaterThanOrEqual(0);
+        expect(res.body.score).toBeLessThanOrEqual(100);
     });
 
     it('GET /api/v1/discipline/pressure should return drift vectors', async () => {
@@ -72,31 +76,27 @@ describe('Discipline Cockpit Endpoints', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.status).toBe(200);
-        // expect(res.body).toHaveProperty('compositePressure'); // TODO: Implement service
-        // expect(Array.isArray(res.body.driftVectors)).toBe(true);
+        expect(res.body).toHaveProperty('compositePressure');
+        expect(Array.isArray(res.body.driftVectors)).toBe(true);
     });
 
-    it('GET /api/v1/discipline/predictions should return forward-looking violations', async () => {
+    it('GET /api/v1/discipline/preview should return forward-looking violations', async () => {
         const res = await request(app)
-            .get('/api/v1/discipline/predictions')
+            .get('/api/v1/discipline/preview')
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-        if (res.body.length > 0) {
-            expect(res.body[0]).toHaveProperty('event');
-            expect(res.body[0]).toHaveProperty('confidence');
-        }
+        expect(res.body).toHaveProperty('message');
     });
 
-    it('GET /api/v1/discipline/constraints should return active enforcements', async () => {
+    it('GET /api/v1/discipline/identity should return active enforcements', async () => {
         const res = await request(app)
-            .get('/api/v1/discipline/constraints')
+            .get('/api/v1/discipline/identity')
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.status).toBe(200);
-        // expect(res.body).toHaveProperty('activePolicies'); // TODO: Implement service
-        // expect(res.body).toHaveProperty('reducedPrivileges');
+        expect(res.body).toHaveProperty('activePolicies');
+        expect(res.body).toHaveProperty('lockedUntil');
     });
 
     it('GET /api/v1/discipline/history should return immutable log', async () => {

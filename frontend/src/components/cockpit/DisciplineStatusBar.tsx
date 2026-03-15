@@ -69,7 +69,12 @@ export function DisciplineStatusBar() {
                 <div className="flex flex-col border-l border-iron-900 pl-4">
                     <span className="text-iron-600 text-[9px] uppercase tracking-[0.3em] mb-1">Operational Tier</span>
                     <span className={`text-xl font-bold uppercase font-display tracking-tight leading-none ${getStatusColor(state.classification)}`}>
-                        {state.classification}
+                        {{
+                            'ONBOARDING': 'Building track record',
+                            'RECOVERING': 'RECOVERING',
+                            'STABLE': 'STABLE',
+                            'HIGH_RELIABILITY': 'HIGH RELIABILITY',
+                        }[state.classification] ?? state.classification}
                     </span>
                 </div>
 

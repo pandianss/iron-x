@@ -3,6 +3,7 @@ import { AuthClient } from '../domain/auth';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import GoogleSignInButton from '../components/auth/GoogleSignInButton';
 import { api } from '../domain/api';
 
 export default function RegisterPage() {
@@ -51,18 +52,18 @@ export default function RegisterPage() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-black">
             <div className="px-10 py-10 my-8 text-left bg-iron-900 border border-iron-800 shadow-2xl rounded-xl w-full max-w-md">
-                <h3 className="text-3xl font-bold text-center text-white mb-2">Initialize Personnel</h3>
-                <p className="text-iron-500 text-center text-xs uppercase tracking-widest mb-8">Access Level: NEW_ENTRY</p>
+                <h3 className="text-3xl font-bold text-center text-white mb-2">Join Iron-X</h3>
+                <p className="text-iron-500 text-center text-xs uppercase tracking-widest mb-8">Start your consistency journey today</p>
 
                 {error && <div className="text-red-400 bg-red-900/20 border border-red-900/50 p-3 rounded mb-4 text-sm text-center">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-iron-400 text-xs uppercase mb-1">Email Identifier</label>
+                            <label className="block text-iron-400 text-xs uppercase mb-1">Email Address</label>
                             <input
                                 type="email"
-                                placeholder="operator@iron-x.internal"
+                                placeholder="you@example.com"
                                 className="w-full px-4 py-3 bg-black border border-iron-800 text-white rounded-lg focus:outline-none focus:border-red-600 transition-colors"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -70,7 +71,7 @@ export default function RegisterPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-iron-400 text-xs uppercase mb-1">Security Credential</label>
+                            <label className="block text-iron-400 text-xs uppercase mb-1">Choose a Password</label>
                             <input
                                 type="password"
                                 placeholder="••••••••"
@@ -122,11 +123,18 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="flex flex-col gap-4 mt-8">
+                        <GoogleSignInButton onError={setError} />
+
+                        <div className="relative flex items-center justify-center py-2">
+                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-iron-800"></div></div>
+                            <span className="relative z-10 px-4 bg-iron-900 text-[10px] text-iron-600 uppercase font-mono tracking-widest">or</span>
+                        </div>
+
                         <button className="w-full px-6 py-3 text-white font-bold bg-red-600 rounded-lg hover:bg-red-700 active:scale-95 transition-all uppercase tracking-widest">
-                            Initialize Account
+                            Create My Account
                         </button>
                         <Link to="/login" className="text-xs text-iron-500 hover:text-white text-center transition-colors uppercase">
-                            Already Authorized? Login
+                            Already have an account? Sign In
                         </Link>
                     </div>
                 </form>

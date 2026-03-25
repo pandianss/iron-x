@@ -111,8 +111,8 @@ export default function SecuritySettingsPage() {
         <div className="min-h-screen bg-iron-950 text-iron-300 font-sans selection:bg-amber-900 selection:text-amber-100 p-8 infrastructure-bg">
             <div className="max-w-3xl mx-auto space-y-12">
                 {/* Header */}
-                <div className="space-y-4 border-l-2 border-iron-800 pl-6">
-                    <h1 className="text-5xl font-display font-black text-white tracking-tighter uppercase">Security_Protocols</h1>
+                <div className="space-y-4 border-l-2 border-iron-800 pl-4 lg:pl-6">
+                    <h1 className="text-3xl lg:text-5xl font-display font-black text-white tracking-tighter uppercase">Security_Protocols</h1>
                     <div className="flex items-center gap-4">
                         <p className="text-iron-500 font-mono text-xs uppercase tracking-widest italic">Node Protection & Access Control Management</p>
                         <div className="h-px flex-1 bg-iron-900"></div>

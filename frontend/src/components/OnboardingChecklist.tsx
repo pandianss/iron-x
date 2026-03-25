@@ -13,17 +13,17 @@ export default function OnboardingChecklist() {
     const completedCount = steps.filter(s => s.completed).length;
 
     return (
-        <div className="bg-iron-950/40 border border-iron-900 p-8 hardened-border glass-panel font-mono mb-12">
-            <div className="flex justify-between items-end mb-8">
+        <div className="bg-iron-950/40 border border-iron-900 p-4 lg:p-8 hardened-border glass-panel font-mono mb-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
                 <div>
-                    <h2 className="text-xs font-bold text-iron-500 uppercase tracking-[0.3em] mb-2">Operator Activation</h2>
-                    <div className="text-3xl font-display font-black uppercase italic tracking-tighter text-white">
+                    <h2 className="text-[10px] font-bold text-iron-500 uppercase tracking-[0.3em] mb-2">Operator Activation</h2>
+                    <div className="text-2xl lg:text-3xl font-display font-black uppercase italic tracking-tighter text-white">
                         Node Completion: {Math.round((completedCount / steps.length) * 100)}%
                     </div>
                 </div>
-                <div className="text-right hidden md:block">
-                    <div className="text-[10px] text-iron-700 uppercase tracking-widest mb-1">Status</div>
-                    <div className="text-xs text-yellow-500 uppercase font-black tracking-widest">[ PROVISIONAL NODE ]</div>
+                <div className="text-right">
+                    <div className="text-[8px] lg:text-[10px] text-iron-700 uppercase tracking-widest mb-1">Status</div>
+                    <div className="text-[10px] lg:text-xs text-yellow-500 uppercase font-black tracking-widest">[ PROVISIONAL NODE ]</div>
                 </div>
             </div>
 

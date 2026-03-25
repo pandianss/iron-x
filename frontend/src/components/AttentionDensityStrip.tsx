@@ -38,7 +38,7 @@ export default function AttentionDensityStrip() {
         <div className="bg-iron-950/40 text-iron-300 px-6 py-4 border border-iron-900 hardened-border flex flex-wrap items-center justify-between mb-8 glass-panel relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-iron-500 opacity-20"></div>
 
-            <div className="flex items-center space-x-12">
+            <div className="flex flex-wrap items-center gap-6 lg:gap-12">
                 <div className="flex items-center group">
                     <AlertCircle className="w-3.5 h-3.5 text-iron-600 mr-2 group-hover:text-amber-500 transition-colors" />
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-iron-500 mr-3">Nodes at Risk</span>

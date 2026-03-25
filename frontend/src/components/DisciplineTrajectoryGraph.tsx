@@ -53,10 +53,10 @@ export default function DisciplineTrajectoryGraph() {
     // Projection logic removed as backend doesn't provide it yet in getTrajectory
 
     return (
-        <div className="bg-iron-950/40 p-6 border border-iron-900 hardened-border mt-8 glass-panel">
-            <div className="flex justify-between items-center mb-8 border-b border-iron-900 pb-4">
+        <div className="bg-iron-950/40 p-4 lg:p-6 border border-iron-900 hardened-border mt-8 glass-panel">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 border-b border-iron-900 pb-4">
                 <h3 className="text-xs font-bold text-iron-500 uppercase tracking-[0.3em]">Operational Trajectory</h3>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     {[30, 60, 90].map(d => (
                         <button
                             key={d}

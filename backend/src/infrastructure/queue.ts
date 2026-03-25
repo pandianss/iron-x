@@ -8,6 +8,7 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://iron_redis:6379';
 export const redisConnection = new Redis(REDIS_URL, {
     maxRetriesPerRequest: null
 });
+redisConnection.on('error', (err) => console.warn('[Redis Queue] Connection Error:', err.message));
 
 export const QUEUE_NAME = 'kernel-operations';
 

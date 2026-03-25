@@ -1,9 +1,11 @@
-
-import React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
 
 function MarketingNavbar() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
     return (
         <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-iron-900 border-dashed">
             <div className="max-w-7xl mx-auto px-6">
@@ -23,15 +25,43 @@ function MarketingNavbar() {
                             <span className="text-[10px] font-mono text-iron-700 uppercase tracking-widest">Status: Operational</span>
                         </div>
                         <div className="flex items-center gap-6">
-                            <Link to="/login" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Login</Link>
-                            <Link
-                                to="/register"
-                                className="bg-white text-black hover:bg-neutral-200 px-6 py-2.5 font-bold font-display text-xs uppercase tracking-widest transition-all"
+                            <div className="hidden sm:flex items-center gap-6">
+                                <Link to="/login" className="text-neutral-500 hover:text-white text-xs font-mono uppercase tracking-widest transition-colors">Login</Link>
+                                <Link
+                                    to="/register"
+                                    className="bg-white text-black hover:bg-neutral-200 px-6 py-2.5 font-bold font-display text-xs uppercase tracking-widest transition-all"
+                                >
+                                    Initialize Node
+                                </Link>
+                            </div>
+                            {/* Mobile Toggle */}
+                            <button 
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                className="md:hidden p-2 text-iron-400 hover:text-white transition-colors"
                             >
-                                Initialize Node
-                            </Link>
+                                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            </button>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Mobile Menu Overlay */}
+            <div className={`
+                md:hidden fixed inset-0 top-20 bg-black z-40 transition-transform duration-300 ease-in-out
+                ${isMenuOpen ? 'translate-y-0' : '-translate-y-full opacity-0 pointer-events-none'}
+            `}>
+                <div className="p-8 space-y-8 flex flex-col items-center justify-center h-full">
+                    <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="text-xl font-mono uppercase tracking-widest text-white">Licensing</Link>
+                    <Link to="/roi-calculator" onClick={() => setIsMenuOpen(false)} className="text-xl font-mono uppercase tracking-widest text-white">Projection Engine</Link>
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)} className="text-xl font-mono uppercase tracking-widest text-white">Login</Link>
+                    <Link
+                        to="/register"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="w-full text-center bg-white text-black py-4 font-bold font-display uppercase tracking-widest"
+                    >
+                        Initialize Node
+                    </Link>
                 </div>
             </div>
         </nav>

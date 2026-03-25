@@ -87,7 +87,7 @@ export default function DashboardPage() {
     );
 
     return (
-        <div className="min-h-screen bg-iron-950 text-iron-300 font-mono infrastructure-bg p-8 pt-32">
+        <div className="min-h-screen bg-iron-950 text-iron-300 font-mono infrastructure-bg p-4 pt-10 lg:p-8 lg:pt-32">
             <div className="max-w-5xl mx-auto space-y-12">
                 {showQuotaBanner && subscription?.plan_tier === 'FREE' && (
                     <div className="bg-iron-950 border border-yellow-900/50 p-3 flex justify-between items-center transition-all animate-in fade-in slide-in-from-top-4">

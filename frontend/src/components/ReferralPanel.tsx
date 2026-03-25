@@ -32,7 +32,7 @@ export default function ReferralPanel() {
     if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;
 
     return (
-        <div className="bg-iron-950/20 border border-iron-900 p-8 hardened-border font-mono relative overflow-hidden">
+        <div className="bg-iron-950/20 border border-iron-900 p-4 lg:p-8 hardened-border font-mono relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-5">
                 <Gift size={80} />
             </div>

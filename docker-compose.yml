@@ -1,10 +1,12 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     restart: unless-stopped
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-iron_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-iron_password}
       POSTGRES_DB: ${POSTGRES_DB:-iron_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -19,6 +21,8 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
 
   backend:
     build:

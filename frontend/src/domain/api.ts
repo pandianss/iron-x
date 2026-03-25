@@ -14,7 +14,8 @@ export const api = axios.create({
 // Optimized token injection: Only fetch if needed, and rely on Firebase's internal caching
 api.interceptors.request.use(
     async (config) => {
-        if (config.headers.Authorization) {
+        // Check for both capitalization variants as Axios 1.x tends to normalize to lowercase
+        if (config.headers.Authorization || config.headers.authorization) {
             return config;
         }
 

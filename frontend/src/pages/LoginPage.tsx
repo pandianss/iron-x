@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import GoogleSignInButton from '../components/auth/GoogleSignInButton';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -29,7 +30,7 @@ export default function LoginPage() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-black">
             <div className="px-10 py-10 mt-4 text-left bg-iron-900 border border-iron-800 shadow-2xl rounded-xl w-full max-w-md">
-                <h3 className="text-3xl font-bold text-center text-white mb-6">Iron-X Internal</h3>
+                <h3 className="text-3xl font-bold text-center text-white mb-6">Welcome Back</h3>
                 {error && <div className="text-red-400 bg-red-900/20 border border-red-900/50 p-3 rounded mb-4 text-sm text-center">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
@@ -38,7 +39,7 @@ export default function LoginPage() {
                             <label className="block text-iron-400 text-sm mb-1" htmlFor="email">Email</label>
                             <input
                                 type="email"
-                                placeholder="terminal@iron-x.internal"
+                                placeholder="you@example.com"
                                 className="w-full px-4 py-3 bg-black border border-iron-800 text-white rounded-lg focus:outline-none focus:border-red-600 transition-colors"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -59,11 +60,18 @@ export default function LoginPage() {
                     </>
 
                     <div className="flex flex-col gap-4 mt-8">
+                        <GoogleSignInButton onError={setError} />
+                        
+                        <div className="relative flex items-center justify-center py-2">
+                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-iron-800"></div></div>
+                            <span className="relative z-10 px-4 bg-iron-900 text-[10px] text-iron-600 uppercase font-mono tracking-widest">or</span>
+                        </div>
+
                         <button className="w-full px-6 py-3 text-white font-bold bg-red-600 rounded-lg hover:bg-red-700 active:scale-95 transition-all uppercase tracking-widest">
-                            Authorize
+                            Sign In
                         </button>
                         <Link to="/register" className="text-xs text-iron-500 hover:text-white text-center transition-colors uppercase">
-                            New User? Register Access
+                            New here? Create an account
                         </Link>
                     </div>
                 </form>

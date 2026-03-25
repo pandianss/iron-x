@@ -22,9 +22,9 @@ export default function CockpitPage() {
             </div>
 
             {/* Main Content Area - Grid Layout for Single Screen */}
-            <div className="flex-1 grid grid-cols-12 grid-rows-6 gap-4 p-4 min-h-0 relative">
+            <div className="flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:grid-rows-6 gap-4 p-4 pt-10 lg:pt-4 min-h-0 relative overflow-y-auto lg:overflow-hidden">
                 {/* 2. Pressure & Drift Panel */}
-                <div className="col-span-8 row-span-4 flex flex-col min-h-0 overflow-hidden relative group">
+                <div className="lg:col-span-8 lg:row-span-4 flex flex-col min-h-[400px] lg:min-h-0 overflow-hidden relative group">
                     <div className="absolute top-0 right-0 p-1">
                         <div className="w-2 h-2 bg-amber-500 rounded-full animate-ping opacity-75"></div>
                     </div>
@@ -32,22 +32,22 @@ export default function CockpitPage() {
                 </div>
 
                 {/* 3. Active Controls & Constraints */}
-                <div className="col-span-4 row-span-2 flex flex-col min-h-0 overflow-hidden">
+                <div className="lg:col-span-4 lg:row-span-2 flex flex-col min-h-[200px] lg:min-h-0 overflow-hidden">
                     <ActiveControlsPanel />
                 </div>
 
                 {/* 4. Violation Horizon */}
-                <div className="col-span-4 row-span-2 flex flex-col min-h-0 overflow-hidden">
+                <div className="lg:col-span-4 lg:row-span-2 flex flex-col min-h-[200px] lg:min-h-0 overflow-hidden">
                     <ViolationHorizon />
                 </div>
 
                 {/* 5. Strategy Sandbox */}
-                <div className="col-span-4 row-span-2 flex flex-col min-h-0 overflow-hidden">
+                <div className="lg:col-span-4 lg:row-span-2 flex flex-col min-h-[200px] lg:min-h-0 overflow-hidden">
                     <StrategySandbox />
                 </div>
 
                 {/* 6. Performance Panel */}
-                <div className="col-span-8 row-span-2 flex flex-col min-h-0 overflow-hidden">
+                <div className="lg:col-span-8 lg:row-span-2 flex flex-col min-h-[300px] lg:min-h-0 overflow-hidden">
                     <PerformancePanel />
                 </div>
             </div>

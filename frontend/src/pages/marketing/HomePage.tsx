@@ -12,29 +12,29 @@ const HomePage = () => {
                 <div className="absolute inset-0 bg-gradient-to-b from-iron-900/10 via-transparent to-black pointer-events-none" />
                 <div className="relative z-10 max-w-5xl mx-auto">
                     <div className="inline-block mb-8 px-4 py-1.5 border border-iron-800 bg-iron-950/50 backdrop-blur-sm rounded-sm">
-                        <span className="text-xs font-mono tracking-[0.3em] text-iron-500 uppercase">Status: Operational // System: Structural_Enforcement</span>
+                        <span className="text-xs font-mono tracking-[0.3em] text-iron-500 uppercase">Status: Active // Mode: Growth_Support</span>
                     </div>
                     <h1 className="text-6xl md:text-8xl font-bold tracking-tighter mb-8 font-display uppercase leading-[0.9]">
-                        Structural <br />
+                        Unshakeable <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-iron-500 via-white to-iron-400">
-                            Enforcement
+                            Consistency
                         </span>
                     </h1>
                     <p className="text-xl md:text-2xl text-neutral-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed font-mono">
-                        Iron-X replaces habit tracking with automated system lockouts. Stop negotiating with drift. Enforce your operating protocols.
+                        Iron-X turns your goals into non-negotiable habits. Break the cycle of procrastination and build a lifestyle you're proud of.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                         <Link
                             to="/register"
                             className="group relative bg-white text-black px-12 py-5 rounded-sm font-bold hover:bg-neutral-200 transition-all w-full sm:w-auto overflow-hidden font-display text-lg uppercase tracking-wider"
                         >
-                            <span className="relative z-10">Initialize_Lockdown_Protocol</span>
+                            <span className="relative z-10">Start_Your_Journey</span>
                         </Link>
                         <a
                             href="#capabilities"
                             className="px-12 py-5 rounded-sm font-bold text-white border border-iron-800 hover:bg-iron-900/50 transition-all w-full sm:w-auto font-display text-lg uppercase tracking-wider bg-iron-950/20 backdrop-blur-sm"
                         >
-                            Review_Capabilities
+                            Explore_Benefits
                         </a>
                     </div>
                 </div>
@@ -44,11 +44,11 @@ const HomePage = () => {
             <section className="py-32 px-6 bg-black border-y border-iron-900 relative">
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-bold text-white font-display uppercase tracking-widest mb-8">
-                        WILLPOWER IS A VULNERABILITY. <br />
-                        <span className="text-iron-500 italic lowercase tracking-tight">Iron-X bars the door when you drift.</span>
+                        WILLPOWER IS LIMITED. <br />
+                        <span className="text-iron-500 italic lowercase tracking-tight">Iron-X supports you when you stumble.</span>
                     </h2>
                     <p className="text-lg text-neutral-500 mb-16 font-mono leading-relaxed max-w-2xl mx-auto">
-                        Capability loss is the only true deterrent for behavior drift. Iron-X doesn't send notifications; it revokes your access to the execution environment when policy thresholds are breached.
+                        Real change comes from removing the option to fail. Iron-X doesn't just nudge you; it creates a focused environment where your best intentions win.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
@@ -93,26 +93,26 @@ const HomePage = () => {
                         <div className="space-y-24">
                             <MechanismStep
                                 number="01"
-                                title="Automated Lockdown"
-                                desc="Total interface occlusion and route blocking when Discipline Scores drop below the 'Policy Ground' threshold. Access is denied until the lockout duration expires."
+                                title="Focused Environment"
+                                desc="Avoid distractions and stay on track. When you drift from your goals, Iron-X gently redirects your focus by limiting access to non-essential apps until your next scheduled window."
                                 side="left"
                             />
                             <MechanismStep
                                 number="02"
-                                title="Protocol MFA"
-                                desc="High-governance configuration changes and lockout overrides (where enabled) require dual-gate TOTP pulse verification. Security is not negotiable."
+                                title="Secure Boundaries"
+                                desc="Protect your most important habits with extra security. High-priority changes require a quick verification to ensure you're sticking to your long-term plan, not just reacting in the moment."
                                 side="right"
                             />
                             <MechanismStep
                                 number="03"
-                                title="Drift Prediction"
-                                desc="Real-time modeling of execution lag and commitment variance. Visual pressure markers appear in the Cockpit before intervention triggers."
+                                title="Growth Insights"
+                                desc="Understand your progress with real-time feedback. Visual indicators help you see when you're starting to slip before it becomes a problem, giving you the chance to adjust early."
                                 side="left"
                             />
                             <MechanismStep
                                 number="04"
-                                title="Capability Restoration"
-                                desc="Access is only re-granted following verified compliance with recovery protocols. Motivation is ignored; only execution logs are valid."
+                                title="Earning Progress"
+                                desc="Full access is regained as you demonstrate consistency. We focus on your actions and results, building a sustainable path to your goals one step at a time."
                                 side="right"
                             />
                         </div>
@@ -137,23 +137,23 @@ const HomePage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-iron-900 border border-iron-900 overflow-hidden">
                         <SignalBlock
                             id="01"
-                            title="Lockout Convergence"
-                            desc="Average lockout duration per node decreases by 40% as operators align with policy limits."
+                            title="Habit Strength"
+                            desc="Users see a 40% increase in consistency as they align their daily actions with their long-term goals."
                         />
                         <SignalBlock
                             id="02"
-                            title="Protocol Compliance"
-                            desc="MFA-mandated actions experience near-zero breach rates due to hard gate verification."
+                            title="Safe Progress"
+                            desc="Extra verification steps ensure that your most important routines are never broken by short-term impulses."
                         />
                         <SignalBlock
                             id="03"
-                            title="Variance Suppression"
-                            desc="Behavioral noise and 'procrastination loops' are structurally eliminated through capability revocation."
+                            title="Zero Procrastination"
+                            desc="Eliminate the friction of choice. Our system helps you move directly from intention to action without the usual delays."
                         />
                         <SignalBlock
                             id="04"
-                            title="Execution Stabilization"
-                            desc="Node execution metrics show immediate stabilization following initial policy hardening."
+                            title="Sustainable Growth"
+                            desc="Watch your progress stabilize and grow as you build a foundation of unshakeable daily habits."
                         />
                     </div>
                 </div>
@@ -163,8 +163,8 @@ const HomePage = () => {
             <section className="py-40 px-6 bg-neutral-950 flex justify-center">
                 <div className="max-w-4xl w-full">
                     <div className="mb-16">
-                        <h2 className="text-4xl font-bold text-white font-display uppercase mb-4">Initialize Your Discipline Profile</h2>
-                        <p className="text-neutral-500 font-mono">Align system constraints with your tolerance for enforcement.</p>
+                        <h2 className="text-4xl font-bold text-white font-display uppercase mb-4">Set Your Consistency Goals</h2>
+                        <p className="text-neutral-500 font-mono">Tailor your habits to your personal goals.</p>
                     </div>
                     <InitializationModule />
                 </div>
@@ -181,26 +181,26 @@ const HomePage = () => {
                     <div className="space-y-4">
                         <ArchitectureLayer
                             id="04"
-                            name="Outcome Layer"
-                            desc="Measured stabilization across time cycles. Feedback loop for policy refinement."
+                            name="Reflection Layer"
+                            desc="Visualize your growth over time. Use your history to refine your future goals."
                             icon={<Target className="w-5 h-5" />}
                         />
                         <ArchitectureLayer
                             id="03"
-                            name="Enforcement Layer"
-                            desc="Automated constraints applied when drift exceeds policy limits. No manual intervention."
+                            name="Support Layer"
+                            desc="Automatic boundaries provide the space you need to focus when willpower is low."
                             icon={<Lock className="w-5 h-5" />}
                         />
                         <ArchitectureLayer
                             id="02"
-                            name="Policy Layer"
-                            desc="Rules that describe acceptable deviation thresholds and trigger conditions."
+                            name="Goal Layer"
+                            desc="Define what matters most. Set clear targets for your consistency and growth."
                             icon={<FileText className="w-5 h-5" />}
                         />
                         <ArchitectureLayer
                             id="01"
                             name="Identity Layer"
-                            desc="Defines the operator, not the user. Establishes declared intent and baseline parameters."
+                            desc="Connect with your future self. Establish your vision and baseline for success."
                             icon={<Users className="w-5 h-5" />}
                         />
                     </div>
@@ -218,8 +218,8 @@ const HomePage = () => {
             <section className="py-40 px-6 bg-neutral-950">
                 <div className="max-w-6xl mx-auto">
                     <div className="mb-24 text-center">
-                        <h2 className="text-5xl md:text-6xl font-bold text-white font-display uppercase mb-6">Governance Projection Engine</h2>
-                        <p className="text-xl text-neutral-500 font-mono">Model the impact of enforced discipline parameters on your operational baseline.</p>
+                        <h2 className="text-5xl md:text-6xl font-bold text-white font-display uppercase mb-6">Results Calculator</h2>
+                        <p className="text-xl text-neutral-500 font-mono">See how even small daily wins add up to massive results over time.</p>
                     </div>
                     <GovernanceProjectionEngine />
                 </div>
@@ -228,15 +228,15 @@ const HomePage = () => {
             {/* 8. SYSTEM PHILOSOPHY */}
             <section className="py-40 px-6 bg-black">
                 <div className="max-w-4xl mx-auto">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white font-display uppercase mb-12 italic">CHARACTER IS VOLATILE. <br /><span className="text-iron-500">GOVERNANCE IS CONSTANT.</span></h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white font-display uppercase mb-12 italic">CHOICE IS LIMITED. <br /><span className="text-iron-500">SYSTEMS ARE PERMANENT.</span></h2>
 
                     <div className="space-y-8 text-lg text-neutral-400 font-light leading-relaxed">
-                        <p className="font-mono text-sm uppercase tracking-widest text-iron-600 mb-4">// Intent: Structural Behavioral Correction</p>
+                        <p className="font-mono text-sm uppercase tracking-widest text-iron-600 mb-4">// Purpose: Building Better Habits</p>
                         <p>
-                            Iron-X does not "help" you. It governs you. It assumes that you, the Operator, have an intent that your biological self often fails to execute.
+                            Iron-X is your partner in growth. It helps you stick to your intentions when willpower runs low.
                         </p>
                         <p>
-                            By delegating the authority to restrict your own access to a machine-governed engine, you remove the 'Negotiation Gap' where procrastination occurs.
+                            By building a system that guards your time, you remove the 'Decision Fatigue' where procrastination takes root.
                         </p>
                         <div className="p-8 border-l-2 border-iron-800 bg-iron-950/20 my-12">
                             <p className="text-white font-display uppercase tracking-widest text-2xl">
@@ -367,7 +367,7 @@ function InitializationModule() {
                         className={`flex-1 py-4 text-center text-[10px] font-mono uppercase tracking-[0.2em] transition-colors
                             ${step === i ? 'bg-iron-900 text-white' : 'text-iron-600'}`}
                     >
-                        Step {String(i).padStart(2, '0')} // {i === 1 ? 'Preference' : i === 2 ? 'Tolerance' : 'Axis'}
+                        Step {String(i).padStart(2, '0')} // {i === 1 ? 'Habits' : i === 2 ? 'Goals' : 'Vision'}
                     </div>
                 ))}
             </div>
@@ -376,31 +376,31 @@ function InitializationModule() {
             <div className="flex-grow p-12 overflow-y-auto">
                 {step === 1 && (
                     <div className="space-y-8 animate-in fade-in duration-500">
-                        <label className="text-xs font-mono text-iron-400 uppercase tracking-widest block mb-10">Enforcement Preference</label>
+                        <label className="text-xs font-mono text-iron-400 uppercase tracking-widest block mb-10">Goal Intensity</label>
                         <div className="space-y-4">
-                            <ConfigOption title="Soft Guardrails" desc="Notifications, logging, minimal friction" />
-                            <ConfigOption title="Structured Constraint" desc="App blocking, scheduled lockouts" active />
-                            <ConfigOption title="Hard Enforcement" desc="System-level restrictions, no override paths" />
+                            <ConfigOption title="Gentle Reminders" desc="Stay aware with helpful notifications" />
+                            <ConfigOption title="Focus Mode" desc="Briefly limit distractions during work" active />
+                            <ConfigOption title="Deep Commitment" desc="Strict boundaries for maximum results" />
                         </div>
                     </div>
                 )}
                 {step === 2 && (
                     <div className="space-y-8 animate-in fade-in duration-500">
-                        <label className="text-xs font-mono text-iron-400 uppercase tracking-widest block mb-10">Drift Tolerance</label>
+                        <label className="text-xs font-mono text-iron-400 uppercase tracking-widest block mb-10">Flexibility</label>
                         <div className="space-y-4">
-                            <ConfigOption title="Low Variance" desc="5–10% deviation acceptable" />
-                            <ConfigOption title="Moderate Variance" desc="10–20% deviation acceptable" active />
-                            <ConfigOption title="Strict Zero-Drift" desc="Immediate intervention on deviation" />
+                            <ConfigOption title="High Consistency" desc="Stay on track 90% of the time" />
+                            <ConfigOption title="Balanced Approach" desc="Allow for some flexibility" active />
+                            <ConfigOption title="Absolute Focus" desc="Zero tolerance for distractions" />
                         </div>
                     </div>
                 )}
                 {step === 3 && (
                     <div className="space-y-8 animate-in fade-in duration-500">
-                        <label className="text-xs font-mono text-iron-400 uppercase tracking-widest block mb-10">Primary Outcome Axis</label>
+                        <label className="text-xs font-mono text-iron-400 uppercase tracking-widest block mb-10">Main Focus Area</label>
                         <div className="space-y-4">
-                            <ConfigOption title="Execution Consistency" desc="Minimize behavioral variance" active />
-                            <ConfigOption title="Cognitive Clarity" desc="Reduce decision loops" />
-                            <ConfigOption title="Time Protection" desc="Defend declared work windows" />
+                            <ConfigOption title="Daily Habits" desc="Build consistency every day" active />
+                            <ConfigOption title="Peace of Mind" desc="Reduce stress and overthinking" />
+                            <ConfigOption title="Work-Life Balance" desc="Protect your personal time" />
                         </div>
                     </div>
                 )}
@@ -461,7 +461,7 @@ function GovernanceProjectionEngine() {
                 <div className="space-y-12">
                     <div className="space-y-4">
                         <label className="text-xs font-mono text-iron-400 uppercase tracking-widest flex justify-between">
-                            Weekly Drift Hours <span>{drift}h</span>
+                            Weekly Procrastination (Hours) <span>{drift}h</span>
                         </label>
                         <input
                             type="range"
@@ -497,8 +497,8 @@ function GovernanceProjectionEngine() {
                         <div className="w-6 h-2 border border-iron-700 rounded-full" />
                         <div className="w-6 h-2 border border-iron-700 rounded-full bg-iron-800" />
                     </div>
-                    <span className="text-xs font-mono text-iron-500 uppercase tracking-[0.4em] mb-10">Output: Projected Stabilization</span>
-                    <div className="text-7xl font-bold text-white font-display uppercase mb-4 tabular-nums">-{Math.round(drift * 0.85)}h</div>
+                    <span className="text-xs font-mono text-iron-500 uppercase tracking-[0.4em] mb-10">Output: Potential Time Saved</span>
+                    <div className="text-7xl font-bold text-white font-display uppercase mb-4 tabular-nums">{Math.round(drift * 0.85)}h</div>
                     <p className="text-xs font-mono text-iron-400 uppercase tracking-widest">Reduction in weekly variance</p>
                     <div className="mt-12 flex items-center gap-4 text-xs font-mono text-iron-700 bg-black/50 px-4 py-2 border border-iron-900">
                         <AlertCircle className="w-3 h-3 text-iron-600" />

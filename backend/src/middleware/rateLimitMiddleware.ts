@@ -3,6 +3,7 @@ import RedisStore from 'rate-limit-redis';
 import Redis from 'ioredis';
 
 const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+redisClient.on('error', (err) => console.warn('[Redis] Connection Error:', err.message));
 
 // Helper to create a new store instance with a unique prefix
 const createStore = (prefix: string) => new RedisStore({
@@ -25,6 +26,7 @@ export const authLimiter = rateLimit({
     legacyHeaders: false,
     skipSuccessfulRequests: true,
     keyGenerator: (req) => req.ip || 'unknown',
+    validate: false,
 });
 
 export const apiLimiter = rateLimit({
@@ -35,6 +37,7 @@ export const apiLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: (req) => req.ip || 'unknown',
+    validate: false,
 });
 
 // Tighter limiter for public developer API (key-authenticated, higher abuse potential)
@@ -56,6 +59,7 @@ export const logExecutionLimiter = rateLimit({
     message: { error: 'Logging rate limit exceeded' },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: false,
 });
 
 export const billingWebhookLimiter = rateLimit({
@@ -65,6 +69,7 @@ export const billingWebhookLimiter = rateLimit({
     message: { error: 'Webhook rate limit exceeded' },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: false,
 });
 
 export const adminLimiter = rateLimit({
@@ -74,4 +79,5 @@ export const adminLimiter = rateLimit({
     message: { error: 'Admin API rate limit exceeded' },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: false,
 });

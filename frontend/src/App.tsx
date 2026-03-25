@@ -21,6 +21,7 @@ import {
     CompliancePage,
     ApiKeysPage,
 } from './routers/AppRouter';
+import { AppLayout } from './components/layout/AppLayout';
 
 const basename = import.meta.env.VITE_APP_BASENAME || '/';
 
@@ -60,19 +61,21 @@ function App() {
 
                             {/* Protected app routes */}
                             <Route element={<ProtectedRoute />}>
-                                <Route path="/dashboard" element={<DashboardPage />} />
-                                <Route path="/cockpit" element={<CockpitPage />} />
-                                <Route path="/goals" element={<GoalsPage />} />
-                                <Route path="/actions" element={<ActionsPage />} />
-                                <Route path="/security" element={<SecuritySettingsPage />} />
-                                <Route path="/org/:slug" element={<OrganizationDashboardPage />} />
-                                <Route path="/billing" element={<BillingPortalPage />} />
-                                <Route path="/witness" element={<WitnessPage />} />
-                                <Route path="/drift-report" element={<DriftReportPage />} />
-                                <Route path="/coach" element={<CoachDashboardPage />} />
-                                <Route path="/coach/setup" element={<CoachSetupPage />} />
-                                <Route path="/compliance" element={<CompliancePage />} />
-                                <Route path="/developer" element={<ApiKeysPage />} />
+                                <Route element={<AppLayout />}>
+                                    <Route path="/dashboard" element={<DashboardPage />} />
+                                    <Route path="/cockpit" element={<CockpitPage />} />
+                                    <Route path="/goals" element={<GoalsPage />} />
+                                    <Route path="/actions" element={<ActionsPage />} />
+                                    <Route path="/security" element={<SecuritySettingsPage />} />
+                                    <Route path="/org/:slug" element={<OrganizationDashboardPage />} />
+                                    <Route path="/billing" element={<BillingPortalPage />} />
+                                    <Route path="/witness" element={<WitnessPage />} />
+                                    <Route path="/drift-report" element={<DriftReportPage />} />
+                                    <Route path="/coach" element={<CoachDashboardPage />} />
+                                    <Route path="/coach/setup" element={<CoachSetupPage />} />
+                                    <Route path="/compliance" element={<CompliancePage />} />
+                                    <Route path="/developer" element={<ApiKeysPage />} />
+                                </Route>
                                 <Route path="/lockout" element={
                                     <div className="min-h-screen flex items-center justify-center bg-black text-white p-8">
                                         <div className="max-w-md text-center border border-red-900 bg-red-950/20 p-8 rounded-2xl">

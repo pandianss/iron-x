@@ -101,11 +101,11 @@ const DisciplineIdentityCard: React.FC = () => {
                 <div className="flex items-end gap-4 mb-6">
                     <div>
                         {data.classification === 'ONBOARDING' ? (
-                            <div className="text-3xl font-bold text-iron-500 italic">
+                            <div className="text-2xl lg:text-3xl font-bold text-iron-500 italic">
                                 INITIALIZING
                             </div>
                         ) : (
-                            <div className={`text-5xl font-bold ${getScoreColor(data.score)}`}>
+                            <div className={`text-3xl lg:text-5xl font-bold ${getScoreColor(data.score)}`}>
                                 {data.score.toFixed(1)}
                             </div>
                         )}
@@ -117,7 +117,7 @@ const DisciplineIdentityCard: React.FC = () => {
                 </div>
 
                 {/* Metrics Grid */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="bg-iron-50 p-3 rounded border border-iron-100">
                         <div className="flex items-center gap-2 mb-1">
                             <TrendingUp className="w-4 h-4 text-iron-400" />

@@ -170,8 +170,8 @@ v1Router.use('/api-keys', apiKeyRoutes);
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', publicProfileRoutes);
-app.use('/api/v1', publicApiRoutes);
 app.use('/api/v1', v1Router);
+app.use('/api/v1', publicApiRoutes);
 
 // Stripe routes (can be outside v1Router if they have a different base path or specific middleware needs)
 app.use('/api/v1/billing', billingWebhookLimiter, stripeRoutes);
